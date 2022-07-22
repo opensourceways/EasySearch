@@ -10,5 +10,5 @@ scheduled:
   cron: 0 31 11 ? * *
 
 #openEuler    openGauss    openLookeng    mindSpore
-system: ${searchsystem}
+system: ${searchsystem:openEuler}
 docsversion: 20

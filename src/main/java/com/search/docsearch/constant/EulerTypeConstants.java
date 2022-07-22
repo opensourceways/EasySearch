@@ -9,6 +9,7 @@ public class EulerTypeConstants {
     public static final String DOCS = "docs";
     public static final String NEWS = "news";
     public static final String OTHER = "other";
+    public static final String SHOWCASE = "showcase";
 
     public static final String MAPPINGPATH = "/EaseSearch/target/classes/mapping/openEuler/mapping.json";
 

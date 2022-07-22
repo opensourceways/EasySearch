@@ -13,6 +13,11 @@ cp -r /usr/local/docs/source/website-v2/web-ui/docs/zh/* /usr/local/docs/target/
 mkdir -p /usr/local/docs/target/en/
 cp -r /usr/local/docs/source/website-v2/web-ui/docs/en/* /usr/local/docs/target/en/
 
+# shellcheck disable=SC2164
+cd /usr/local/docs/source/openEuler-portal
+git pull
+cp -r /usr/local/docs/source/openEuler-portal/app/zh/showcase /usr/local/docs/target/zh/
+
 
 # shellcheck disable=SC2164
 cd /usr/local/docs/source/docs

@@ -17,6 +17,9 @@ cp -r /usr/local/docs/source/website-v2/web-ui/docs/zh/* /usr/local/docs/target/
 mkdir -p /usr/local/docs/target/en/
 cp -r /usr/local/docs/source/website-v2/web-ui/docs/en/* /usr/local/docs/target/en/
 
+git clone https://gitee.com/openeuler/openEuler-portal.git
+cp -r /usr/local/docs/source/openEuler-portal/app/zh/showcase /usr/local/docs/target/zh/
+
 git clone https://gitee.com/openeuler/docs.git
 
 # shellcheck disable=SC2164

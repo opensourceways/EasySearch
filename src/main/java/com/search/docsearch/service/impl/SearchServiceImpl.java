@@ -151,10 +151,12 @@ public class SearchServiceImpl implements SearchService {
             boolQueryBuilder.filter(QueryBuilders.termQuery("type", condition.getType()));
         }
 
-//        MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("title", condition.getKeyword());
-//        titleMP.boost(2);
-//        MatchPhraseQueryBuilder textContentMP = QueryBuilders.matchPhraseQuery("textContent", condition.getKeyword());
-//        textContentMP.boost(1);
+        MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", condition.getKeyword());
+        ptitleMP.boost(200);
+        MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", condition.getKeyword());
+        ptitleMP.boost(100);
+
+        boolQueryBuilder.should(ptitleMP).should(ptitleMP);
 
         MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", condition.getKeyword());
         titleMP.boost(2);

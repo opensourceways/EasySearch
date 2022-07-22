@@ -22,7 +22,7 @@ public class EulerParse {
     public static Map<String, Object> parseMD(String lang, String type, File mdFile) throws Exception {
         Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put("lang", lang);
-        if (!EulerTypeConstants.DOCS.equals(type) && !EulerTypeConstants.BLOGS.equals(type) && !EulerTypeConstants.NEWS.equals(type)) {
+        if (!EulerTypeConstants.DOCS.equals(type) && !EulerTypeConstants.BLOGS.equals(type) && !EulerTypeConstants.NEWS.equals(type) && !EulerTypeConstants.SHOWCASE.equals(type)) {
             type = EulerTypeConstants.OTHER;
         }
 
