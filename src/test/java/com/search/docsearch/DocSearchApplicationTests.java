@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SpringBootTest
 class DocSearchApplicationTests {
@@ -54,30 +56,23 @@ class DocSearchApplicationTests {
 
 
 
-	@Test
-	void testPa() throws IOException {
-		File mdFile = FileUtils.getFile("C:\\CYDev\\workspace\\eulerdoc\\website-v2\\web-ui\\docs\\zh\\interaction\\post-blog\\README.md");
-		String fileContent = FileUtils.readFileToString(mdFile, StandardCharsets.UTF_8);
-
-		Parser parser = Parser.builder().build();
-		HtmlRenderer renderer = HtmlRenderer.builder().build();
-
-		Node document = parser.parse(fileContent);
-
-		Document node = Jsoup.parse(renderer.render(document));
-		Elements tags = node.getElementsByTag("h2");
-		System.out.println(node);
-
-		String r = "";
-		if (tags.size() > 0) {
-			Element tag = tags.first();
-			r = tag.text();
-			tag.remove();
-		}
-//		System.out.println(r);
-//		System.out.println(EuleGetValue(r, "title"));
-
-	}
+//	@Test
+//	void testPa() throws IOException {
+//		File mdFile = FileUtils.getFile("");
+//		String fileContent = FileUtils.readFileToString(mdFile, StandardCharsets.UTF_8);
+//
+//		Parser parser = Parser.builder().build();
+//		HtmlRenderer renderer = HtmlRenderer.builder().build();
+//
+//		Node document = parser.parse(fileContent);
+//
+//		Document node = Jsoup.parse(renderer.render(document));
+//		System.out.println(node);
+//		Element tags = node.getElementsByTag("hr").first().nextElementSibling();
+//		String r = "";
+//		System.out.println(tags);
+//
+//	}
 
 
 
