@@ -84,7 +84,7 @@ public class SearchServiceImpl implements SearchService {
         }
         log.info("开始更新es文档");
         String lang = "";
-        String type = "";
+        String deleteType = "";
         File[] typeDir;
         File[] languageDir = indexFile.listFiles();
         assert languageDir != null;
@@ -95,13 +95,13 @@ public class SearchServiceImpl implements SearchService {
             for (File typeFile : typeDir) {
                 if (typeFile.isDirectory()) {
                     BulkRequest bulkRequest = new BulkRequest();
-                    type = typeFile.getName();
+                    deleteType = typeFile.getName();
 
                     Collection<File> listFiles = FileUtils.listFiles(typeFile, new String[]{"md"}, true);
                     for (File mdFile : listFiles) {
                         if (!mdFile.getName().startsWith("_")) {
                             try {
-                                Map<String, Object> map = EulerParse.parseMD(lang, type, mdFile);
+                                Map<String, Object> map = EulerParse.parseMD(lang, deleteType, mdFile);
                                 if (map != null) {
                                     IndexRequest indexRequest = new IndexRequest(s.index).id(IdUtil.getId()).source(map);
                                     bulkRequest.add(indexRequest);
@@ -117,13 +117,13 @@ public class SearchServiceImpl implements SearchService {
                     DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(s.index);
                     BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
                     boolQueryBuilder.must(new TermQueryBuilder("lang", lang));
-                    boolQueryBuilder.must(new TermQueryBuilder("type", type));
+                    boolQueryBuilder.must(new TermQueryBuilder("type", deleteType));
                     deleteByQueryRequest.setQuery(boolQueryBuilder);
                     restHighLevelClient.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
 
                     if (bulkRequest.requests().size() > 0) {
                         restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-                        log.info(lang + "/" + type + "更新成功");
+                        log.info(lang + "/" + deleteType + "更新成功");
                     }
 
                 }
@@ -163,6 +163,7 @@ public class SearchServiceImpl implements SearchService {
         MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", condition.getKeyword());
         textContentMP.boost(1);
         boolQueryBuilder.should(titleMP).should(textContentMP);
+
         boolQueryBuilder.minimumShouldMatch(1);
 
         sourceBuilder.query(boolQueryBuilder);
@@ -208,7 +209,7 @@ public class SearchServiceImpl implements SearchService {
 
         List<Map<String, Object>> numberList = new ArrayList<>();
         Map<String, Object> numberMap = new HashMap<>();
-        numberMap.put("count", response.getHits().getTotalHits().value);
+        numberMap.put("doc_count", response.getHits().getTotalHits().value);
         numberMap.put("key", "all");
         numberList.add(numberMap);
         ParsedTerms aggregation = response.getAggregations().get("data");
@@ -216,14 +217,14 @@ public class SearchServiceImpl implements SearchService {
         for (Terms.Bucket bucket : buckets) {
             Map<String, Object> countMap = new HashMap<>();
             countMap.put("key", bucket.getKeyAsString());
-            countMap.put("count", bucket.getDocCount());
+            countMap.put("doc_count", bucket.getDocCount());
             numberList.add(countMap);
         }
         Map<String, Object> result = new HashMap<>();
         result.put("page", condition.getPage());
         result.put("pageSize", condition.getPageSize());
         result.put("records", data);
-        result.put("totalNum", numberList);
+        result.put("total", numberList);
         return result;
     }
 
