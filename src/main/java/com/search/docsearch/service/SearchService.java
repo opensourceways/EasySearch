@@ -3,6 +3,7 @@ package com.search.docsearch.service;
 import com.search.docsearch.entity.vo.SearchCondition;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public interface SearchService {
@@ -24,4 +25,7 @@ public interface SearchService {
      * @throws IOException
      */
     Map<String, Object> searchByCondition(SearchCondition condition) throws IOException;
+
+
+
 }

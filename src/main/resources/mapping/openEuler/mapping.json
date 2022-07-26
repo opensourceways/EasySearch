@@ -36,6 +36,9 @@
     "type": {
       "type": "keyword"
     },
+    "deleteType": {
+      "type": "keyword"
+    },
     "version": {
       "type": "keyword"
     }
