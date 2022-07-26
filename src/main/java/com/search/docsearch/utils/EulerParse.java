@@ -19,30 +19,37 @@ import java.util.Map;
 public class EulerParse {
 
 
-    public static Map<String, Object> parseMD(String lang, String type, File mdFile) throws Exception {
-        Map<String, Object> jsonMap = new HashMap<>();
-        jsonMap.put("lang", lang);
-        if (!EulerTypeConstants.DOCS.equals(type) && !EulerTypeConstants.BLOGS.equals(type) && !EulerTypeConstants.NEWS.equals(type) && !EulerTypeConstants.SHOWCASE.equals(type)) {
-            type = EulerTypeConstants.OTHER;
-        }
-
-        jsonMap.put("type", type);
-//        jsonMap.put("id", IdUtil.getId());
-        jsonMap.put("articleName", mdFile.getName());
-
+    public static Map<String, Object> parseMD(String lang, String deleteType, File mdFile) throws Exception {
+        String type = deleteType;
+        String fileName = mdFile.getName();
         String path = mdFile.getPath()
                 .replace("\\", "/")
                 .replace(EulerTypeConstants.BASEPATH + lang + "/", "")
                 .replace("\\\\", "/")
                 .replace(".md", "");
+        if (!EulerTypeConstants.DOCS.equals(deleteType) && !EulerTypeConstants.BLOGS.equals(deleteType) && !EulerTypeConstants.NEWS.equals(deleteType) && !EulerTypeConstants.SHOWCASE.equals(deleteType)) {
+            type = EulerTypeConstants.OTHER;
+            if(!fileName.equals("README.md")) {
+                return null;
+            }
+            path = path.replace("README", "");
+        }
+
+
+        Map<String, Object> jsonMap = new HashMap<>();
+        jsonMap.put("lang", lang);
+        jsonMap.put("deleteType", deleteType);
+
+
+
+        jsonMap.put("type", type);
+        jsonMap.put("articleName", fileName);
+
+
 
         jsonMap.put("path", path);
 
         String fileContent = FileUtils.readFileToString(mdFile, StandardCharsets.UTF_8);
-
-        if (fileContent.length() < 100) {
-            return null;
-        }
 
 
         Parser parser = Parser.builder().build();
@@ -71,21 +78,31 @@ public class EulerParse {
 
             jsonMap.put("version", version);
         } else {
-            Elements tags = node.getElementsByTag("h2");
             String r = "";
-            if (tags.size() > 0) {
-                Element tag = tags.first();
-                r = tag.text();
-                tag.remove();
+            Element tag = node.getElementsByTag("hr").first();
+            if (tag != null) {
+                Element t = tag.nextElementSibling();
+                r = t.text();
+                t.remove();
                 jsonMap.put("textContent", node.text());
             }
-            jsonMap.put("title", EuleGetValue(r, "title"));
+
+            if (EulerTypeConstants.SHOWCASE.equals(type)) {
+                jsonMap.put("title", EulerGetValue(r, "company"));
+                jsonMap.put("industry", EulerGetValue(r, "industry"));
+                jsonMap.put("company", EulerGetValue(r, "company"));
+                jsonMap.put("summary", EulerGetValue(r, "summary"));
+                jsonMap.put("img", EulerGetValue(r, "img"));
+            } else {
+                jsonMap.put("title", EulerGetValue(r, "title"));
+            }
         }
+
         return jsonMap;
     }
 
 
-    public static String EuleGetValue(String r, String t) {
+    public static String EulerGetValue(String r, String t) {
         if (!r.contains(t)) {
             return "";
         }
