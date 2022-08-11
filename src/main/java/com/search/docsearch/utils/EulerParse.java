@@ -1,6 +1,6 @@
 package com.search.docsearch.utils;
 
-import com.search.docsearch.constant.EulerTypeConstants;
+import com.search.docsearch.constant.Constants;
 
 import org.apache.commons.io.FileUtils;
 import org.commonmark.node.Node;
@@ -9,7 +9,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.springframework.util.StringUtils;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -18,17 +19,23 @@ import java.util.Map;
 
 public class EulerParse {
 
+    public static final String BLOGS = "blog";
+    public static final String DOCS = "docs";
+    public static final String NEWS = "news";
+    public static final String OTHER = "other";
+    public static final String SHOWCASE = "showcase";
+
 
     public static Map<String, Object> parseMD(String lang, String deleteType, File mdFile) throws Exception {
         String type = deleteType;
         String fileName = mdFile.getName();
         String path = mdFile.getPath()
                 .replace("\\", "/")
-                .replace(EulerTypeConstants.BASEPATH + lang + "/", "")
+                .replace(Constants.BASEPATH + lang + "/", "")
                 .replace("\\\\", "/")
                 .replace(".md", "");
-        if (!EulerTypeConstants.DOCS.equals(deleteType) && !EulerTypeConstants.BLOGS.equals(deleteType) && !EulerTypeConstants.NEWS.equals(deleteType) && !EulerTypeConstants.SHOWCASE.equals(deleteType)) {
-            type = EulerTypeConstants.OTHER;
+        if (!DOCS.equals(deleteType) && !BLOGS.equals(deleteType) && !NEWS.equals(deleteType) && !SHOWCASE.equals(deleteType)) {
+            type = OTHER;
             if(!fileName.equals("README.md")) {
                 return null;
             }
@@ -39,14 +46,8 @@ public class EulerParse {
         Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put("lang", lang);
         jsonMap.put("deleteType", deleteType);
-
-
-
         jsonMap.put("type", type);
         jsonMap.put("articleName", fileName);
-
-
-
         jsonMap.put("path", path);
 
         String fileContent = FileUtils.readFileToString(mdFile, StandardCharsets.UTF_8);
@@ -55,10 +56,11 @@ public class EulerParse {
         Parser parser = Parser.builder().build();
         HtmlRenderer renderer = HtmlRenderer.builder().build();
 
-        Node document = parser.parse(fileContent);
 
-        Document node = Jsoup.parse(renderer.render(document));
-        if (EulerTypeConstants.DOCS.equals(type)) {
+        if (DOCS.equals(type)) {
+            Node document = parser.parse(fileContent);
+            Document node = Jsoup.parse(renderer.render(document));
+
             if (node.getElementsByTag("h1").size() > 0) {
                 jsonMap.put("title", node.getElementsByTag("h1").first().text());
             } else {
@@ -79,46 +81,40 @@ public class EulerParse {
             jsonMap.put("version", version);
         } else {
             String r = "";
-            Element tag = node.getElementsByTag("hr").first();
-            if (tag != null) {
-                Element t = tag.nextElementSibling();
-                r = t.text();
-                t.remove();
-                jsonMap.put("textContent", node.text());
+            if (fileContent.contains("---")) {
+                fileContent = fileContent.substring(fileContent.indexOf("---") + 3);
+                if (fileContent.contains("---")) {
+                    r = fileContent.substring(0, fileContent.indexOf("---"));
+                    fileContent = fileContent.substring(fileContent.indexOf("---") + 3);
+                }
             }
 
-            if (EulerTypeConstants.SHOWCASE.equals(type)) {
-                jsonMap.put("title", EulerGetValue(r, "company"));
-                jsonMap.put("industry", EulerGetValue(r, "industry"));
-                jsonMap.put("company", EulerGetValue(r, "company"));
-                jsonMap.put("summary", EulerGetValue(r, "summary"));
-                jsonMap.put("img", EulerGetValue(r, "img"));
-            } else {
-                jsonMap.put("title", EulerGetValue(r, "title"));
+
+            Node document = parser.parse(fileContent);
+            Document node = Jsoup.parse(renderer.render(document));
+            jsonMap.put("textContent", node.text());
+
+
+            Yaml yaml = new Yaml();
+            Map<String, Object> ret = yaml.load(r);
+
+            String key = "";
+            Object value = "";
+            for (Map.Entry<String, Object> entry : ret.entrySet()) {
+                //TODO 需要处理日期不标准导致的存入ES失败的问题。
+                key = entry.getKey();
+                value = entry.getValue();
+                if (key.equals("archives")) {
+                    value = value.toString().substring(0, 7);
+                }
+                jsonMap.put(key, value);
             }
+        }
+        if (jsonMap.get("title") == "" || jsonMap.get("textContent") == "") {
+            return null;
         }
 
         return jsonMap;
-    }
-
-
-    public static String EulerGetValue(String r, String t) {
-        if (!r.contains(t)) {
-            return "";
-        }
-        String m = ":";
-
-        r = r.substring(r.indexOf(t) + t.length());
-        r = r.substring(r.indexOf(m) + m.length());
-
-        if (!r.contains(":")) {
-            return r.trim().replaceAll("\"", "");
-        }
-
-        r = r.substring(0, r.indexOf(":"));
-        r = r.substring(0, r.lastIndexOf(" ")).trim();
-        r = r.replaceAll("\"", "");
-        return r;
     }
 
 }
