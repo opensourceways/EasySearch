@@ -1,9 +1,9 @@
 package com.search.docsearch.controller;
 
 
-import com.search.docsearch.config.mySystem;
-import com.search.docsearch.constant.EulerTypeConstants;
+import com.search.docsearch.config.MySystem;
 import com.search.docsearch.entity.vo.SearchCondition;
+import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.entity.vo.SysResult;
 import com.search.docsearch.service.SearchService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -23,13 +24,14 @@ import java.util.Map;
 
 @RestController
 @Slf4j
+@RequestMapping("/search")
 public class SearchController {
 
     @Autowired
     private SearchService searchService;
     @Autowired
     @Qualifier("setConfig")
-    private mySystem s;
+    private MySystem s;
 
     /**
      * 查询文档
@@ -42,7 +44,7 @@ public class SearchController {
         if (!StringUtils.hasText(condition.getKeyword())) {
             return SysResult.fail("keyword must not null", null);
         }
-        condition.setKeyword(condition.getKeyword().replace("#", ""));
+//        condition.setKeyword(condition.getKeyword().replace("#", ""));
         try {
             Map<String, Object> result = searchService.searchByCondition(condition);
             if (result == null) {
@@ -53,6 +55,57 @@ public class SearchController {
             log.error(e.getMessage());
             e.printStackTrace();
         }
+        return SysResult.fail("查询失败", null);
+    }
+
+
+    @PostMapping("count")
+    public SysResult getCount(@RequestBody SearchCondition condition) {
+        try {
+            Map<String, Object> result = searchService.getCount(condition.getKeyword(), condition.getLang());
+            if (result == null) {
+                return SysResult.fail("内容不存在", null);
+            }
+            return SysResult.ok("查询成功", result);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+        return SysResult.fail("查询失败", null);
+    }
+
+
+
+    @PostMapping("sort")
+    public SysResult makeSort(@RequestBody Map<String, String> m) {
+
+        try {
+            Map<String, Object> result = searchService.advancedSearch(m);
+            if (result == null) {
+                return SysResult.fail("内容不存在", null);
+            }
+            return SysResult.ok("查询成功", result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return SysResult.fail("查询失败", null);
+    }
+
+    @PostMapping("tags")
+    public SysResult getTags(@RequestBody SearchTags searchTags) {
+        try {
+            Map<String, Object> result = searchService.getTags(searchTags);
+            if (result == null) {
+                return SysResult.fail("内容不存在", null);
+            }
+            return SysResult.ok("查询成功", result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         return SysResult.fail("查询失败", null);
     }
 

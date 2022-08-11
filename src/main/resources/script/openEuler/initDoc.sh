@@ -3,22 +3,34 @@ if [ -d "/usr/local/docs" ]; then
   rm -rf /usr/local/docs/source/*
   rm -rf /usr/local/docs/target/*
 fi
+
+#npm i pnpm -g
+
 mkdir -p /usr/local/docs/source/
 mkdir -p /usr/local/docs/target/zh/
 mkdir -p /usr/local/docs/target/en/
+mkdir -p /usr/local/docs/target/ru/
 
 # shellcheck disable=SC2164
 cd /usr/local/docs/source
-git clone https://gitee.com/openeuler/website-v2.git
-
-mkdir -p /usr/local/docs/target/zh/
-cp -r /usr/local/docs/source/website-v2/web-ui/docs/zh/* /usr/local/docs/target/zh/
-
-mkdir -p /usr/local/docs/target/en/
-cp -r /usr/local/docs/source/website-v2/web-ui/docs/en/* /usr/local/docs/target/en/
-
 git clone https://gitee.com/openeuler/openEuler-portal.git
+#pnpm install
+#pnpm build
+
+cp -r /usr/local/docs/source/openEuler-portal/app/zh/blog /usr/local/docs/target/zh/
+cp -r /usr/local/docs/source/openEuler-portal/app/zh/news /usr/local/docs/target/zh/
 cp -r /usr/local/docs/source/openEuler-portal/app/zh/showcase /usr/local/docs/target/zh/
+
+cp -r /usr/local/docs/source/openEuler-portal/app/en/blog /usr/local/docs/target/en/
+cp -r /usr/local/docs/source/openEuler-portal/app/en/news /usr/local/docs/target/en/
+cp -r /usr/local/docs/source/openEuler-portal/app/en/showcase /usr/local/docs/target/en/
+
+cp -r /usr/local/docs/source/openEuler-portal/app/ru/blog /usr/local/docs/target/ru/
+cp -r /usr/local/docs/source/openEuler-portal/app/ru/news /usr/local/docs/target/ru/
+cp -r /usr/local/docs/source/openEuler-portal/app/ru/showcase /usr/local/docs/target/ru/
+
+
+
 
 git clone https://gitee.com/openeuler/docs.git
 

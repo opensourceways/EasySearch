@@ -1,5 +1,15 @@
 package com.search.docsearch.config;
-public class mySystem {
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+public class MySystem {
 
     public String system;
     public String docsVersion;
@@ -9,13 +19,4 @@ public class mySystem {
     public String initDoc;
     public String updateDoc;
 
-    public mySystem(String system, String docsVersion, String index, String mappingPath, String basePath, String initDoc, String updateDoc) {
-        this.system = system;
-        this.docsVersion = docsVersion;
-        this.index = index;
-        this.mappingPath = mappingPath;
-        this.basePath = basePath;
-        this.initDoc = initDoc;
-        this.updateDoc = updateDoc;
-    }
 }
