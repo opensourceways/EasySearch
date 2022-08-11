@@ -1,28 +1,15 @@
 package com.search.docsearch;
 
-import com.search.docsearch.constant.EulerTypeConstants;
-import com.search.docsearch.utils.IdUtil;
+import com.search.docsearch.config.MySystem;
+import com.search.docsearch.constant.Constants;
+import com.search.docsearch.utils.EulerParse;
 import org.apache.commons.io.FileUtils;
-import org.commonmark.node.Node;
-import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.CreateIndexResponse;
-import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,11 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @SpringBootTest
 class DocSearchApplicationTests {
@@ -42,10 +25,16 @@ class DocSearchApplicationTests {
 	@Qualifier("restHighLevelClient")
 	private RestHighLevelClient restHighLevelClient;
 
+	@Autowired
+	@Qualifier("setConfig")
+	private MySystem s;
+
+
+
 	@Test
 	void contextLoads() throws IOException {
 
-		DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(EulerTypeConstants.INDEX);
+		DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest("");
 		BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 		boolQueryBuilder.must(new TermQueryBuilder("lang", "zh"));
 		boolQueryBuilder.must(new TermQueryBuilder("type", "news"));
@@ -56,23 +45,19 @@ class DocSearchApplicationTests {
 
 
 
-//	@Test
-//	void testPa() throws IOException {
+	@Test
+	void testPa() throws Exception {
 //		File mdFile = FileUtils.getFile("");
-//		String fileContent = FileUtils.readFileToString(mdFile, StandardCharsets.UTF_8);
+//		Map<String, Object> map = EulerParse.parseMD("zh", "news", mdFile);
+
+//		System.out.println(map);
 //
-//		Parser parser = Parser.builder().build();
-//		HtmlRenderer renderer = HtmlRenderer.builder().build();
 //
-//		Node document = parser.parse(fileContent);
+//		IndexRequest indexRequest = new IndexRequest(s.index).id(IdUtil.getId()).source(map);
 //
-//		Document node = Jsoup.parse(renderer.render(document));
-//		System.out.println(node);
-//		Element tags = node.getElementsByTag("hr").first().nextElementSibling();
-//		String r = "";
-//		System.out.println(tags);
-//
-//	}
+//		IndexResponse indexResponse = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+//		System.out.println(indexResponse.toString());
+	}
 
 
 
@@ -80,45 +65,10 @@ class DocSearchApplicationTests {
 
 	@Test
 	void ines() throws IOException {
-
-		BulkRequest bulkRequest = new BulkRequest();
-
-
-		for (int i=1; i < 10; i ++) {
-			Map<String, Object> jsonMap = new HashMap<>();
-			jsonMap.put("lang", "zh");
-			jsonMap.put("type", "tt");
-			jsonMap.put("in", i);
-			IndexRequest indexRequest = new IndexRequest("cytest").source(jsonMap);
-			bulkRequest.add(indexRequest);
-		}
-
-
-
-		if (bulkRequest.requests().size() > 0) {
-			restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-		}
+		String d = "- ddd -aae -zzz";
+		String[] e = d.split("-");
+		System.out.println(e.toString());
 	}
 
 
-	public static String EuleGetValue(String r, String t) {
-		if (!r.contains(t)) {
-			return "";
-		}
-		String m = ":";
-
-		r = r.substring(r.indexOf(t) + t.length());
-		r = r.substring(r.indexOf(m) + m.length());
-
-		if (!r.contains(":")) {
-			return r.trim().replaceAll("\"", "");
-		}
-
-		r = r.substring(0, r.indexOf(":"));
-		r = r.substring(0, r.lastIndexOf(" ")).trim();
-		System.out.println(r);
-		r = r.replaceAll("\"", "");
-		System.out.println(r);
-		return r;
-	}
 }

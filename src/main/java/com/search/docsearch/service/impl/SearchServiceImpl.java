@@ -1,9 +1,9 @@
 package com.search.docsearch.service.impl;
 
-import com.search.docsearch.config.mySystem;
-import com.search.docsearch.constant.EulerTypeConstants;
+import com.search.docsearch.config.MySystem;
 import com.search.docsearch.entity.Article;
 import com.search.docsearch.entity.vo.SearchCondition;
+import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.EulerParse;
 import com.search.docsearch.utils.IdUtil;
@@ -24,23 +24,25 @@ import org.elasticsearch.index.query.*;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.elasticsearch.search.sort.ScoreSortBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.logging.Slf4JLoggingSystem;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.StreamSupport;
 
 
 @Service
@@ -53,7 +55,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Autowired
     @Qualifier("setConfig")
-    private mySystem s;
+    private MySystem s;
 
 
 
@@ -98,6 +100,7 @@ public class SearchServiceImpl implements SearchService {
                     deleteType = typeFile.getName();
 
                     Collection<File> listFiles = FileUtils.listFiles(typeFile, new String[]{"md"}, true);
+
                     for (File mdFile : listFiles) {
                         if (!mdFile.getName().startsWith("_")) {
                             try {
@@ -113,16 +116,14 @@ public class SearchServiceImpl implements SearchService {
                         }
                     }
 
-
                     DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(s.index);
                     BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-                    boolQueryBuilder.must(new TermQueryBuilder("lang", lang));
-                    boolQueryBuilder.must(new TermQueryBuilder("type", deleteType));
+                    boolQueryBuilder.must(new TermQueryBuilder("lang.keyword", lang));
+                    boolQueryBuilder.must(new TermQueryBuilder("deleteType.keyword", deleteType));
                     deleteByQueryRequest.setQuery(boolQueryBuilder);
-                    restHighLevelClient.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
-
+                    BulkByScrollResponse r =  restHighLevelClient.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
                     if (bulkRequest.requests().size() > 0) {
-                        restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+                        BulkResponse q = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
                         log.info(lang + "/" + deleteType + "更新成功");
                     }
 
@@ -145,10 +146,10 @@ public class SearchServiceImpl implements SearchService {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         if (StringUtils.hasText(condition.getLang())) {
-            boolQueryBuilder.filter(QueryBuilders.termQuery("lang", condition.getLang()));
+            boolQueryBuilder.filter(QueryBuilders.termQuery("lang.keyword", condition.getLang()));
         }
         if (StringUtils.hasText(condition.getType())) {
-            boolQueryBuilder.filter(QueryBuilders.termQuery("type", condition.getType()));
+            boolQueryBuilder.filter(QueryBuilders.termQuery("type.keyword", condition.getType()));
         }
 
         MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", condition.getKeyword());
@@ -156,7 +157,7 @@ public class SearchServiceImpl implements SearchService {
         MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", condition.getKeyword());
         ptitleMP.boost(100);
 
-        boolQueryBuilder.should(ptitleMP).should(ptitleMP);
+        boolQueryBuilder.should(ptitleMP).should(ptextContentMP);
 
         MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", condition.getKeyword());
         titleMP.boost(2);
@@ -177,7 +178,6 @@ public class SearchServiceImpl implements SearchService {
         sourceBuilder.highlighter(highlightBuilder);
         sourceBuilder.from(startIndex).size(condition.getPageSize());
         sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
-        sourceBuilder.aggregation(AggregationBuilders.terms("data").field("type"));
         request.source(sourceBuilder);
         SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
         List<Article> data = new ArrayList<>();
@@ -207,6 +207,37 @@ public class SearchServiceImpl implements SearchService {
             return null;
         }
 
+        Map<String, Object> result = new HashMap<>();
+        result.put("page", condition.getPage());
+        result.put("pageSize", condition.getPageSize());
+        result.put("records", data);
+        return result;
+    }
+
+
+
+
+
+    public Map<String, Object> getCount(String keyword, String lang) throws IOException {
+        SearchRequest request = new SearchRequest(s.index);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        boolQueryBuilder.filter(QueryBuilders.termQuery("lang.keyword", lang));
+
+        MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", keyword);
+        titleMP.boost(2);
+        MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", keyword);
+        textContentMP.boost(1);
+        boolQueryBuilder.should(titleMP).should(textContentMP);
+        boolQueryBuilder.minimumShouldMatch(1);
+
+        sourceBuilder.query(boolQueryBuilder);
+
+        sourceBuilder.aggregation(AggregationBuilders.terms("data").field("type.keyword"));
+        request.source(sourceBuilder);
+        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+
         List<Map<String, Object>> numberList = new ArrayList<>();
         Map<String, Object> numberMap = new HashMap<>();
         numberMap.put("doc_count", response.getHits().getTotalHits().value);
@@ -221,11 +252,98 @@ public class SearchServiceImpl implements SearchService {
             numberList.add(countMap);
         }
         Map<String, Object> result = new HashMap<>();
-        result.put("page", condition.getPage());
-        result.put("pageSize", condition.getPageSize());
-        result.put("records", data);
         result.put("total", numberList);
         return result;
     }
+
+    @Override
+    public Map<String, Object> advancedSearch(Map<String, String> search) throws Exception {
+        SearchRequest request = new SearchRequest(s.index);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        int page = 1;
+        int pageSize = 10;
+        String keyword = "";
+        for (Map.Entry<String, String> entry : search.entrySet()) {
+            if (entry.getKey().equals("page")) {
+                page = Integer.parseInt(entry.getValue());
+                continue;
+            }
+            if (entry.getKey().equals("pageSize")) {
+                pageSize = Integer.parseInt(entry.getValue());
+                continue;
+            }
+            if (entry.getKey().equals("keyword")) {
+                keyword = entry.getValue();
+                continue;
+            }
+
+            boolQueryBuilder.filter(QueryBuilders.termQuery(entry.getKey() + ".keyword", entry.getValue()));
+        }
+
+        int startIndex = (page - 1) * pageSize;
+
+        if (!keyword.equals("")) {
+            MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", keyword);
+            titleMP.boost(2);
+            MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", keyword);
+            textContentMP.boost(1);
+            boolQueryBuilder.should(titleMP).should(textContentMP);
+
+            boolQueryBuilder.minimumShouldMatch(1);
+        }
+        sourceBuilder.from(startIndex).size(pageSize);
+        sourceBuilder.query(boolQueryBuilder);
+
+        sourceBuilder.sort("date", SortOrder.DESC);
+
+        request.source(sourceBuilder);
+
+
+        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> data = new ArrayList<>();
+        for (SearchHit hit : response.getHits().getHits()) {
+            Map<String, Object> map = hit.getSourceAsMap();
+
+            data.add(map);
+        }
+        result.put("page", page);
+        result.put("pageSize", pageSize);
+        result.put("count", response.getHits().getTotalHits().value);
+        result.put("records", data);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getTags(SearchTags searchTags) throws Exception {
+        SearchRequest request = new SearchRequest(s.index);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.filter(QueryBuilders.termQuery("lang.keyword", searchTags.getLang()));
+        boolQueryBuilder.filter(QueryBuilders.termQuery("category.keyword", searchTags.getCategory()));
+        BucketOrder bucketOrder = BucketOrder.key(false);
+        sourceBuilder.aggregation(AggregationBuilders.terms("data").field(searchTags.getTags() + ".keyword").size(10000).order(bucketOrder));
+        sourceBuilder.query(boolQueryBuilder);
+        request.source(sourceBuilder);
+        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        ParsedTerms aggregation = response.getAggregations().get("data");
+        List<Map<String, Object>> numberList = new ArrayList<>();
+        List<? extends Terms.Bucket> buckets = aggregation.getBuckets();
+        for (Terms.Bucket bucket : buckets) {
+
+            Map<String, Object> countMap = new HashMap<>();
+
+            countMap.put("key", bucket.getKeyAsString());
+            countMap.put("count", bucket.getDocCount());
+            numberList.add(countMap);
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalNum", numberList);
+        return result;
+    }
+
 
 }
