@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -17,5 +18,9 @@ public class SearchTags implements Serializable {
     private static final long serialVersionUID = -969897369024720352L;
     private String lang;
     private String category;
-    private String tags;
+    private String want;
+    private Map<String, String> condition;
+
 }
+
+
