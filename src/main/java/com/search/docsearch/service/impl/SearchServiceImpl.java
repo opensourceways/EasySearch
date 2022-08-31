@@ -99,12 +99,12 @@ public class SearchServiceImpl implements SearchService {
                     BulkRequest bulkRequest = new BulkRequest();
                     deleteType = typeFile.getName();
 
-                    Collection<File> listFiles = FileUtils.listFiles(typeFile, new String[]{"md"}, true);
+                    Collection<File> listFiles = FileUtils.listFiles(typeFile, new String[]{"md", "html"}, true);
 
                     for (File mdFile : listFiles) {
                         if (!mdFile.getName().startsWith("_")) {
                             try {
-                                Map<String, Object> map = EulerParse.parseMD(lang, deleteType, mdFile);
+                                Map<String, Object> map = EulerParse.parse(lang, deleteType, mdFile);
                                 if (map != null) {
                                     IndexRequest indexRequest = new IndexRequest(s.index).id(IdUtil.getId()).source(map);
                                     bulkRequest.add(indexRequest);
@@ -115,7 +115,7 @@ public class SearchServiceImpl implements SearchService {
                             }
                         }
                     }
-
+                    log.info(deleteType + " have " + bulkRequest.requests().size());
                     DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(s.index);
                     BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
                     boolQueryBuilder.must(new TermQueryBuilder("lang.keyword", lang));
@@ -124,6 +124,7 @@ public class SearchServiceImpl implements SearchService {
                     BulkByScrollResponse r =  restHighLevelClient.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
                     if (bulkRequest.requests().size() > 0) {
                         BulkResponse q = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+                        log.info("wrong ? " + q.hasFailures());
                         log.info(lang + "/" + deleteType + "更新成功");
                     }
 
@@ -324,8 +325,17 @@ public class SearchServiceImpl implements SearchService {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.filter(QueryBuilders.termQuery("lang.keyword", searchTags.getLang()));
         boolQueryBuilder.filter(QueryBuilders.termQuery("category.keyword", searchTags.getCategory()));
+
+
+        if (searchTags.getCondition() != null) {
+            for (Map.Entry<String, String> entry : searchTags.getCondition().entrySet()) {
+                boolQueryBuilder.filter(QueryBuilders.termQuery(entry.getKey() + ".keyword", entry.getValue()));
+            }
+        }
+
+
         BucketOrder bucketOrder = BucketOrder.key(false);
-        sourceBuilder.aggregation(AggregationBuilders.terms("data").field(searchTags.getTags() + ".keyword").size(10000).order(bucketOrder));
+        sourceBuilder.aggregation(AggregationBuilders.terms("data").field(searchTags.getWant() + ".keyword").size(10000).order(bucketOrder));
         sourceBuilder.query(boolQueryBuilder);
         request.source(sourceBuilder);
         SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
