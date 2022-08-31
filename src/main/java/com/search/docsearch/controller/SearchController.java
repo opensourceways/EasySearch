@@ -78,9 +78,9 @@ public class SearchController {
         try {
             String[] result = null;
             if (lang.equals("zh")) {
-                result = new String[] {"迁移", "docker", "mysql", "yum", "建设", "ssh", "生命周期", "虚拟化"};
+                result = new String[] {"迁移", "docker", "openGauss", "yum", "建设", "ssh", "生命周期", "虚拟化"};
             } else {
-                result = new String[] {"docker", "mysql", "yum", "openstack", "cla"};
+                result = new String[] {"docker", "openGauss", "yum", "openstack", "cla"};
             }
 
             return SysResult.ok("查询成功", result);
