@@ -28,7 +28,6 @@ public class BeginFun implements ApplicationRunner {
 
 
     @Override
-    @PostMapping("begin")
     public void run(ApplicationArguments args) throws IOException {
         boolean success = false;
         try {
@@ -45,7 +44,6 @@ public class BeginFun implements ApplicationRunner {
                     success = true;
                 }
             }
-
             log.info("===============仓库资源拉取成功=================");
         } catch (Exception e) {
             log.error(e.getMessage());
