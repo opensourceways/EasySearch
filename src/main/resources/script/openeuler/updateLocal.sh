@@ -50,12 +50,10 @@ cp -r /usr/local/docs/source/openEuler-portal/app/zh/migration /usr/local/docs/t
 
 # shellcheck disable=SC2164
 cd /usr/local/docs/source/docs
-git pull
 for r in $(git branch -r --list "origin/stable2-*")
 do
   b=${r##*origin/stable2-}
-  git checkout $b $r
-  git pull
+  git checkout $r
   mkdir -p /usr/local/docs/target/zh/docs/$b/docs
   mkdir -p /usr/local/docs/target/en/docs/$b/docs
   cp -r /usr/local/docs/source/docs/docs/zh/docs/* /usr/local/docs/target/zh/docs/$b/docs/
