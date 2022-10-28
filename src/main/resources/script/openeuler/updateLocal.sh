@@ -3,14 +3,13 @@
 rm -rf /usr/local/docs/target/*
 mkdir -p /usr/local/docs/target/zh/
 mkdir -p /usr/local/docs/target/en/
-
+mkdir -p /usr/local/docs/target/ru/
 # shellcheck disable=SC2164
 cd /usr/local/docs/source/openEuler-portal
 git pull
 #pnpm install
 #pnpm build
-
-
+#
 #cp -r /usr/local/docs/source/openEuler-portal/app/.vitepress/dist/zh /usr/local/docs/target/
 #cp -r /usr/local/docs/source/openEuler-portal/app/.vitepress/dist/en /usr/local/docs/target/
 #cp -r /usr/local/docs/source/openEuler-portal/app/.vitepress/dist/ru /usr/local/docs/target/

@@ -3,33 +3,45 @@ if [ -d "/usr/local/docs" ]; then
   rm -rf /usr/local/docs/source/*
   rm -rf /usr/local/docs/target/*
 fi
+
+npm i pnpm -g
+
 mkdir -p /usr/local/docs/source/
 mkdir -p /usr/local/docs/target/zh/
 mkdir -p /usr/local/docs/target/en/
 
 # shellcheck disable=SC2164
 cd /usr/local/docs/source
-git clone https://gitee.com/opengauss/website.git
-git clone https://gitee.com/opengauss/blog.git
+git clone https://gitee.com/ailoooong/gaussv2.git
+# shellcheck disable=SC2164
+cd ./gaussv2
+#pnpm install
+#pnpm build
 
 
-mkdir -p /usr/local/docs/target/zh/events/
-mkdir -p /usr/local/docs/target/zh/news/
-mkdir -p /usr/local/docs/target/zh/post/
-cp -r ./website/content/zh/events/* ../target/zh/events/
-cp -r ./website/content/zh/news/* ../target/zh/news/
-cp -r ./blog/content/zh/post/* ../target/zh/post/
+cp -r /usr/local/docs/source/gaussv2/app/.vitepress/dist/zh /usr/local/docs/target/
+cp -r /usr/local/docs/source/gaussv2/app/.vitepress/dist/en /usr/local/docs/target/
 
-mkdir -p /usr/local/docs/target/en/events/
-mkdir -p /usr/local/docs/target/en/news/
-mkdir -p /usr/local/docs/target/en/post/
-cp -r ./website/content/en/events/* ../target/en/events/
-cp -r ./website/content/en/news/* ../target/en/news/
-cp -r ./blog/content/en/post/* ../target/en/post/
+rm -rf /usr/local/docs/target/zh/blogs
+cp -r /usr/local/docs/source/gaussv2/app/zh/blogs /usr/local/docs/target/zh/
+rm -rf /usr/local/docs/target/zh/news
+cp -r /usr/local/docs/source/gaussv2/app/zh/news /usr/local/docs/target/zh/
+rm -rf /usr/local/docs/target/zh/events
+cp -r /usr/local/docs/source/gaussv2/app/zh/events /usr/local/docs/target/zh/
 
+rm -rf /usr/local/docs/target/en/blogs
+cp -r /usr/local/docs/source/gaussv2/app/en/blogs /usr/local/docs/target/en/
+rm -rf /usr/local/docs/target/en/news
+cp -r /usr/local/docs/source/gaussv2/app/en/news /usr/local/docs/target/en/
+rm -rf /usr/local/docs/target/en/events
+cp -r /usr/local/docs/source/gaussv2/app/en/events /usr/local/docs/target/en/
 
+# shellcheck disable=SC2164
+cd /usr/local/docs/source
 
 git clone https://gitee.com/opengauss/docs.git
+
+# shellcheck disable=SC2164
 cd ./docs
 
 for r in $(git branch -r --list "origin/*"); do
@@ -39,12 +51,13 @@ for r in $(git branch -r --list "origin/*"); do
  # shellcheck disable=SC1072
  # shellcheck disable=SC1020
  # shellcheck disable=SC1009
+ # shellcheck disable=SC2053
  if [[ "master" != $b ]] && [[ "website" != $b ]] && [[ "HEAD" != $b ]] && [[ "->" != $b ]]; then
-    git checkout $b
+    git checkout $r
     mkdir -p /usr/local/docs/target/zh/docs/$b/docs
     mkdir -p /usr/local/docs/target/en/docs/$b/docs
-    cp -r ./content/zh/docs/* /usr/local/docs/target/zh/docs/$b/docs/
-    cp -r ./content/en/docs/* /usr/local/docs/target/en/docs/$b/docs/
+    cp -r /usr/local/docs/source/docs/content/zh/docs/* /usr/local/docs/target/zh/docs/$b/docs/
+    cp -r /usr/local/docs/source/docs/content/en/docs/* /usr/local/docs/target/en/docs/$b/docs/
  fi
 done
 
