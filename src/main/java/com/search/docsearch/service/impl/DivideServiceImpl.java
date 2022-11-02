@@ -1,22 +1,30 @@
 package com.search.docsearch.service.impl;
 
 import com.search.docsearch.config.MySystem;
+import com.search.docsearch.entity.Article;
+import com.search.docsearch.entity.vo.SearchDocs;
 import com.search.docsearch.service.DivideService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +44,15 @@ public class DivideServiceImpl implements DivideService {
 
     @Override
     public Map<String, Object> advancedSearch(Map<String, String> search, String category) throws Exception {
-        SearchRequest request = new SearchRequest(s.index);
+        String saveIndex;
+        String lang = search.get("lang");
+        if (lang != null) {
+            saveIndex = s.index + "_" + lang;
+        } else {
+            //在没有传语言时默认为zh
+            saveIndex = s.index + "_zh";
+        }
+        SearchRequest request = new SearchRequest(saveIndex);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.filter(QueryBuilders.termQuery("category" + ".keyword", category));
@@ -98,4 +114,85 @@ public class DivideServiceImpl implements DivideService {
         result.put("records", data);
         return result;
     }
+
+    @Override
+    public Map<String, Object> docsSearch(SearchDocs searchDocs) throws IOException {
+        String saveIndex = s.index + "_" + searchDocs.getLang();
+
+        Map<String, Object> result = new HashMap<>();
+
+        int startIndex = (searchDocs.getPage() - 1) * searchDocs.getPageSize();
+        SearchRequest request = new SearchRequest(saveIndex);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        boolQueryBuilder.filter(QueryBuilders.termQuery("type.keyword", "docs"));
+
+        if (StringUtils.hasText(searchDocs.getVersion())) {
+            boolQueryBuilder.filter(QueryBuilders.termQuery("version.keyword", searchDocs.getVersion()));
+        }
+
+        MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", searchDocs.getKeyword());
+        ptitleMP.boost(200);
+        MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", searchDocs.getKeyword());
+        ptitleMP.boost(100);
+
+        boolQueryBuilder.should(ptitleMP).should(ptextContentMP);
+
+        MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", searchDocs.getKeyword());
+        titleMP.boost(2);
+        MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", searchDocs.getKeyword());
+        textContentMP.boost(1);
+        boolQueryBuilder.should(titleMP).should(textContentMP);
+
+        boolQueryBuilder.minimumShouldMatch(1);
+
+        sourceBuilder.query(boolQueryBuilder);
+
+        HighlightBuilder highlightBuilder = new HighlightBuilder()
+                .field("textContent")
+                .field("title")
+                .fragmentSize(100)
+                .preTags("<span>")
+                .postTags("</span>");
+        sourceBuilder.highlighter(highlightBuilder);
+        sourceBuilder.from(startIndex).size(searchDocs.getPageSize());
+        sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
+        request.source(sourceBuilder);
+        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+
+        List<Article> data = new ArrayList<>();
+
+        for (SearchHit hit : response.getHits().getHits()) {
+            Map<String, Object> map = hit.getSourceAsMap();
+            String highLight = map.get("textContent").toString();
+            String title = map.getOrDefault("title", "").toString();
+            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+            if (highlightFields.containsKey("textContent")) {
+                highLight = highlightFields.get("textContent").getFragments()[0].toString();
+            }
+            if (highlightFields.containsKey("title")) {
+                title = highlightFields.get("title").getFragments()[0].toString();
+            }
+            Article article = new Article().setId(hit.getId())
+                    .setArticleName(map.get("articleName").toString())
+                    .setLang(map.getOrDefault("lang", "").toString())
+                    .setPath(map.getOrDefault("path", "").toString())
+                    .setTitle(title)
+                    .setVersion(map.getOrDefault("version", "").toString())
+                    .setType(map.getOrDefault("type", "").toString())
+                    .setTextContent(highLight);
+            data.add(article);
+        }
+        if (data.isEmpty()) {
+            return null;
+        }
+
+        result.put("page", searchDocs.getPage());
+        result.put("pageSize", searchDocs.getPageSize());
+        result.put("count", response.getHits().getTotalHits().value);
+        result.put("records", data);
+        return result;
+    }
+
 }

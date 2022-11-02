@@ -1,9 +1,11 @@
 #es用户名 密码等配置
 elasticsearch:
-  host: ${eshost}
-  username: ${esusername}
-  password: ${espassword}
-  port: ${esport}
+  host: ${eshost:127.0.0.1}
+  username: ${esusername:admin}
+  password: ${espassword:admin}
+  port: ${esport:9200}
+  #deploy dev
+  isDev: ${isDev:false}
 
 #定时读取配置
 scheduled:
@@ -11,7 +13,17 @@ scheduled:
 
 #openEuler    openGauss    openLookeng    mindSpore
 system: ${searchsystem:openEuler}
+
 docsversion: 20
 
 #formal test
 dep: ${depp:test}
+
+#异步配置
+asyncThreadPool:
+  corePoolSize: 10
+  maxPoolSize: 10
+  queueCapacity: 10
+  keepAliveSeconds: 300
+  awaitTerminationSeconds: 300
+  threadNamePrefix: thread-name-prefix
