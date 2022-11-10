@@ -7,20 +7,17 @@ import lombok.experimental.Accessors;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Map;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class SearchTags implements Serializable {
+public class SearchDocs implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1L;
     private String lang;
-    private String category;
-    private String want;
-    private Map<String, String> condition;
-
+    private int page = 1;
+    private int pageSize = 10;
+    private String keyword;
+    private String version;
 }
-
-

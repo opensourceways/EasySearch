@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +57,6 @@ public class SearchController {
         }
         return SysResult.fail("查询失败", null);
     }
-
 
     @PostMapping("count")
     public SysResult getCount(@RequestBody SearchCondition condition) {
@@ -132,41 +132,7 @@ public class SearchController {
     @GetMapping("updoc")
     @Scheduled(cron = "${scheduled.cron}")
     public String scheduledTask() throws IOException {
-        boolean success = false;
-        Process process;
-        try {
-            log.info("===============开始更新仓库资源=================");
-            ProcessBuilder pb = new ProcessBuilder(s.updateDoc);
-            Process p = pb.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = null;
-            while ((line = reader.readLine()) != null)
-            {
-                log.info(line);
-                if (line.contains("build complete in")) {
-                    success = true;
-                }
-            }
-            log.info("===============仓库资源更新成功=================");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-
-        if (success) {
-            log.info("全局更新成功!");
-        } else {
-            log.info("全局更新失败，开始局部更新");
-            ProcessBuilder pb = new ProcessBuilder(s.updateLocal);
-            Process p = pb.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = null;
-            while ((line = reader.readLine()) != null)
-            {
-                log.info(line);
-            }
-        }
-
-        searchService.refreshDoc();
-        return "success";
+        searchService.AsyncrefreshDoc();
+        return "Now try to start updating the document, it will take about three minutes";
     }
 }
