@@ -58,6 +58,26 @@ public class SearchController {
         return SysResult.fail("查询失败", null);
     }
 
+    @PostMapping("sugg")
+    public SysResult getSuggestion(@RequestBody SearchCondition condition) {
+        if (!StringUtils.hasText(condition.getKeyword())) {
+            return SysResult.fail("keyword must not null", null);
+        }
+
+        try {
+            Map<String, Object> result = searchService.getSuggestion(condition.getKeyword(), condition.getLang());
+            if (result == null) {
+                return SysResult.fail("内容不存在", null);
+            }
+            return SysResult.ok("查询成功", result);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+        return SysResult.fail("查询失败", null);
+    }
+
+
     @PostMapping("count")
     public SysResult getCount(@RequestBody SearchCondition condition) {
         try {
