@@ -6,6 +6,7 @@ import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.EulerParse;
+import com.search.docsearch.utils.General;
 import com.search.docsearch.utils.IdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -216,20 +217,34 @@ public class SearchServiceImpl implements SearchService {
             StringBuilder sb = new StringBuilder();
             boolean isNew = false;
             for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option> my_sugg : suggResponse.getSuggest().getSuggestion("my_sugg")) {
+
                 String op = my_sugg.getText().string();
-                if (my_sugg.getOptions().size() > i) {
-                    op = my_sugg.getOptions().get(i).getText().string();
-                    isNew = true;
+
+                boolean hc = General.haveChinese(op);
+
+                if (!hc) {
+                    if (my_sugg.getOptions().size() > i) {
+                        op = my_sugg.getOptions().get(i).getText().string();
+                        isNew = true;
+                        sb.append("<em>").append(op).append("</em>").append(" ");
+                    } else {
+                        sb.append(op).append(" ");
+                    }
+                } else {
+                    sb.append(op);
                 }
-                sb.append(op).append(" ");
             }
+
+
             if (isNew) {
-                suggestList.add(sb.toString());
+                suggestList.add(sb.toString().trim());
             }
         }
         Map<String, Object> result = new HashMap<>();
         result.put("suggestList", suggestList);
         return result;
+
+
     }
 
 
@@ -290,16 +305,16 @@ public class SearchServiceImpl implements SearchService {
             boolQueryBuilder.filter(QueryBuilders.termQuery("type.keyword", condition.getType()));
         }
 
-        MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", condition.getKeyword()).slop(2);
+        MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", condition.getKeyword()).analyzer("ik_max_word").slop(2);
         ptitleMP.boost(200);
-        MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", condition.getKeyword()).slop(2);
+        MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", condition.getKeyword()).analyzer("ik_max_word").slop(2);
         ptextContentMP.boost(100);
 
         boolQueryBuilder.should(ptitleMP).should(ptextContentMP);
 
-        MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", condition.getKeyword());
+        MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", condition.getKeyword()).analyzer("ik_smart");
         titleMP.boost(2);
-        MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", condition.getKeyword());
+        MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", condition.getKeyword()).analyzer("ik_smart");
         textContentMP.boost(1);
         boolQueryBuilder.should(titleMP).should(textContentMP);
 

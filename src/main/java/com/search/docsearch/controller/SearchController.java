@@ -98,9 +98,9 @@ public class SearchController {
         try {
             String[] result = null;
             if (lang.equals("zh")) {
-                result = new String[] {"迁移", "openGauss", "yum", "安装", "白皮书", "生命周期", "docker", "虚拟化"};
+                result = new String[]{"迁移", "openGauss", "yum", "安装", "白皮书", "生命周期", "docker", "虚拟化"};
             } else {
-                result = new String[] {"migration", "openGauss", "doc", "openstack", "cla"};
+                result = new String[]{"migration", "openGauss", "doc", "openstack", "cla"};
             }
 
             return SysResult.ok("查询成功", result);
