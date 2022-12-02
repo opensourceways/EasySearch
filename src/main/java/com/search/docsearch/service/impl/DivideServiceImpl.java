@@ -110,8 +110,8 @@ public class DivideServiceImpl implements DivideService {
 
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> data = new ArrayList<>();
- //       for (SearchHit hit : response.getHits().getHits()) {
- //           Map<String, Object> map = hit.getSourceAsMap();
+        for (SearchHit hit : response.getHits().getHits()) {
+            Map<String, Object> map = hit.getSourceAsMap();
 
 
  //           Object la = map.get("lang");
@@ -123,11 +123,11 @@ public class DivideServiceImpl implements DivideService {
  //           trackerBoolQueryBuilder.must(QueryBuilders.termQuery("event", "pageview")).must(QueryBuilders.termQuery("properties.$url_path.keyword", url_path));
  //           countRequest.query(trackerBoolQueryBuilder);
  //           CountResponse countResponse = trackerClient.count(countRequest, RequestOptions.DEFAULT);
-
+//
  //           map.put("views", countResponse.getCount());
 
- //           data.add(map);
-//      }
+            data.add(map);
+      }
         result.put("page", page);
         result.put("pageSize", pageSize);
         result.put("count", response.getHits().getTotalHits().value);
