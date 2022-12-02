@@ -9,6 +9,8 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -37,6 +39,10 @@ public class DivideServiceImpl implements DivideService {
     @Autowired
     @Qualifier("restHighLevelClient")
     private RestHighLevelClient restHighLevelClient;
+
+    @Autowired
+    @Qualifier("trackerClient")
+    private RestHighLevelClient trackerClient;
 
     @Autowired
     @Qualifier("setConfig")
@@ -107,6 +113,19 @@ public class DivideServiceImpl implements DivideService {
         for (SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> map = hit.getSourceAsMap();
 
+
+            Object la = map.get("lang");
+            Object up = map.get("path");
+            String url_path = "/" + la + "/" + up + ".html";
+
+            CountRequest countRequest = new CountRequest(s.trackerIndex);
+            BoolQueryBuilder trackerBoolQueryBuilder = QueryBuilders.boolQuery();
+            trackerBoolQueryBuilder.must(QueryBuilders.termQuery("event", "pageview")).must(QueryBuilders.termQuery("properties.$url_path.keyword", url_path));
+            countRequest.query(trackerBoolQueryBuilder);
+            CountResponse countResponse = trackerClient.count(countRequest, RequestOptions.DEFAULT);
+
+            map.put("views", countResponse.getCount());
+
             data.add(map);
         }
         result.put("page", page);
@@ -133,9 +152,9 @@ public class DivideServiceImpl implements DivideService {
             boolQueryBuilder.filter(QueryBuilders.termQuery("version.keyword", searchDocs.getVersion()));
         }
 
-        MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", searchDocs.getKeyword()).slop(2);
+        MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", searchDocs.getKeyword()).analyzer("ik_max_word").slop(2);
         ptitleMP.boost(200);
-        MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", searchDocs.getKeyword()).slop(2);
+        MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", searchDocs.getKeyword()).analyzer("ik_max_word").slop(2);
         ptextContentMP.boost(100);
 
         boolQueryBuilder.should(ptitleMP).should(ptextContentMP);
