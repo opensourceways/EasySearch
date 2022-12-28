@@ -342,12 +342,14 @@ public class SearchServiceImpl implements SearchService {
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
-        MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", keyword);
-        titleMP.boost(2);
-        MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", keyword);
-        textContentMP.boost(1);
+        MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", keyword).analyzer("ik_max_word").slop(2);
+        MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", keyword).analyzer("ik_max_word").slop(2);
+
+        boolQueryBuilder.should(ptitleMP).should(ptextContentMP);
+
+        MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", keyword).analyzer("ik_smart");
+        MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", keyword).analyzer("ik_smart");
         boolQueryBuilder.should(titleMP).should(textContentMP);
-        boolQueryBuilder.minimumShouldMatch(1);
 
         sourceBuilder.query(boolQueryBuilder);
 
