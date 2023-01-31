@@ -150,7 +150,7 @@ public class SearchController {
      * 定时任务
      */
     @GetMapping("updoc")
-    @Scheduled(cron = "${scheduled.cron}")
+//    @Scheduled(cron = "${scheduled.cron}")
     public String scheduledTask() throws IOException {
         searchService.AsyncrefreshDoc();
         return "Now try to start updating the document, it will take about three minutes";
