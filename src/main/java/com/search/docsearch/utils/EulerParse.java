@@ -14,9 +14,12 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EulerParse {
 
@@ -47,7 +50,7 @@ public class EulerParse {
                 && !SHOWCASE.equals(deleteType)
                 && !MIGRATION.equals(deleteType)
                 && !EVENTS.equals(deleteType)
-                && !USERPRACTICE.equals(deleteType)){
+                && !USERPRACTICE.equals(deleteType)) {
             type = OTHER;
             if (!fileName.equals("index.html")) {
                 return null;
@@ -67,7 +70,7 @@ public class EulerParse {
             parseHtml(jsonMap, fileContent);
         } else {
             if (DOCS.equals(type)) {
-               parseDocsType(jsonMap, fileContent, fileName, path, type);
+                parseDocsType(jsonMap, fileContent, fileName, path, type);
             } else {
                 parseUnDocsType(jsonMap, fileContent);
             }
@@ -94,7 +97,7 @@ public class EulerParse {
         }
     }
 
-    public static void parseDocsType(Map<String, Object> jsonMap, String fileContent,String fileName, String path, String type ) {
+    public static void parseDocsType(Map<String, Object> jsonMap, String fileContent, String fileName, String path, String type) {
         Parser parser = Parser.builder().build();
         HtmlRenderer renderer = HtmlRenderer.builder().build();
         Node document = parser.parse(fileContent);
@@ -120,7 +123,7 @@ public class EulerParse {
         jsonMap.put("version", version);
     }
 
-    public static void parseUnDocsType(Map<String, Object> jsonMap, String fileContent){
+    public static void parseUnDocsType(Map<String, Object> jsonMap, String fileContent) {
         Parser parser = Parser.builder().build();
         HtmlRenderer renderer = HtmlRenderer.builder().build();
         String r = "";
@@ -145,7 +148,28 @@ public class EulerParse {
             key = entry.getKey().toLowerCase(Locale.ROOT);
             value = entry.getValue();
             if (key.equals("date")) {
-                //TODO 需要处理日期不标准导致的存入ES失败的问题。
+                //需要处理日期不标准导致的存入ES失败的问题。
+                String dateString = "";
+                if (value.getClass().getSimpleName().equals("Date")) {
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    dateString = format.format(value);
+                } else {
+                    dateString = value.toString();
+                }
+                Pattern pattern = Pattern.compile("\\D"); //匹配所有非数字
+                Matcher matcher = pattern.matcher(dateString);
+                dateString = matcher.replaceAll("-");
+                if (dateString.length() < 10) {
+                    StringBuilder stringBuilder = new StringBuilder(dateString);
+                    if (stringBuilder.charAt(7) != '-') {
+                        stringBuilder.insert(5, "0");
+                    }
+                    if (stringBuilder.length() < 10) {
+                        stringBuilder.insert(8, "0");
+                    }
+                    dateString = stringBuilder.toString();
+                }
+                value = dateString;
             }
             if (key.equals("author") && value instanceof String) {
                 value = new String[]{value.toString()};
@@ -154,6 +178,9 @@ public class EulerParse {
                 continue;
             }
             jsonMap.put(key, value);
+        }
+        if (jsonMap.containsKey("date")) {
+            jsonMap.put("archives", jsonMap.get("date").toString().substring(0, 7));
         }
 
     }
