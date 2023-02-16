@@ -23,10 +23,11 @@ import java.io.InputStreamReader;
 public class DataImportController implements ApplicationRunner {
 
     @Autowired
-    public SearchService searchService;
+    private SearchService searchService;
 
     @Autowired
-    public DataImportService dataImportService;
+    private DataImportService dataImportService;
+
     @Autowired
     @Qualifier("setConfig")
     private MySystem s;

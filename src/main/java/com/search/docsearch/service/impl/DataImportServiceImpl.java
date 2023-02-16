@@ -48,10 +48,6 @@ public class DataImportServiceImpl implements DataImportService {
     private ParseData parseData;
 
 
-    @Value("${kafka.topic}")
-    private String topic;
-
-
     @Override
     public void refreshDoc() throws IOException {
         File indexFile = new File(s.basePath);
