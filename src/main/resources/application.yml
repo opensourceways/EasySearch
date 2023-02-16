@@ -34,3 +34,7 @@ asyncThreadPool:
   keepAliveSeconds: 300
   awaitTerminationSeconds: 300
   threadNamePrefix: thread-name-prefix
+
+
+server:
+  port: 8080

@@ -10,13 +10,6 @@ import java.util.Map;
 public interface SearchService {
 
 
-    /**
-     * 根据索引名称和版本刷新数据
-     *
-     */
-    void refreshDoc() throws IOException;
-
-    void AsyncrefreshDoc() throws IOException;
 
     Map<String, Object> getSuggestion(String keyword, String lang) throws IOException;
 

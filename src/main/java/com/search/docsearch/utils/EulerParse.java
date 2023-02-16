@@ -1,7 +1,10 @@
 package com.search.docsearch.utils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.search.docsearch.constant.Constants;
 
+import com.search.docsearch.entity.vo.EulerForumPost;
 import org.apache.commons.io.FileUtils;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
@@ -55,6 +58,9 @@ public class EulerParse {
             if (!fileName.equals("index.html")) {
                 return null;
             }
+
+        }
+        if (type.equals(OTHER) || type.equals(SHOWCASE)) {
             path = path.substring(0, path.length() - 5);
         }
         Map<String, Object> jsonMap = new HashMap<>();
