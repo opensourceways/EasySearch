@@ -4,19 +4,11 @@ import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 public interface SearchService {
 
 
-    /**
-     * 根据索引名称和版本刷新数据
-     *
-     */
-    void refreshDoc() throws IOException;
-
-    void AsyncrefreshDoc() throws IOException;
 
     Map<String, Object> getSuggestion(String keyword, String lang) throws IOException;
 

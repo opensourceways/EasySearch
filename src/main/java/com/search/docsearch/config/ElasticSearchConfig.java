@@ -49,7 +49,6 @@ public class ElasticSearchConfig {
 
     @Bean(destroyMethod = "close")
     public RestHighLevelClient restHighLevelClient() {
-
         if (isDev) {
             return new RestHighLevelClient(RestClient.builder(new HttpHost("127.0.0.1", 9200, "http")));
         } else {
