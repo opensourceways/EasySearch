@@ -55,6 +55,8 @@ public class EulerParse {
             if (!fileName.equals("index.html")) {
                 return null;
             }
+        }
+        if (type.equals(OTHER) || type.equals(SHOWCASE)) {
             path = path.substring(0, path.length() - 5);
         }
         Map<String, Object> jsonMap = new HashMap<>();
