@@ -17,12 +17,10 @@ public class SystemConfig {
 
     @Value("${system}")
     private String system;
-    @Value("${docsversion}")
-    private String docsVersion;
     @Value("${dep}")
     private String dep;
 
-
+    //d
     public static final String MAPPINGPATH = "/EaseSearch/target/classes/mapping/mapping.json";
 
     public static final String BASEPATH = "/usr/local/docs/target/";
@@ -42,7 +40,6 @@ public class SystemConfig {
         }
         mySystem.setTrackerIndex(system + "_tracker");
 
-        mySystem.setDocsVersion(docsVersion);
         mySystem.setMappingPath(MAPPINGPATH);
         mySystem.setBasePath(BASEPATH);
 

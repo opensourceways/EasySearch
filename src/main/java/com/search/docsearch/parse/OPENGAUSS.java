@@ -1,7 +1,6 @@
-package com.search.docsearch.utils;
+package com.search.docsearch.parse;
 
 import com.search.docsearch.constant.Constants;
-
 import org.apache.commons.io.FileUtils;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
@@ -21,7 +20,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class EulerParse {
+public class OPENGAUSS {
 
     public static final String BLOG = "blog";
     public static final String BLOGS = "blogs";
@@ -33,35 +32,38 @@ public class EulerParse {
     public static final String EVENTS = "events";
     public static final String USERPRACTICE = "userPractice";
 
-    public static Map<String, Object> parse(String lang, String deleteType, File mdFile) throws Exception {
-        String type = deleteType;
+    public Map<String, Object> parse(File mdFile) throws Exception {
+        String originalPath = mdFile.getPath();
         String fileName = mdFile.getName();
-
-        String path = mdFile.getPath()
+        String path = originalPath
                 .replace("\\", "/")
-                .replace(Constants.BASEPATH + lang + "/", "")
+                .replace(Constants.BASEPATH, "")
                 .replace("\\\\", "/")
                 .replace(".md", "")
                 .replace(".html", "");
-        if (!DOCS.equals(deleteType)
-                && !BLOG.equals(deleteType)
-                && !BLOGS.equals(deleteType)
-                && !NEWS.equals(deleteType)
-                && !SHOWCASE.equals(deleteType)
-                && !MIGRATION.equals(deleteType)
-                && !EVENTS.equals(deleteType)
-                && !USERPRACTICE.equals(deleteType)) {
+
+        String lang = path.substring(0,path.indexOf("/"));
+
+        String type = path.substring(lang.length() + 1, path.indexOf("/", lang.length() + 1));
+        if (!DOCS.equals(type)
+                && !BLOG.equals(type)
+                && !BLOGS.equals(type)
+                && !NEWS.equals(type)
+                && !SHOWCASE.equals(type)
+                && !MIGRATION.equals(type)
+                && !EVENTS.equals(type)
+                && !USERPRACTICE.equals(type)) {
             type = OTHER;
             if (!fileName.equals("index.html")) {
                 return null;
             }
+
         }
         if (type.equals(OTHER) || type.equals(SHOWCASE)) {
             path = path.substring(0, path.length() - 5);
         }
         Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put("lang", lang);
-        jsonMap.put("deleteType", deleteType);
         jsonMap.put("type", type);
         jsonMap.put("articleName", fileName);
         jsonMap.put("path", path);
@@ -186,6 +188,7 @@ public class EulerParse {
         }
 
     }
+
 
 
 }
