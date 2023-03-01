@@ -145,14 +145,4 @@ public class SearchController {
         return SysResult.fail("查询失败", null);
     }
 
-
-    /**
-     * 定时任务
-     */
-    @GetMapping("updoc")
-//    @Scheduled(cron = "${scheduled.cron}")
-    public String scheduledTask() throws IOException {
-        searchService.AsyncrefreshDoc();
-        return "Now try to start updating the document, it will take about three minutes";
-    }
 }
