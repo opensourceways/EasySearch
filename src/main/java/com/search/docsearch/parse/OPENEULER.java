@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.search.docsearch.constant.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
@@ -16,14 +17,15 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class OPENEULER {
 
     public static final String BLOG = "blog";
@@ -231,7 +233,7 @@ public class OPENEULER {
         }
 
         //验证是否为删除
-        //为了清楚http请求缓存所在请求路径上加了随机数
+        //为了清除http请求缓存所在请求路径上加了随机数
         String p = FORUMDOMAIM + jsonMap.get("path") + "?ran=" + Math.random(); ;
         HttpURLConnection connection = null;
         try {
@@ -264,15 +266,17 @@ public class OPENEULER {
             req = path + i;
             try {
                 connection = sendHTTP(req, "GET");
+                TimeUnit.SECONDS.sleep(30);
                 if (connection.getResponseCode() == 200) {
                     result = ReadInput(connection.getInputStream());
                     if (!setData(result, r)) {
                         break;
                     }
                 } else {
+                    log.error(req + " - ", connection.getResponseCode());
                     return null;
                 }
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
                 return null;
             } finally {
@@ -322,7 +326,8 @@ public class OPENEULER {
                     jsonMap.put("path", "/t/" + slug + "/" + id);
 
                     r.add(jsonMap);
-
+                } else {
+                    log.error(path + " - ", connection.getResponseCode());
                 }
             } catch (IOException e) {
                 e.printStackTrace();

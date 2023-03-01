@@ -1,5 +1,6 @@
 package com.search.docsearch.service.impl;
 
+import com.search.docsearch.config.KafkaConfig;
 import com.search.docsearch.config.MySystem;
 import com.search.docsearch.service.DataImportService;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +8,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -24,8 +24,6 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.reindex.BulkByScrollResponse;
-import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -54,9 +52,13 @@ public class DataImportServiceImpl implements DataImportService {
     @Qualifier("setConfig")
     private MySystem s;
 
+    @Autowired
+    @Qualifier("initKafka")
+    private KafkaConfig kafkaConfig;
+
 
     @Override
-    public void refreshDoc() throws IOException {
+    public void refreshDoc() {
         File indexFile = new File(s.basePath);
         if (!indexFile.exists()) {
             log.error(String.format("%s 文件夹不存在", indexFile.getPath()));
@@ -72,6 +74,7 @@ public class DataImportServiceImpl implements DataImportService {
             log.error(e.getMessage());
             return;
         }
+        Set<String> idSet = new HashSet<>();
         Collection<File> listFiles = FileUtils.listFiles(indexFile, new String[]{"md", "html"}, true);
         for (File paresFile : listFiles) {
             if (!paresFile.getName().startsWith("_")) {
@@ -82,7 +85,8 @@ public class DataImportServiceImpl implements DataImportService {
                     Object map = m.invoke(c.getDeclaredConstructor().newInstance(), paresFile);
                     if (map != null) {
                         Map<String, Object> d = (Map<String, Object>) map;
-                        renew(d, s.getIndex() + "_" + d.get("lang"));
+                        insert(d, s.getIndex() + "_" + d.get("lang"));
+                        idSet.add((String)d.get("path"));
                     }
 
                 } catch (Exception e) {
@@ -92,6 +96,24 @@ public class DataImportServiceImpl implements DataImportService {
             }
         }
 
+        try {
+            String className = "com.search.docsearch.parse." + s.getSystem().toUpperCase(Locale.ROOT);
+            Class<?> c = Class.forName(className);
+            Method m = c.getMethod("customizeData");
+            Object map = m.invoke(c.getDeclaredConstructor().newInstance());
+            if (map != null) {
+                List<Map<String, Object>> d = (List<Map<String, Object>>) map;
+                System.out.println("============== " + d.size());
+                for (Map<String, Object> lm : d) {
+                    insert(lm, s.getIndex() + "_" + lm.get("lang"));
+                    idSet.add((String) lm.get("path"));
+                }
+            }
+        } catch (Exception e) {
+            log.error("error: " + e.getMessage());
+        }
+
+        deleteExpired(idSet);
 
         log.info("所有文档更新成功");
     }
@@ -171,24 +193,18 @@ public class DataImportServiceImpl implements DataImportService {
         refreshDoc();
     }
 
-    @Autowired
-    @Qualifier("kafkaProducerClient")
-    private KafkaProducer<String, String> kafkaProducer;
-
     @Override
     public void sendKafka(String data, String parameter) {
         String topic = s.getSystem() + "_search_topic";
         ProducerRecord<String, String> mess = new ProducerRecord<String, String>(topic, parameter + " " + data);
-        kafkaProducer.send(mess);
+        kafkaConfig.kafkaProducer.send(mess);
     }
 
-    @Autowired
-    @Qualifier("kafkaConsumerClient")
-    private KafkaConsumer<String, String> kafkaConsumer;
 
     @Override
     @Async("threadPoolTaskExecutor")
     public void listenKafka() {
+        KafkaConsumer<String, String> kafkaConsumer = kafkaConfig.kafkaConsumer;
         String topic = s.getSystem() + "_search_topic";
         kafkaConsumer.subscribe(Collections.singleton(topic));
         while (true) {
@@ -207,14 +223,12 @@ public class DataImportServiceImpl implements DataImportService {
                 } catch (Exception e) {
                     log.error("error: " + e.getMessage());
                 }
-
-
             }
         }
     }
 
     @Override
-    public void synchronousData() {
+    public void deleteExpired(Set<String> idSet) {
         try {
             long st = System.currentTimeMillis();
             int scrollSize = 500;//一次读取的doc数量
@@ -222,7 +236,7 @@ public class DataImportServiceImpl implements DataImportService {
             searchSourceBuilder.query(QueryBuilders.matchAllQuery());//读取全量数据
             searchSourceBuilder.size(scrollSize);
             Scroll scroll = new Scroll(TimeValue.timeValueMinutes(10));//设置一次读取的最大连接时长
-            SearchRequest searchRequest = new SearchRequest(s.index + "_*");
+            SearchRequest searchRequest = new SearchRequest(s.getIndex() + "_*");
 //        searchRequest1.types("_doc");
             searchRequest.source(searchSourceBuilder);
             searchRequest.scroll(scroll);
@@ -230,10 +244,14 @@ public class DataImportServiceImpl implements DataImportService {
             SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
 
             String scrollId = searchResponse.getScrollId();
-            System.out.println("scrollId - " + scrollId);
 
             SearchHit[] hits = searchResponse.getHits().getHits();
-            System.out.println("hits - " + hits.length);
+            for (SearchHit hit : hits) {
+                if (!idSet.contains(hit.getId())) {
+                    DeleteRequest deleteRequest = new DeleteRequest(hit.getIndex(), hit.getId());
+                    DeleteResponse deleteResponse = restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
+                }
+            }
 
 
             while (hits.length > 0) {
@@ -241,12 +259,15 @@ public class DataImportServiceImpl implements DataImportService {
                 searchScrollRequestS.scroll(scroll);
                 SearchResponse searchScrollResponseS = restHighLevelClient.scroll(searchScrollRequestS, RequestOptions.DEFAULT);
                 scrollId = searchScrollResponseS.getScrollId();
-                System.out.println("scrollId - " + scrollId);
 
                 hits = searchScrollResponseS.getHits().getHits();
-                System.out.println("hits - " + hits.length);
+                for (SearchHit hit : hits) {
+                    if (!idSet.contains(hit.getId())) {
+                        DeleteRequest deleteRequest = new DeleteRequest(hit.getIndex(), hit.getId());
+                        DeleteResponse deleteResponse = restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
+                    }
+                }
             }
-
 
             ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
             clearScrollRequest.addScrollId(scrollId);
@@ -258,65 +279,6 @@ public class DataImportServiceImpl implements DataImportService {
             log.error(e.getMessage());
         }
 
-
     }
-
-    @Override
-    public void refreshSynIndex() {
-//        makeIndex(s.index + "_syn_" + "zh");
-//        makeIndex(s.index + "_syn_" + "en");
-//        makeIndex(s.index + "_syn_" + "ru");
-//
-//        DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(s.getIndex() + "_syn_*");
-//        deleteByQueryRequest.setQuery(QueryBuilders.matchAllQuery());
-//        BulkByScrollResponse bulkByScrollResponse = restHighLevelClient.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
-//        File indexFile = new File(s.basePath);
-//        Collection<File> listFiles = FileUtils.listFiles(indexFile, new String[]{"md", "html"}, true);
-//        if (listFiles.size() < 10) {
-//            return false;
-//        }
-//        for (File paresFile : listFiles) {
-//            if (!paresFile.getName().startsWith("_")) {
-//                try {
-//                    Properties p = new Properties();
-//                    String className = "com.search.docsearch.parse." + s.getSystem().toUpperCase(Locale.ROOT);
-//                    Class<?> c = Class.forName(className);
-//                    Method m = c.getMethod("parse", File.class);
-//                    Object map = m.invoke(c.getDeclaredConstructor().newInstance(), paresFile);
-//                    if (map != null) {
-//                        Map<String, Object> d = (Map<String, Object>) map;
-//                        insert(d, s.getIndex() + "_syn_");
-//                    }
-//
-//                } catch (Exception e) {
-//                    log.info(paresFile.getPath());
-//                    log.error("error: " + e.getMessage());
-//                }
-//            }
-//        }
-        try {
-            DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(s.getIndex() + "_*");
-            deleteByQueryRequest.setQuery(QueryBuilders.termQuery("type", "forum"));
-            BulkByScrollResponse bulkByScrollResponse = restHighLevelClient.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
-
-
-            String className = "com.search.docsearch.parse." + s.getSystem().toUpperCase(Locale.ROOT);
-            Class<?> c = Class.forName(className);
-            Method m = c.getMethod("customizeData");
-            Object map = m.invoke(c.getDeclaredConstructor().newInstance());
-            if (map != null) {
-                List<Map<String, Object>> d = (List<Map<String, Object>>) map;
-                for (Map<String, Object> lm : d) {
-//                    insert(lm, s.getIndex() + "_syn_" + lm.get("lang"));
-                    insert(lm, s.getIndex() + "_" + lm.get("lang"));
-                }
-            } else {
-            }
-
-        } catch (Exception e) {
-            log.error("error: " + e.getMessage());
-        }
-    }
-
 
 }

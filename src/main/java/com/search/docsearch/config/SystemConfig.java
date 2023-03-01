@@ -20,7 +20,6 @@ public class SystemConfig {
     @Value("${dep}")
     private String dep;
 
-    //d
     public static final String MAPPINGPATH = "/EaseSearch/target/classes/mapping/mapping.json";
 
     public static final String BASEPATH = "/usr/local/docs/target/";
@@ -34,7 +33,7 @@ public class SystemConfig {
         mySystem.setSystem(system);
 
         if (dep.equals("test")) {
-            mySystem.setIndex(system + "_articles_test");
+            mySystem.setIndex(system + "_test");
         } else {
             mySystem.setIndex(system + "_articles");
         }
@@ -46,6 +45,7 @@ public class SystemConfig {
         mySystem.setInitDoc("/EaseSearch/target/classes/script/" + system + "/initDoc.sh");
         mySystem.setUpdateDoc("/EaseSearch/target/classes/script/" + system + "/updateDoc.sh");
         mySystem.setUpdateLocal("/EaseSearch/target/classes/script/" + system + "/updateLocal.sh");
+
         return mySystem;
     }
 }

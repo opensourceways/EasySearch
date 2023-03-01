@@ -71,9 +71,4 @@ public class DataImportController implements ApplicationRunner {
         dataImportService.sendKafka(data, parameter);
     }
 
-    @GetMapping("syn")
-    public void scheduledTask() {
-        dataImportService.refreshSynIndex();
-    }
-
 }

@@ -5,8 +5,8 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
-import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.Properties;
 
@@ -20,40 +20,48 @@ public class KafkaConfig {
     private String bootstrap;
 
     @Value("${kafka.consumer.group}")
+    private String group;
 
-    @Bean()
+    public KafkaProducer<String, String> kafkaProducer;
+
+    public KafkaConsumer<String, String> kafkaConsumer;
+
+    @Bean
+    public KafkaConfig initKafka() {
+        KafkaConfig kafkaConfig = new KafkaConfig();
+        if (needKafka) {
+            kafkaConfig.kafkaProducer = kafkaProducerClient();
+            kafkaConfig.kafkaConsumer = kafkaConsumerClient();
+        }
+
+        return kafkaConfig;
+    }
+
+
     public KafkaProducer<String, String> kafkaProducerClient() {
-        if (needKafka) {
-            Properties props = new Properties();
-            props.put("bootstrap.servers", bootstrap);
+        Properties props = new Properties();
+        props.put("bootstrap.servers", bootstrap);
 
-            props.put("key.serializer", StringSerializer.class.getName());
-            props.put("value.serializer", StringSerializer.class.getName());
+        props.put("key.serializer", StringSerializer.class.getName());
+        props.put("value.serializer", StringSerializer.class.getName());
 
-            KafkaProducer<String, String> producer = new KafkaProducer(props);
-            return producer;
-        }
-        return null;
+        KafkaProducer<String, String> producer = new KafkaProducer(props);
+        return producer;
     }
 
-    @Bean()
+
     public KafkaConsumer<String, String> kafkaConsumerClient() {
-        if (needKafka) {
-            Properties props = new Properties();
-            props.put("bootstrap.servers", bootstrap);
+        Properties props = new Properties();
+        props.put("bootstrap.servers", bootstrap);
 
-            props.put("group.id", "openeuler");
-            props.put("key.deserializer", StringDeserializer.class);
-            props.put("value.deserializer", StringDeserializer.class);
+        props.put("group.id", group);
+        props.put("key.deserializer", StringDeserializer.class);
+        props.put("value.deserializer", StringDeserializer.class);
 
 
-            KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-            return consumer;
-        }
-        return null;
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+        return consumer;
     }
-
-
 
 
 }

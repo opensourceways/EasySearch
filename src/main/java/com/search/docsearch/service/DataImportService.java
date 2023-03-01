@@ -1,10 +1,11 @@
 package com.search.docsearch.service;
 
 import java.io.IOException;
+import java.util.Set;
 
 public interface DataImportService {
 
-    void refreshDoc() throws IOException;
+    void refreshDoc();
 
     void asyncrefreshDoc() throws IOException;
 
@@ -12,7 +13,5 @@ public interface DataImportService {
 
     void listenKafka();
 
-    void synchronousData();
-
-    void refreshSynIndex() ;
+    void deleteExpired(Set<String> idSet);
 }
