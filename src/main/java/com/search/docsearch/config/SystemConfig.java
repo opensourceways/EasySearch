@@ -17,11 +17,8 @@ public class SystemConfig {
 
     @Value("${system}")
     private String system;
-    @Value("${docsversion}")
-    private String docsVersion;
     @Value("${dep}")
     private String dep;
-
 
     public static final String MAPPINGPATH = "/EaseSearch/target/classes/mapping/mapping.json";
 
@@ -36,19 +33,19 @@ public class SystemConfig {
         mySystem.setSystem(system);
 
         if (dep.equals("test")) {
-            mySystem.setIndex(system + "_articles_test");
+            mySystem.setIndex(system + "_test");
         } else {
             mySystem.setIndex(system + "_articles");
         }
         mySystem.setTrackerIndex(system + "_tracker");
 
-        mySystem.setDocsVersion(docsVersion);
         mySystem.setMappingPath(MAPPINGPATH);
         mySystem.setBasePath(BASEPATH);
 
         mySystem.setInitDoc("/EaseSearch/target/classes/script/" + system + "/initDoc.sh");
         mySystem.setUpdateDoc("/EaseSearch/target/classes/script/" + system + "/updateDoc.sh");
         mySystem.setUpdateLocal("/EaseSearch/target/classes/script/" + system + "/updateLocal.sh");
+
         return mySystem;
     }
 }

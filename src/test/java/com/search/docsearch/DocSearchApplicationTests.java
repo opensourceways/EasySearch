@@ -1,8 +1,7 @@
 package com.search.docsearch;
 
 import com.search.docsearch.config.MySystem;
-import com.search.docsearch.utils.EulerParse;
-import com.search.docsearch.utils.IdUtil;
+import com.search.docsearch.service.DataImportService;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -18,7 +17,6 @@ import org.apache.http.ssl.TrustStrategy;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -55,7 +53,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Map;
+import java.util.HashSet;
 
 @SpringBootTest
 class DocSearchApplicationTests {
@@ -66,6 +64,9 @@ class DocSearchApplicationTests {
 	@Autowired
 	@Qualifier("setConfig")
 	private MySystem s;
+
+	@Autowired
+	public DataImportService dataImportService;
 
 
 
@@ -80,24 +81,6 @@ class DocSearchApplicationTests {
 		BulkByScrollResponse bulkByScrollResponse = restHighLevelClient.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
 		System.out.println(bulkByScrollResponse);
 	}
-
-
-
-	@Test
-	void testPa() throws Exception {
-		File mdFile = FileUtils.getFile("");
-		Map<String, Object> map = EulerParse.parse("zh", "download", mdFile);
-
-		System.out.println(map);
-
-
-		IndexRequest indexRequest = new IndexRequest(s.index).id(IdUtil.getId()).source(map);
-
-		IndexResponse indexResponse = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
-		System.out.println(indexResponse.toString());
-	}
-
-
 
 
 
@@ -267,7 +250,5 @@ class DocSearchApplicationTests {
 
 
 	}
-
-
 
 }

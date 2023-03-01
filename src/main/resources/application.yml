@@ -14,6 +14,15 @@ tracker:
   password: ${tespassword:admin}
   port: ${tesport:9200}
 
+
+kafka:
+  need: ${kneed:false}
+  bootstrap: ${kbootstrap:127.0.0.1:9092}
+  producer:
+  consumer:
+    group: ${kgroup:openeuler}
+
+
 #定时读取配置
 scheduled:
   cron: 0 31 11 ? * *
@@ -21,7 +30,6 @@ scheduled:
 #openEuler    openGauss    openLookeng    mindSpore
 system: ${searchsystem:openEuler}
 
-docsversion: 20
 
 #formal test
 dep: ${depp:test}
@@ -34,3 +42,6 @@ asyncThreadPool:
   keepAliveSeconds: 300
   awaitTerminationSeconds: 300
   threadNamePrefix: thread-name-prefix
+
+server:
+  port: 8080
