@@ -26,6 +26,7 @@ public class SystemConfig {
 
     @Bean
     public MySystem setConfig() {
+        log.info("system -> " + system);
         system = system.toLowerCase(Locale.ROOT);
         dep = dep.toLowerCase(Locale.ROOT);
         MySystem mySystem = new MySystem();
@@ -43,8 +44,6 @@ public class SystemConfig {
         mySystem.setBasePath(BASEPATH);
 
         mySystem.setInitDoc("/EaseSearch/target/classes/script/" + system + "/initDoc.sh");
-        mySystem.setUpdateDoc("/EaseSearch/target/classes/script/" + system + "/updateDoc.sh");
-        mySystem.setUpdateLocal("/EaseSearch/target/classes/script/" + system + "/updateLocal.sh");
 
         return mySystem;
     }

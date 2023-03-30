@@ -1,24 +1,13 @@
 #!/bin/bash
-if [ -d "/usr/local/docs" ]; then
-  rm -rf /usr/local/docs/source/*
+if [ -d "/usr/local/docs/target" ]; then
   rm -rf /usr/local/docs/target/*
 fi
 
-npm i pnpm -g
-
-mkdir -p /usr/local/docs/source/
 mkdir -p /usr/local/docs/target/zh/
 mkdir -p /usr/local/docs/target/en/
 
 # shellcheck disable=SC2164
-cd /usr/local/docs/source
-git clone https://gitee.com/opengauss/website.git
-git checkout v2
-# shellcheck disable=SC2164
-cd ./website
-#pnpm install
-#pnpm build
-
+cd /usr/local/docs/source/website
 
 cp -r /usr/local/docs/source/website/app/.vitepress/dist/zh /usr/local/docs/target/
 cp -r /usr/local/docs/source/website/app/.vitepress/dist/en /usr/local/docs/target/
@@ -57,7 +46,7 @@ for r in $(git branch -r --list "origin/*"); do
  # shellcheck disable=SC1020
  # shellcheck disable=SC1009
  # shellcheck disable=SC2053
- if [[ "website" != $b ]] && [[ "HEAD" != $b ]] && [[ "->" != $b ]]; then
+ if [[ "website" != $b ]] && [[ "HEAD" != $b ]] && [[ "->" != $b ]] && [[ "reconstruct-frozen" != $b ]] && [[ "master-bak" != $b ]] && [[ "website-v2" != $b ]]; then
     git checkout $r
     mkdir -p /usr/local/docs/target/zh/docs/$b/docs
     mkdir -p /usr/local/docs/target/en/docs/$b/docs
