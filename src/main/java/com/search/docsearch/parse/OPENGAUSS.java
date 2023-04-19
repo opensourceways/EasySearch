@@ -42,7 +42,7 @@ public class OPENGAUSS {
                 .replace(".md", "")
                 .replace(".html", "");
 
-        String lang = path.substring(0,path.indexOf("/"));
+        String lang = path.substring(0, path.indexOf("/"));
 
         String type = path.substring(lang.length() + 1, path.indexOf("/", lang.length() + 1));
         if (!DOCS.equals(type)
@@ -57,7 +57,9 @@ public class OPENGAUSS {
             if (!fileName.equals("index.html")) {
                 return null;
             }
-
+        }
+        if (type.equals(USERPRACTICE)) {
+            type = SHOWCASE;
         }
         if (type.equals(OTHER) || type.equals(SHOWCASE)) {
             path = path.substring(0, path.length() - 5);
@@ -123,7 +125,12 @@ public class OPENGAUSS {
 
         String version = path.replaceFirst(jsonMap.get("lang") + "/" + type + "/", "");
         version = version.substring(0, version.indexOf("/"));
-
+        //gauss master分支需要显示为latest
+        if (version.equals("master") || version.equals("master-lite")) {
+            String p = (String) jsonMap.get("path");
+            jsonMap.put("path", p.replaceAll("/master/", "/latest/").replaceAll("/master-lite/", "/latest-lite/"));
+            version = version.replaceAll("master", "latest");
+        }
         jsonMap.put("version", version);
     }
 
@@ -188,7 +195,6 @@ public class OPENGAUSS {
         }
 
     }
-
 
 
 }
