@@ -176,13 +176,40 @@ public class SearchServiceImpl implements SearchService {
 
         boolQueryBuilder.minimumShouldMatch(1);
 
-        if (StringUtils.hasText(condition.getDocsVersion())) {
-            String[] versions = condition.getDocsVersion().split(",");
-            BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
-            vBuilder.must(QueryBuilders.termQuery("type.keyword", "docs"));
-            vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", versions));
+        if (condition.getLimit() != null) {
+            for (Map<String, String> map : condition.getLimit()) {
+                BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    if (key.equals("version")) {
+                        String[] versions = value.split(",");
+                        vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", versions));
+                    } else {
+                        vBuilder.must(QueryBuilders.termQuery(key + ".keyword", value));
+                    }
+                }
+                boolQueryBuilder.mustNot(vBuilder);
+            }
+        }
 
-            boolQueryBuilder.mustNot(vBuilder);
+        if (condition.getFilter() != null) {
+            BoolQueryBuilder zBuilder = QueryBuilders.boolQuery();
+            for (Map<String, String> map : condition.getFilter()) {
+                BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    if (key.equals("version")) {
+                        String[] versions = value.split(",");
+                        vBuilder.must(QueryBuilders.termsQuery("version.keyword", versions));
+                    } else {
+                        vBuilder.must(QueryBuilders.termQuery(key + ".keyword", value));
+                    }
+                }
+               zBuilder.should(vBuilder);
+            }
+            boolQueryBuilder.filter(zBuilder);
         }
 
         sourceBuilder.query(boolQueryBuilder);
@@ -218,13 +245,40 @@ public class SearchServiceImpl implements SearchService {
 
         boolQueryBuilder.minimumShouldMatch(1);
 
-        if (StringUtils.hasText(condition.getDocsVersion())) {
-            String[] versions = condition.getDocsVersion().split(",");
-            BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
-            vBuilder.must(QueryBuilders.termQuery("type.keyword", "docs"));
-            vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", versions));
+        if (condition.getLimit() != null) {
+            for (Map<String, String> map : condition.getLimit()) {
+                BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    if (key.equals("version")) {
+                        String[] versions = value.split(",");
+                        vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", versions));
+                    } else {
+                        vBuilder.must(QueryBuilders.termQuery(key + ".keyword", value));
+                    }
+                }
+                boolQueryBuilder.mustNot(vBuilder);
+            }
+        }
 
-            boolQueryBuilder.mustNot(vBuilder);
+        if (condition.getFilter() != null) {
+            BoolQueryBuilder zBuilder = QueryBuilders.boolQuery();
+            for (Map<String, String> map : condition.getFilter()) {
+                BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    if (key.equals("version")) {
+                        String[] versions = value.split(",");
+                        vBuilder.must(QueryBuilders.termsQuery("version.keyword", versions));
+                    } else {
+                        vBuilder.must(QueryBuilders.termQuery(key + ".keyword", value));
+                    }
+                }
+                zBuilder.should(vBuilder);
+            }
+            boolQueryBuilder.filter(zBuilder);
         }
 
         sourceBuilder.query(boolQueryBuilder);
@@ -336,8 +390,9 @@ public class SearchServiceImpl implements SearchService {
         SearchRequest request = new SearchRequest(saveIndex);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        boolQueryBuilder.filter(QueryBuilders.termQuery("type.keyword", searchTags.getCategory()));
-
+        if (StringUtils.hasText(searchTags.getCategory())) {
+            boolQueryBuilder.filter(QueryBuilders.termQuery("type.keyword", searchTags.getCategory()));
+        }
 
         if (searchTags.getCondition() != null) {
             for (Map.Entry<String, String> entry : searchTags.getCondition().entrySet()) {
