@@ -7,6 +7,11 @@ mkdir -p /usr/local/docs/target/zh/
 mkdir -p /usr/local/docs/target/en/
 mkdir -p /usr/local/docs/target/ru/
 
+if [ ! -d "/usr/local/docs/source/openEuler-portal" ]; then
+ rm -rf /usr/local/docs/target
+ exit
+fi
+
 # shellcheck disable=SC2164
 cd /usr/local/docs/source/openEuler-portal
 
@@ -50,6 +55,11 @@ cp -r /usr/local/docs/source/openEuler-portal/app/ru/migration /usr/local/docs/t
 cd /usr/local/docs/source
 
 git clone https://gitee.com/openeuler/docs.git
+
+if [ ! -d "/usr/local/docs/source/docs" ]; then
+ rm -rf /usr/local/docs/target
+ exit
+fi
 
 # shellcheck disable=SC2164
 cd ./docs

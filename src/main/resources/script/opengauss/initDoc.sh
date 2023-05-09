@@ -6,6 +6,11 @@ fi
 mkdir -p /usr/local/docs/target/zh/
 mkdir -p /usr/local/docs/target/en/
 
+if [ ! -d "/usr/local/docs/source/website" ]; then
+ rm -rf /usr/local/docs/target
+ exit
+fi
+
 # shellcheck disable=SC2164
 cd /usr/local/docs/source/website
 
@@ -34,6 +39,11 @@ cp -r /usr/local/docs/source/website/app/en/userPractice /usr/local/docs/target/
 cd /usr/local/docs/source
 
 git clone https://gitee.com/opengauss/docs.git
+
+if [ ! -d "/usr/local/docs/source/docs" ]; then
+ rm -rf /usr/local/docs/target
+ exit
+fi
 
 # shellcheck disable=SC2164
 cd ./docs
