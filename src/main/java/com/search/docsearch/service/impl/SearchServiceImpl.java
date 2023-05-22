@@ -209,7 +209,7 @@ public class SearchServiceImpl implements SearchService {
                         vBuilder.must(QueryBuilders.termQuery(key + ".keyword", value));
                     }
                 }
-               zBuilder.should(vBuilder);
+                zBuilder.should(vBuilder);
             }
             boolQueryBuilder.filter(zBuilder);
         }
@@ -235,7 +235,7 @@ public class SearchServiceImpl implements SearchService {
         SearchRequest request = new SearchRequest(saveIndex);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        
+
         //因为会出现一些特殊的字符导致分词出错（比如英文连接词），在这里处理一下
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
