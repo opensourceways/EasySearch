@@ -13,6 +13,7 @@ public class General {
         put("_", " ");
         put("&", " ");
         put("+", " ");
+        put(".", " ");
     }};
 
     public static String removeChinese(String str) {
