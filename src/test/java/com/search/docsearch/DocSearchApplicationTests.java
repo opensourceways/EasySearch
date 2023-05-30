@@ -68,58 +68,6 @@ class DocSearchApplicationTests {
 	@Autowired
 	public DataImportService dataImportService;
 
-
-
-	@Test
-	void contextLoads() throws IOException {
-
-		DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest("");
-		BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-		boolQueryBuilder.must(new TermQueryBuilder("lang", "zh"));
-		boolQueryBuilder.must(new TermQueryBuilder("type", "news"));
-		deleteByQueryRequest.setQuery(boolQueryBuilder);
-		BulkByScrollResponse bulkByScrollResponse = restHighLevelClient.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
-		System.out.println(bulkByScrollResponse);
-	}
-
-
-
-	@Test
-	void ines() throws IOException {
-		CreateIndexRequest request1 = new CreateIndexRequest("ddat");
-		File mappingJson = FileUtils.getFile("");
-		String mapping = FileUtils.readFileToString(mappingJson, StandardCharsets.UTF_8);
-
-		request1.mapping(mapping, XContentType.JSON);
-		request1.setTimeout(TimeValue.timeValueMillis(1));
-
-		CreateIndexResponse d = restHighLevelClient.indices().create(request1, RequestOptions.DEFAULT);
-		System.out.println(d.index());
-	}
-
-	@Test
-	void testSuggestions() throws IOException {
-		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		SuggestionBuilder<TermSuggestionBuilder> termSuggestionBuilder =
-				SuggestBuilders.termSuggestion("textContent").text("").minWordLength(2).prefixLength(0).analyzer("ik_smart");
-
-		SuggestBuilder suggestBuilder = new SuggestBuilder();
-		suggestBuilder.addSuggestion("my_sugg", termSuggestionBuilder);
-
-		SearchRequest request = new SearchRequest("opengauss_articles_test_zh");
-
-		request.source(searchSourceBuilder.suggest(suggestBuilder));
-
-		SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-
-		System.out.println(response);
-		StringBuilder newKeyword = new StringBuilder();
-		for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option> my_sugg : response.getSuggest().getSuggestion("my_sugg")) {
-			String text = my_sugg.getOptions().get(0).getText().string();
-		}
-	}
-
-
 	@Test
 	void testMigrate() throws IOException {
 		System.out.println("begin --------");
