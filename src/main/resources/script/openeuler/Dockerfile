@@ -14,8 +14,8 @@ RUN cd /root \
 
 ENV JAVA_HOME=/root/jdk-19.0.2
 ENV PATH=${JAVA_HOME}/bin:$PATH
-
-ENV FORUMDOMAIM=https://forum.openeuler.org
+#正式环境配置openEuler论坛域名
+#ENV FORUMDOMAIM=FORUMDOMAIM
 
 WORKDIR /EaseSearch
 COPY . /EaseSearch
