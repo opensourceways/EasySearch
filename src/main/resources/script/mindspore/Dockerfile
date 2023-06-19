@@ -14,8 +14,6 @@ RUN cd /root \
 
 ENV JAVA_HOME=/root/jdk-19.0.2
 ENV PATH=${JAVA_HOME}/bin:$PATH
-#正式环境配置mindspore官网域名
-#ENV MINDSPORE_OFFICIAL=MINDSPORE_OFFICIAL
 
 WORKDIR /EaseSearch
 COPY . /EaseSearch
