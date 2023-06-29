@@ -106,13 +106,13 @@ public class DataImportServiceImpl implements DataImportService {
             if (!paresFile.getName().startsWith("_")) {
                 try {
                     String className = "com.search.docsearch.parse." + s.getSystem().toUpperCase(Locale.ROOT);
-                    Class<?> c = Class.forName(className);
-                    Method m = c.getMethod("parse", File.class);
-                    Object map = m.invoke(c.getDeclaredConstructor().newInstance(), paresFile);
-                    if (map != null) {
-                        Map<String, Object> d = (Map<String, Object>) map;
-                        insert(d, s.getIndex() + "_" + d.get("lang"));
-                        idSet.add((String) d.get("path"));
+                    Class<?> clazz = Class.forName(className);
+                    Method method = clazz.getMethod("parse", File.class);
+                    Object result = method.invoke(clazz.getDeclaredConstructor().newInstance(), paresFile);
+                    if (result != null) {
+                        Map<String, Object> escape = (Map<String, Object>) result;
+                        insert(escape, s.getIndex() + "_" + escape.get("lang"));
+                        idSet.add((String) escape.get("path"));
                     }
 
                 } catch (Exception e) {
@@ -124,18 +124,18 @@ public class DataImportServiceImpl implements DataImportService {
 
         try {
             String className = "com.search.docsearch.parse." + s.getSystem().toUpperCase(Locale.ROOT);
-            Class<?> c = Class.forName(className);
-            Method m = c.getMethod("customizeData");
-            Object map = m.invoke(c.getDeclaredConstructor().newInstance());
-            if (map == null) {
+            Class<?> clazz = Class.forName(className);
+            Method method = clazz.getMethod("customizeData");
+            Object result = method.invoke(clazz.getDeclaredConstructor().newInstance());
+            if (result == null) {
                 log.error("自定义数据获取失效，不更新该部分");
                 globalUnlock();
                 return;
             }
 
-            List<Map<String, Object>> d = (List<Map<String, Object>>) map;
-            System.out.println("============== " + d.size());
-            for (Map<String, Object> lm : d) {
+            List<Map<String, Object>> escape = (List<Map<String, Object>>) result;
+            System.out.println("============== " + escape.size());
+            for (Map<String, Object> lm : escape) {
                 insert(lm, s.getIndex() + "_" + lm.get("lang"));
                 idSet.add((String) lm.get("path"));
             }
@@ -247,12 +247,12 @@ public class DataImportServiceImpl implements DataImportService {
     public void addForum(String data, String parameter) {
         try {
             String className = "com.search.docsearch.parse." + s.getSystem().toUpperCase(Locale.ROOT);
-            Class<?> c = Class.forName(className);
-            Method m = c.getMethod("parseHook", String.class);
-            Object map = m.invoke(c.getDeclaredConstructor().newInstance(), parameter + " " + data);
-            if (map != null) {
-                Map<String, Object> d = (Map<String, Object>) map;
-                renew(d, s.getIndex() + "_" + d.get("lang"));
+            Class<?> clazz = Class.forName(className);
+            Method method = clazz.getMethod("parseHook", String.class);
+            Object result = method.invoke(clazz.getDeclaredConstructor().newInstance(), parameter + " " + data);
+            if (result != null) {
+                Map<String, Object> escape = (Map<String, Object>) result;
+                renew(d, s.getIndex() + "_" + escape.get("lang"));
             }
         } catch (Exception e) {
             log.error("error: " + e.getMessage());
