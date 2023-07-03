@@ -30,7 +30,8 @@ public class DivideController {
 
 
     @PostMapping("/{type}")
-    public SysResult DivideBLog(@PathVariable @NotBlank(message = "must have a type") String type, @RequestBody @NotEmpty(message = "Requires at least one condition") Map<String, String> m){
+    public SysResult DivideBLog(@PathVariable @NotBlank(message = "must have a type") String type, 
+    @RequestBody @NotEmpty(message = "Requires at least one condition") Map<String, String> m){
 
         try {
             Map<String, Object> result = divideService.advancedSearch(m, type);

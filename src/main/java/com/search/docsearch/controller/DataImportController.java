@@ -1,6 +1,5 @@
 package com.search.docsearch.controller;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
 
@@ -43,13 +42,14 @@ public class DataImportController implements ApplicationRunner {
     private boolean needKafka;
 
     /**
-     *  该方法在项目启动时就会运行
+     * 该方法在项目启动时就会运行
+     * 
      * @param args
      */
     @Override
     public void run(ApplicationArguments args) {
         try {
-            //导入es数据
+            // 导入es数据
             dataImportService.refreshDoc();
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -58,11 +58,13 @@ public class DataImportController implements ApplicationRunner {
 
     /**
      * 对外提供的webhook
+     * 
      * @param data
      * @param parameter
      */
     @PostMapping("/hook/{parameter}")
-    public void webhook(@RequestBody @NotBlank(message = "hook data can not be blank") String data, @PathVariable @NotBlank(message = "must have a parameter") String parameter) {
+    public void webhook(@RequestBody @NotBlank(message = "hook data can not be blank") String data,
+            @PathVariable @NotBlank(message = "must have a parameter") String parameter) {
         dataImportService.addForum(data, parameter);
     }
 
