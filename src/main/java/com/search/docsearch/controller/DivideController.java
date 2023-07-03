@@ -1,6 +1,5 @@
 package com.search.docsearch.controller;
 
-
 import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
@@ -27,11 +26,9 @@ public class DivideController {
     @Autowired
     private DivideService divideService;
 
-
-
     @PostMapping("/{type}")
-    public SysResult DivideBLog(@PathVariable @NotBlank(message = "must have a type") String type, 
-    @RequestBody @NotEmpty(message = "Requires at least one condition") Map<String, String> m){
+    public SysResult DivideBLog(@PathVariable @NotBlank(message = "must have a type") String type,
+            @RequestBody @NotEmpty(message = "Requires at least one condition") Map<String, String> m) {
 
         try {
             Map<String, Object> result = divideService.advancedSearch(m, type);
@@ -42,7 +39,6 @@ public class DivideController {
         } catch (Exception e) {
             log.error("advancedSearch error is: " + e.getMessage());
         }
-
 
         return SysResult.fail("查询失败", null);
     }
@@ -58,7 +54,6 @@ public class DivideController {
         } catch (Exception e) {
             log.error("docsSearch error is: " + e.getMessage());
         }
-
 
         return SysResult.fail("查询失败", null);
     }
