@@ -131,7 +131,7 @@ public class MINDSPORE {
         String textContent = "";
         Document node = Jsoup.parse(fileContent);
 
-        Elements sections = node.getElementsByClass("section");
+        Elements sections = node.getElementsByTag("section");
         if (sections.size() > 0) {
 
             Element one = sections.get(0);
@@ -147,7 +147,6 @@ public class MINDSPORE {
                 title = t.text();
                 t.remove();
             } else {
-                System.out.println(MINDSPORE_OFFICIAL+ "/" + jsonMap.get("path"));
                 return false;
             }
             title = title.replaceAll("¶", "");
