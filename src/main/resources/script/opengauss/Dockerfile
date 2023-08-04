@@ -3,7 +3,7 @@ FROM node
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV LANGUAGE C.UTF-8
-
+ENV NODE_OPTIONS --max-old-space-size=8192
 ENV searchsystem openGauss
 
 RUN mkdir /workspace
