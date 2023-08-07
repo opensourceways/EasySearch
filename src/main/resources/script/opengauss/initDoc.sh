@@ -1,47 +1,43 @@
 #!/bin/bash
-if [ -d "/usr/local/docs/target" ]; then
-  rm -rf /usr/local/docs/target/*
-fi
+mkdir -p ${TARGET}/zh/
+mkdir -p ${TARGET}/en/
 
-mkdir -p /usr/local/docs/target/zh/
-mkdir -p /usr/local/docs/target/en/
-
-if [ ! -d "/usr/local/docs/source/website" ]; then
- rm -rf /usr/local/docs/target
+if [ ! -d "${SOURCE}/website" ]; then
+ rm -rf ${TARGET}
  exit
 fi
 
 # shellcheck disable=SC2164
-cd /usr/local/docs/source/website
+cd ${SOURCE}/website
 
-cp -r /usr/local/docs/source/website/app/.vitepress/dist/zh /usr/local/docs/target/
-cp -r /usr/local/docs/source/website/app/.vitepress/dist/en /usr/local/docs/target/
+cp -r ${SOURCE}/website/app/.vitepress/dist/zh ${TARGET}/
+cp -r ${SOURCE}/website/app/.vitepress/dist/en ${TARGET}/
 
-rm -rf /usr/local/docs/target/zh/blogs
-cp -r /usr/local/docs/source/website/app/zh/blogs /usr/local/docs/target/zh/
-rm -rf /usr/local/docs/target/zh/news
-cp -r /usr/local/docs/source/website/app/zh/news /usr/local/docs/target/zh/
-rm -rf /usr/local/docs/target/zh/events
-cp -r /usr/local/docs/source/website/app/zh/events /usr/local/docs/target/zh/
-rm -rf /usr/local/docs/target/zh/userPractice
-cp -r /usr/local/docs/source/website/app/zh/userPractice /usr/local/docs/target/zh/
+rm -rf ${TARGET}/zh/blogs
+cp -r ${SOURCE}/website/app/zh/blogs ${TARGET}/zh/
+rm -rf ${TARGET}/zh/news
+cp -r ${SOURCE}/website/app/zh/news ${TARGET}/zh/
+rm -rf ${TARGET}/zh/events
+cp -r ${SOURCE}/website/app/zh/events ${TARGET}/zh/
+rm -rf ${TARGET}/zh/userPractice
+cp -r ${SOURCE}/website/app/zh/userPractice ${TARGET}/zh/
 
-rm -rf /usr/local/docs/target/en/blogs
-cp -r /usr/local/docs/source/website/app/en/blogs /usr/local/docs/target/en/
-rm -rf /usr/local/docs/target/en/news
-cp -r /usr/local/docs/source/website/app/en/news /usr/local/docs/target/en/
-rm -rf /usr/local/docs/target/en/events
-cp -r /usr/local/docs/source/website/app/en/events /usr/local/docs/target/en/
-rm -rf /usr/local/docs/target/en/userPractice
-cp -r /usr/local/docs/source/website/app/en/userPractice /usr/local/docs/target/en/
+rm -rf ${TARGET}/en/blogs
+cp -r ${SOURCE}/website/app/en/blogs ${TARGET}/en/
+rm -rf ${TARGET}/en/news
+cp -r ${SOURCE}/website/app/en/news ${TARGET}/en/
+rm -rf ${TARGET}/en/events
+cp -r ${SOURCE}/website/app/en/events ${TARGET}/en/
+rm -rf ${TARGET}/en/userPractice
+cp -r ${SOURCE}/website/app/en/userPractice ${TARGET}/en/
 
 # shellcheck disable=SC2164
-cd /usr/local/docs/source
+cd ${SOURCE}
 
 git clone https://gitee.com/opengauss/docs.git
 
-if [ ! -d "/usr/local/docs/source/docs" ]; then
- rm -rf /usr/local/docs/target
+if [ ! -d "${SOURCE}/docs" ]; then
+ rm -rf ${TARGET}
  exit
 fi
 
@@ -58,15 +54,15 @@ for r in $(git branch -r --list "origin/*"); do
  # shellcheck disable=SC2053
  if [[ "website" != $b ]] && [[ "HEAD" != $b ]] && [[ "->" != $b ]] && [[ "reconstruct-frozen" != $b ]] && [[ "master-bak" != $b ]] && [[ "website-v2" != $b ]]; then
     git checkout $r
-    mkdir -p /usr/local/docs/target/zh/docs/$b/docs
-    mkdir -p /usr/local/docs/target/en/docs/$b/docs
-    cp -r /usr/local/docs/source/docs/content/zh/docs/* /usr/local/docs/target/zh/docs/$b/docs/
-    cp -r /usr/local/docs/source/docs/content/en/docs/* /usr/local/docs/target/en/docs/$b/docs/
+    mkdir -p ${TARGET}/zh/docs/$b/docs
+    mkdir -p ${TARGET}/en/docs/$b/docs
+    cp -r ${SOURCE}/docs/content/zh/docs/* ${TARGET}/zh/docs/$b/docs/
+    cp -r ${SOURCE}/docs/content/en/docs/* ${TARGET}/en/docs/$b/docs/
 
-    mkdir -p /usr/local/docs/target/zh/docs/$b-lite/docs
-    mkdir -p /usr/local/docs/target/en/docs/$b-lite/docs
-    cp -r /usr/local/docs/source/docs/content/docs-lite/zh/docs/* /usr/local/docs/target/zh/docs/$b-lite/docs/
-    cp -r /usr/local/docs/source/docs/content/docs-list/en/docs/* /usr/local/docs/target/en/docs/$b-lite/docs/
+    mkdir -p ${TARGET}/zh/docs/$b-lite/docs
+    mkdir -p ${TARGET}/en/docs/$b-lite/docs
+    cp -r ${SOURCE}/docs/content/docs-lite/zh/docs/* ${TARGET}/zh/docs/$b-lite/docs/
+    cp -r ${SOURCE}/docs/content/docs-list/en/docs/* ${TARGET}/en/docs/$b-lite/docs/
 
  fi
 done
