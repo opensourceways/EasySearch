@@ -1,63 +1,59 @@
 #!/bin/bash
-if [ -d "/usr/local/docs/target" ]; then
-  rm -rf /usr/local/docs/target/*
-fi
+mkdir -p ${TARGET}/zh/
+mkdir -p ${TARGET}/en/
+mkdir -p ${TARGET}/ru/
 
-mkdir -p /usr/local/docs/target/zh/
-mkdir -p /usr/local/docs/target/en/
-mkdir -p /usr/local/docs/target/ru/
-
-if [ ! -d "/usr/local/docs/source/openEuler-portal" ]; then
- rm -rf /usr/local/docs/target
+if [ ! -d ${SOURCE}/openEuler-portal ]; then
+ rm -rf ${TARGET}
  exit
 fi
 
 # shellcheck disable=SC2164
-cd /usr/local/docs/source/openEuler-portal
+cd ${SOURCE}/openEuler-portal
 
-cp -r /usr/local/docs/source/openEuler-portal/app/.vitepress/dist/zh /usr/local/docs/target/
-cp -r /usr/local/docs/source/openEuler-portal/app/.vitepress/dist/en /usr/local/docs/target/
-cp -r /usr/local/docs/source/openEuler-portal/app/.vitepress/dist/ru /usr/local/docs/target/
+cp -r ${SOURCE}/openEuler-portal/app/.vitepress/dist/zh ${TARGET}/
+cp -r ${SOURCE}/openEuler-portal/app/.vitepress/dist/en ${TARGET}/
+cp -r ${SOURCE}/openEuler-portal/app/.vitepress/dist/ru ${TARGET}/
 
 
-rm -rf /usr/local/docs/target/zh/blog
-cp -r /usr/local/docs/source/openEuler-portal/app/zh/blog /usr/local/docs/target/zh/
-rm -rf /usr/local/docs/target/zh/news
-cp -r /usr/local/docs/source/openEuler-portal/app/zh/news /usr/local/docs/target/zh/
-rm -rf /usr/local/docs/target/zh/showcase
-cp -r /usr/local/docs/source/openEuler-portal/app/zh/showcase /usr/local/docs/target/zh/
-cp /usr/local/docs/source/openEuler-portal/app/.vitepress/dist/zh/showcase/index.html /usr/local/docs/target/zh/showcase/
-rm -rf /usr/local/docs/target/zh/migration
-cp -r /usr/local/docs/source/openEuler-portal/app/zh/migration /usr/local/docs/target/zh/
+rm -rf ${TARGET}/zh/blog
+cp -r ${SOURCE}/openEuler-portal/app/zh/blog ${TARGET}/zh/
+rm -rf ${TARGET}/zh/news
+cp -r ${SOURCE}/openEuler-portal/app/zh/news ${TARGET}/zh/
+rm -rf ${TARGET}/zh/showcase
+cp -r ${SOURCE}/openEuler-portal/app/zh/showcase ${TARGET}/zh/
+cp ${SOURCE}/openEuler-portal/app/.vitepress/dist/zh/showcase/index.html ${TARGET}/zh/showcase/
+rm -rf ${TARGET}/zh/migration
+cp -r ${SOURCE}/openEuler-portal/app/zh/migration ${TARGET}/zh/
 
-rm -rf /usr/local/docs/target/en/blog
-cp -r /usr/local/docs/source/openEuler-portal/app/en/blog /usr/local/docs/target/en/
-rm -rf /usr/local/docs/target/en/news
-cp -r /usr/local/docs/source/openEuler-portal/app/en/news /usr/local/docs/target/en/
-rm -rf /usr/local/docs/target/en/showcase
-cp -r /usr/local/docs/source/openEuler-portal/app/en/showcase /usr/local/docs/target/en/
-cp /usr/local/docs/source/openEuler-portal/app/.vitepress/dist/en/showcase/index.html /usr/local/docs/target/en/showcase/
-rm -rf /usr/local/docs/target/en/migration
-cp -r /usr/local/docs/source/openEuler-portal/app/en/migration /usr/local/docs/target/en/
+rm -rf ${TARGET}/en/blog
+cp -r ${SOURCE}/openEuler-portal/app/en/blog ${TARGET}/en/
+rm -rf ${TARGET}/en/news
+cp -r ${SOURCE}/openEuler-portal/app/en/news ${TARGET}/en/
+rm -rf ${TARGET}/en/showcase
+cp -r ${SOURCE}/openEuler-portal/app/en/showcase ${TARGET}/en/
+cp ${SOURCE}/openEuler-portal/app/.vitepress/dist/en/showcase/index.html ${TARGET}/en/showcase/
+rm -rf ${TARGET}/en/migration
+cp -r ${SOURCE}/openEuler-portal/app/en/migration ${TARGET}/en/
 
-rm -rf /usr/local/docs/target/ru/blog
-cp -r /usr/local/docs/source/openEuler-portal/app/ru/blog /usr/local/docs/target/ru/
-rm -rf /usr/local/docs/target/ru/news
-cp -r /usr/local/docs/source/openEuler-portal/app/ru/news /usr/local/docs/target/ru/
-rm -rf /usr/local/docs/target/ru/showcase
-cp -r /usr/local/docs/source/openEuler-portal/app/ru/showcase /usr/local/docs/target/ru/
-cp /usr/local/docs/source/openEuler-portal/app/.vitepress/dist/ru/showcase/index.html /usr/local/docs/target/ru/showcase/
-rm -rf /usr/local/docs/target/ru/migration
-cp -r /usr/local/docs/source/openEuler-portal/app/ru/migration /usr/local/docs/target/ru/
+rm -rf ${TARGET}/ru/blog
+cp -r ${SOURCE}/openEuler-portal/app/ru/blog ${TARGET}/ru/
+rm -rf ${TARGET}/ru/news
+cp -r ${SOURCE}/openEuler-portal/app/ru/news ${TARGET}/ru/
+rm -rf ${TARGET}/ru/showcase
+cp -r ${SOURCE}/openEuler-portal/app/ru/showcase ${TARGET}/ru/
+cp ${SOURCE}/openEuler-portal/app/.vitepress/dist/ru/showcase/index.html ${TARGET}/ru/showcase/
+rm -rf ${TARGET}/ru/migration
+cp -r ${SOURCE}/openEuler-portal/app/ru/migration ${TARGET}/ru/
 
 
 # shellcheck disable=SC2164
-cd /usr/local/docs/source
+cd ${SOURCE}
 
 git clone https://gitee.com/openeuler/docs.git
 
-if [ ! -d "/usr/local/docs/source/docs" ]; then
- rm -rf /usr/local/docs/target
+if [ ! -d "${SOURCE}/docs" ]; then
+ rm -rf ${TARGET}
  exit
 fi
 
@@ -67,10 +63,10 @@ for r in $(git branch -r --list "origin/stable2-*")
 do
   b=${r##*origin/stable2-}
   git checkout $r
-  mkdir -p /usr/local/docs/target/zh/docs/$b/docs
-  mkdir -p /usr/local/docs/target/en/docs/$b/docs
-  cp -r /usr/local/docs/source/docs/docs/zh/docs/* /usr/local/docs/target/zh/docs/$b/docs/
-  cp -r /usr/local/docs/source/docs/docs/en/docs/* /usr/local/docs/target/en/docs/$b/docs/
+  mkdir -p ${TARGET}/zh/docs/$b/docs
+  mkdir -p ${TARGET}/en/docs/$b/docs
+  cp -r ${SOURCE}/docs/docs/zh/docs/* ${TARGET}/zh/docs/$b/docs/
+  cp -r ${SOURCE}/docs/docs/en/docs/* ${TARGET}/en/docs/$b/docs/
 done
 
 
