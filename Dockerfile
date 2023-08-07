@@ -41,8 +41,8 @@ RUN cd ${BASEPATH} \
    && tar -zxf rasp.tgz \
    && rm -rf plugins
 
-USER runtime
+USER easysearch
 
 EXPOSE 8080
 
-CMD java -javaagent:${BASEPATH}/rasp/rasp.jar -jar ${BASEPATH}/target/EaseSearch-0.0.1-SNAPSHOT.jar --spring.config.location=/home/easysearch/EaseSearch/target/classes/application.yml
+CMD java -javaagent:${BASEPATH}/rasp/rasp.jar -jar ${BASEPATH}/target/EaseSearch-0.0.1-SNAPSHOT.jar --spring.config.location=${APPLICATION_PATH}
