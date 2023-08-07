@@ -1,29 +1,19 @@
 #!/bin/bash
-if [ -d "/usr/local/docs" ]; then
-  rm -rf /usr/local/docs/source/*
-  rm -rf /usr/local/docs/target/*
-fi
+mkdir -p ${TARGET}
 
-mkdir -p /usr/local/docs/source/
-mkdir -p /usr/local/docs/target/
-
-#shellcheck disable=SC2164
-cd /usr/local/docs/source
-git clone https://gitee.com/mindspore/website-docs.git
-
-if [ ! -d "/usr/local/docs/source/website-docs" ]; then
- rm -rf /usr/local/docs/target
+if [ ! -d "${SOURCE}/website-docs" ]; then
+ rm -rf ${TARGET}
  exit
 fi
 
 
 # shellcheck disable=SC2164
-cd /usr/local/docs/source/website-docs
+cd ${SOURCE}/website-docs
 
-cp -r /usr/local/docs/source/website-docs/public/* /usr/local/docs/target/
+cp -r ${SOURCE}/website-docs/public/* ${TARGET}/
 
-# shellcheck disable=SC2164
-cd /usr/local/docs/target/
+# shellcheck disable=SC2164``
+cd ${TARGET}/
 
 # shellcheck disable=SC2035
 
