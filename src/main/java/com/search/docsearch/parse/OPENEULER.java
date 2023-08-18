@@ -2,6 +2,7 @@ package com.search.docsearch.parse;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,6 +29,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.util.ResourceUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import com.alibaba.fastjson2.JSON;
@@ -106,7 +108,6 @@ public class OPENEULER {
         return jsonMap;
     }
 
-
     public static void parseHtml(Map<String, Object> jsonMap, String fileContent) {
         Document node = Jsoup.parse(fileContent);
         Elements titles = node.getElementsByTag("title");
@@ -121,7 +122,8 @@ public class OPENEULER {
         }
     }
 
-    public static void parseDocsType(Map<String, Object> jsonMap, String fileContent, String fileName, String path, String type) {
+    public static void parseDocsType(Map<String, Object> jsonMap, String fileContent, String fileName, String path,
+            String type) {
         Parser parser = Parser.builder().build();
         HtmlRenderer renderer = HtmlRenderer.builder().build();
         Node document = parser.parse(fileContent);
@@ -159,7 +161,6 @@ public class OPENEULER {
             }
         }
 
-
         Node document = parser.parse(fileContent);
         Document node = Jsoup.parse(renderer.render(document));
         jsonMap.put("textContent", node.text());
@@ -172,7 +173,7 @@ public class OPENEULER {
             key = entry.getKey().toLowerCase(Locale.ROOT);
             value = entry.getValue();
             if (key.equals("date")) {
-                //需要处理日期不标准导致的存入ES失败的问题。
+                // 需要处理日期不标准导致的存入ES失败的问题。
                 String dateString = "";
                 if (value.getClass().getSimpleName().equals("Date")) {
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -180,7 +181,7 @@ public class OPENEULER {
                 } else {
                     dateString = value.toString();
                 }
-                Pattern pattern = Pattern.compile("\\D"); //匹配所有非数字
+                Pattern pattern = Pattern.compile("\\D"); // 匹配所有非数字
                 Matcher matcher = pattern.matcher(dateString);
                 dateString = matcher.replaceAll("-");
                 if (dateString.length() < 10) {
@@ -196,7 +197,7 @@ public class OPENEULER {
                 value = dateString;
             }
             if (key.equals("author") && value instanceof String) {
-                value = new String[]{value.toString()};
+                value = new String[] { value.toString() };
             }
             if (key.equals("head")) {
                 continue;
@@ -209,12 +210,10 @@ public class OPENEULER {
 
     }
 
-
     public Map<String, Object> parseHook(String data) {
         int index = data.indexOf(" ");
         String parameter = data.substring(0, index);
         String value = data.substring(index);
-
 
         Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put("type", "forum");
@@ -242,8 +241,8 @@ public class OPENEULER {
             return null;
         }
 
-        //验证是否为删除
-        //为了清除http请求缓存所在请求路径上加了随机数
+        // 验证是否为删除
+        // 为了清除http请求缓存所在请求路径上加了随机数
         String p = FORUMDOMAIM + jsonMap.get("path") + "?ran=" + generateSecureRandomNumber();
         HttpURLConnection connection = null;
         try {
@@ -264,20 +263,34 @@ public class OPENEULER {
 
     }
 
-    //generate secure random number
+    // generate secure random number
     public static String generateSecureRandomNumber() {
         SecureRandom random = new SecureRandom();
         return new BigInteger(130, random).toString(32);
     }
 
     public List<Map<String, Object>> customizeData() {
-        String path = FORUMDOMAIM + "/latest.json?no_definitions=true&page=";
-
         List<Map<String, Object>> r = new ArrayList<>();
+        if (!setForum(r)) {
+            log.error("论坛数据添加失败");
+            return null;
+        }
+
+        if (!setService(r)) {
+            log.error("服务数据添加失败");
+            return null;
+        }
+
+        return r;
+    }
+
+    private boolean setForum(List<Map<String, Object>> r) {
+        String path = FORUMDOMAIM + "/latest.json?no_definitions=true&page=";
 
         String req = "";
         HttpURLConnection connection = null;
         String result;  // 返回结果字符串
+
         for (int i = 0; ; i++) {
             req = path + i;
             try {
@@ -290,20 +303,18 @@ public class OPENEULER {
                     }
                 } else {
                     log.error(req + " - ", connection.getResponseCode());
-                    return null;
-                }
+                    return false;
+                } 
             } catch (IOException | InterruptedException e) {
-                log.error(e.getMessage());
-                return null;
+                log.error("Connection failed, error is: " + e.getMessage());
+                return false;
             } finally {
                 if (null != connection) {
                     connection.disconnect();
                 }
             }
         }
-
-
-        return r;
+        return true;
     }
 
     private boolean setData(String data, List<Map<String, Object>> r) {
@@ -315,7 +326,7 @@ public class OPENEULER {
         }
         String path = "";
         HttpURLConnection connection = null;
-        String result;  // 返回结果字符串
+        String result; // 返回结果字符串
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject topic = jsonArray.getJSONObject(i);
             String id = topic.getString("id");
@@ -358,6 +369,31 @@ public class OPENEULER {
         return true;
     }
 
+    public boolean setService(List<Map<String, Object>> r) {
+        try {
+            File yamlFile = ResourceUtils.getFile("classpath:script/service.yaml");
+
+            InputStream inputStream = new FileInputStream(yamlFile);
+            Yaml yaml = new Yaml();
+            List<Map<String, Object>> data = yaml.load(inputStream);
+
+            for (Map<String, Object> datum : data) {
+                Map<String, Object> jsonMap = new HashMap<>();
+                jsonMap.put("title", datum.get("name"));
+                jsonMap.put("textContent", datum.get("introduce"));
+                jsonMap.put("lang", datum.get("lang"));
+                jsonMap.put("path", datum.get("path"));
+                jsonMap.put("type", "service");
+
+                r.add(jsonMap);
+            }
+            inputStream.close();
+        } catch (IOException e) {
+            log.error("load yaml failed, error is: " + e.getMessage());
+            return false;
+        } 
+        return true;
+    }
 
     private HttpURLConnection sendHTTP(String path, String method) throws IOException {
         URL url = new URL(path);
@@ -391,6 +427,4 @@ public class OPENEULER {
 
     }
 
-
 }
-
