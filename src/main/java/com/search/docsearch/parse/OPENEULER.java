@@ -380,11 +380,21 @@ public class OPENEULER {
             for (Map<String, Object> datum : data) {
                 Map<String, Object> jsonMap = new HashMap<>();
                 jsonMap.put("title", datum.get("name"));
-                jsonMap.put("textContent", datum.get("introduce") + " " + datum.get("describe"));
+                jsonMap.put("secondaryTitle", datum.get("introduction"));
                 jsonMap.put("lang", datum.get("lang"));
                 jsonMap.put("path", datum.get("path"));
                 jsonMap.put("type", "service");
 
+                StringBuilder textContentBuilder = new StringBuilder();
+                if (datum.get("introduction") != null) {
+                    textContentBuilder.append(datum.get("introduction")).append(" ");
+                }
+                if (datum.get("description") != null) {
+                    textContentBuilder.append(datum.get("description"));
+                }
+                String textContent =  textContentBuilder.toString();
+
+                jsonMap.put("textContent", textContent);
                 r.add(jsonMap);
             }
         
