@@ -1,9 +1,7 @@
 package com.search.docsearch.service.impl;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -68,37 +66,18 @@ public class DataImportServiceImpl implements DataImportService {
     @Async("threadPoolTaskExecutor")
     public void refreshDoc() {
         if (!doRefresh()) {
-            //如果先行条件不成立则该服务启动不更新es
-            log.info("===============本次服务启动不更新文档=================");
+            log.info("===============document don't update in this time=================");
             return;
         }
 
-        log.info("===============开始运行bash脚本=================");
-        try {
-            ProcessBuilder pb = new ProcessBuilder(s.initDoc);
-            Process p = pb.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                log.info(line);
-            }
-        } catch (Exception e) {
-            log.error("The script fails to run with the error: " + e.getMessage());
-            globalUnlock();
-            return;
-        }
-
-        log.info("===============bash脚本运行完成=================");
-
-        File indexFile = new File(s.basePath);
+        File indexFile = new File(s.getTargetPath());
         if (!indexFile.exists()) {
-            log.error(String.format("%s 文件夹不存在", indexFile.getPath()));
-            log.error("服务器开小差了");
+            log.error(String.format("%s folder does not exist", indexFile.getPath()));
             globalUnlock();
             return;
         }
 
-        log.info("开始更新es文档");
+        log.info("begin to update document");
 
         Set<String> idSet = new HashSet<>();
         Collection<File> listFiles = FileUtils.listFiles(indexFile, new String[]{"md", "html"}, true);
@@ -123,32 +102,32 @@ public class DataImportServiceImpl implements DataImportService {
         }
 
         try {
+            log.info("begin to update customize data");
             String className = "com.search.docsearch.parse." + s.getSystem().toUpperCase(Locale.ROOT);
             Class<?> clazz = Class.forName(className);
             Method method = clazz.getMethod("customizeData");
             Object result = method.invoke(clazz.getDeclaredConstructor().newInstance());
             if (result == null) {
-                log.error("自定义数据获取失效，不更新该部分");
+                log.error("get customize data error, do not update this part");
                 globalUnlock();
                 return;
             }
 
             List<Map<String, Object>> escape = (List<Map<String, Object>>) result;
-            System.out.println("============== " + escape.size());
             for (Map<String, Object> lm : escape) {
                 insert(lm, s.getIndex() + "_" + lm.get("lang"));
                 idSet.add((String) lm.get("path"));
             }
 
         } catch (Exception e) {
-            log.error("error: " + e.getMessage());
+            log.error("get customize: " + e.getMessage());
             globalUnlock();
             return;
         }
-
+        log.info("start delete expired document");
         deleteExpired(idSet);
 
-        log.info("所有文档更新成功");
+        log.info("all document update success");
         globalUnlock();
     }
 
@@ -306,7 +285,6 @@ public class DataImportServiceImpl implements DataImportService {
 
             restHighLevelClient.clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
 
-            System.out.println("time:" + (System.currentTimeMillis() - st));
         } catch (Exception e) {
             log.error(e.getMessage());
         }

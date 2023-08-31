@@ -3,39 +3,56 @@ FROM node
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV LANGUAGE C.UTF-8
-ENV searchsystem mindspore
+ENV NODE_OPTIONS --max-old-space-size=8192
+
+RUN groupadd -g 1001 easysearch \
+    && useradd -u 1001 -g easysearch -s /bin/bash -m easysearch
+
+ENV WORKSPACE=/home/easysearch
+ENV SOURCE=${WORKSPACE}/file/source
+ENV TARGET=${WORKSPACE}/file/target
+ENV BASEPATH=${WORKSPACE}/EaseSearch
+
+WORKDIR ${WORKSPACE}
 
 RUN apt update \
     && apt install libasm-java \
     && wget http://security.debian.org/debian-security/pool/updates/main/j/json-smart/libjson-smart-java_2.2-2+deb10u1_all.deb \
-    && dpkg -i libjson-smart-java_2.2-2+deb10u1_all.deb  \
-    && cd /root \
-    && wget https://download.java.net/java/GA/jdk19.0.2/fdb695a9d9064ad6b064dc6df578380c/7/GPL/openjdk-19.0.2_linux-x64_bin.tar.gz \
-    && tar -zxvf openjdk-19.0.2_linux-x64_bin.tar.gz \
-    && mkdir -p /EaseSearch \
-    && apt update \
-    && npm i pnpm -g
+    && dpkg -i libjson-smart-java_2.2-2+deb10u1_all.deb
 
-ENV JAVA_HOME=/root/jdk-19.0.2
+RUN wget https://download.java.net/java/GA/jdk19.0.2/fdb695a9d9064ad6b064dc6df578380c/7/GPL/openjdk-19.0.2_linux-x64_bin.tar.gz \
+    && tar -zxvf openjdk-19.0.2_linux-x64_bin.tar.gz \
+    && npm i pnpm -g \
+    && mkdir -p ${BASEPATH}
+
+ENV JAVA_HOME=${WORKSPACE}/jdk-19.0.2
 ENV PATH=${JAVA_HOME}/bin:$PATH
 
-WORKDIR /EaseSearch
-COPY . /EaseSearch
-RUN chmod 777 -R ./* \
+COPY . ${BASEPATH}
+RUN cd ${BASEPATH} \
+    && chmod +x mvnw \
     && ./mvnw clean install package -Dmaven.test.skip \
-    && rm -rf `ls | grep -v target` \
-    && cd ./target/classes \
-    && chmod 777 -R script \
-    && cd /EaseSearch/target
+    && rm -rf `ls | grep -v target`
 
-WORKDIR /EaseSearch
 ARG PUBLIC_USER
 ARG PUBLIC_PASSWORD
-RUN git clone https://$PUBLIC_USER:$PUBLIC_PASSWORD@github.com/Open-Infra-Ops/plugins \
-    && cp plugins/armorrasp/rasp.tgz . \
-    && tar -zxf rasp.tgz \
-    && chown -R root:root rasp && chmod 755 -R rasp \
-    && rm -rf plugins
+RUN cd ${BASEPATH} \
+   && git clone https://$PUBLIC_USER:$PUBLIC_PASSWORD@github.com/Open-Infra-Ops/plugins \
+   && cp plugins/armorrasp/rasp.tgz . \
+   && tar -zxf rasp.tgz \
+   && rm -rf plugins
+
+RUN mkdir -p ${SOURCE} \
+    && cd ${SOURCE} \
+    && git clone https://gitee.com/mindspore/website-docs.git \
+    && cd ${BASEPATH}/target/classes/script/mindspore \
+    && chmod +x initDoc.sh \
+    && ./initDoc.sh
+
+ENV searchsystem mindspore
+
+USER easysearch
 
 EXPOSE 8080
-CMD java -javaagent:/EaseSearch/rasp/rasp.jar -jar ./target/EaseSearch-0.0.1-SNAPSHOT.jar --spring.config.location=${APPLICATION_PATH}
+
+CMD java -javaagent:${BASEPATH}/rasp/rasp.jar -jar ${BASEPATH}/target/EaseSearch-0.0.1-SNAPSHOT.jar --spring.config.location=${APPLICATION_PATH}

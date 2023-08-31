@@ -32,8 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MINDSPORE {
-    public static final String BASEPATH = "/usr/local/docs/target/";
-
+    public static final String BASEPATH = System.getenv("TARGET") + "/";
     public static final String LANG_EN = "/en/";
     public static final String LANG_ZH = "/zh-CN/";
 
@@ -131,7 +130,7 @@ public class MINDSPORE {
         String textContent = "";
         Document node = Jsoup.parse(fileContent);
 
-        Elements sections = node.getElementsByClass("section");
+        Elements sections = node.getElementsByTag("section");
         if (sections.size() > 0) {
 
             Element one = sections.get(0);
@@ -147,10 +146,10 @@ public class MINDSPORE {
                 title = t.text();
                 t.remove();
             } else {
-                System.out.println(MINDSPORE_OFFICIAL+ "/" + jsonMap.get("path"));
                 return false;
             }
             title = title.replaceAll("¶", "");
+            title = title.replaceAll("\uF0C1", "");
             textContent = one.text();
         } else {
             return false;
