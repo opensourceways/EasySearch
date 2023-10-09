@@ -62,7 +62,7 @@ for r in $(git branch -r --list "origin/*"); do
     mkdir -p ${TARGET}/zh/docs/$b-lite/docs
     mkdir -p ${TARGET}/en/docs/$b-lite/docs
     cp -r ${SOURCE}/docs/content/docs-lite/zh/docs/* ${TARGET}/zh/docs/$b-lite/docs/
-    cp -r ${SOURCE}/docs/content/docs-list/en/docs/* ${TARGET}/en/docs/$b-lite/docs/
+    cp -r ${SOURCE}/docs/content/docs-lite/en/docs/* ${TARGET}/en/docs/$b-lite/docs/
 
  fi
 done
