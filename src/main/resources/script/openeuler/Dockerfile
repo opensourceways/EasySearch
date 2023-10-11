@@ -52,6 +52,9 @@ RUN mkdir -p ${SOURCE} \
     && chmod +x initDoc.sh \
     && ./initDoc.sh
 
+RUN rm ${BASEPATH}/src/main/resources/application.yaml
+RUN rm ${BASEPATH}/target/classes/application.yaml
+
 ENV searchsystem=openEuler
 
 USER easysearch
