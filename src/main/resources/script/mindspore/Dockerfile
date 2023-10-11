@@ -32,8 +32,8 @@ COPY . ${BASEPATH}
 RUN cd ${BASEPATH} \
     && chmod +x mvnw \
     && ./mvnw clean install package -Dmaven.test.skip \
-    && rm -rf `ls | grep -v target` \
-    && rm ${BASEPATH}/target/classes/application.yaml
+    && rm -rf `ls | grep -v target` 
+    # && rm ${BASEPATH}/target/classes/application.yaml
 
 ARG PUBLIC_USER
 ARG PUBLIC_PASSWORD
