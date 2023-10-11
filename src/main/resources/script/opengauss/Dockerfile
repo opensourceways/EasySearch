@@ -32,7 +32,8 @@ COPY . ${BASEPATH}
 RUN cd ${BASEPATH} \
     && chmod +x mvnw \
     && ./mvnw clean install package -Dmaven.test.skip \
-    && rm -rf `ls | grep -v target`
+    && rm -rf `ls | grep -v target` \
+    && rm ${BASEPATH}/target/classes/application.yaml
 
 ARG PUBLIC_USER
 ARG PUBLIC_PASSWORD
@@ -54,9 +55,6 @@ RUN mkdir -p ${SOURCE} \
     && cd ${BASEPATH}/target/classes/script/opengauss \
     && chmod +x initDoc.sh \
     && ./initDoc.sh
-
-RUN rm ${BASEPATH}/src/main/resources/application.yaml
-RUN rm ${BASEPATH}/target/classes/application.yaml
 
 ENV searchsystem=openGauss
 
