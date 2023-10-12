@@ -35,7 +35,7 @@ ENV PATH=${MAVEN_HOME}/bin:$PATH
 
 COPY . ${BASEPATH}
 RUN cd ${BASEPATH} \
-    && mvn clean install package -Dmaven.test.skip
+    && mvn clean install package -Dmaven.test.skip \
     && rm -rf `ls | grep -v target` \
     && rm ${BASEPATH}/target/classes/application.yaml
 
