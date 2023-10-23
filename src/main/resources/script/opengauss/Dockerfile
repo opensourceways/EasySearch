@@ -38,8 +38,6 @@ RUN cd /EaseSearch/target/classes/script/opengauss \
     && chmod +x initDoc.sh \
     && ./initDoc.sh 
 
-RUN cp -r jdk-17.0.7 jre
-
 FROM openeuler/openeuler:22.03
 ENV searchsystem=opengauss
 
@@ -53,10 +51,12 @@ ENV TARGET=${WORKSPACE}/file/target
 WORKDIR ${WORKSPACE}
 
 COPY --chown=easysearch --from=Builder /EaseSearch/target ${WORKSPACE}/target
-COPY --chown=easysearch --from=Builder /jre ${WORKSPACE}/jre
 COPY --chown=easysearch --from=Builder /docs-file/target ${WORKSPACE}/file/target
 
-ENV JAVA_HOME=${WORKSPACE}/jre
+RUN dnf install -y wget \
+    && wget https://javadl.oracle.com/webapps/download/AutoDL?BundleId=249192_b291ca3e0c8548b5a51d5a5f50063037 -O jre1.8.0_391.tar.gz \
+    && tar -zxvf jre1.8.0_391.tar.gz 
+ENV JAVA_HOME=${WORKSPACE}/jre1.8.0_391
 ENV PATH=${JAVA_HOME}/bin:$PATH
 
 ENV NO_ID_USER=anonymous
