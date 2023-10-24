@@ -67,7 +67,7 @@ public class ParameterUtil {
 
     public static String vaildPage(String page) {
         page = page == null ? "1" : page;
-        if (Integer.parseInt(page) > 100 && Integer.parseInt(page) < 1) {
+        if (Integer.parseInt(page) > 100 || Integer.parseInt(page) < 1) {
             throw new IllegalArgumentException("Invalid page parameter");
         }
         return page;
@@ -75,7 +75,7 @@ public class ParameterUtil {
 
     public static String vaildPageSize(String pageSize) {
         pageSize = pageSize == null ? "20" : pageSize;
-        if (Integer.parseInt(pageSize) > 20 && Integer.parseInt(pageSize) < 5) {
+        if (Integer.parseInt(pageSize) > 20 || Integer.parseInt(pageSize) < 5) {
             throw new IllegalArgumentException("Invalid page parameter");
         }
         return pageSize;
