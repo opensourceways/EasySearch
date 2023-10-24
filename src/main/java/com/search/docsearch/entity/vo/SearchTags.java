@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,11 +21,14 @@ public class SearchTags implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotBlank(message = "lang can not be null")
+    @Pattern(regexp = "((^zh$|^en$|^ZH$|^EN$))")
     private String lang;
 
+    @Pattern(regexp = "((^migration$|^news$|^forum$|^blog$|^docs$|^showcase$|^other$|^service$))", message = "category format is invalid")
     private String category;
     
     @NotBlank(message = "want can not be null")
+    @Pattern(regexp = "^[a-zA-Z0-9.\\-/_]+$", message = "want format is invalid.")
     private String want;
 
     private Map<String, String> condition;
