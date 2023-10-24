@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,6 +30,7 @@ public class SearchTags implements Serializable {
     
     @NotBlank(message = "want can not be null")
     @Pattern(regexp = "^[a-zA-Z0-9.\\-/_]+$", message = "want format is invalid.")
+    @Size(max = 20)
     private String want;
 
     private Map<String, String> condition;

@@ -1,6 +1,10 @@
 package com.search.docsearch.service.impl;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,15 +36,19 @@ import org.elasticsearch.search.suggest.SuggestionBuilder;
 import org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.config.MySystem;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.General;
+import com.search.docsearch.utils.ParameterUtil;
 
 
 @Service
@@ -53,6 +61,18 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     @Qualifier("setConfig")
     private MySystem s;
+
+    @Value("${api.allApi}")
+    private String allApi;
+
+    @Value("${api.sigNameApi}")
+    private String sigNameApi;
+
+    @Value("${api.sigReadmeApi}")
+    private String sigReadmeApi;
+
+    @Value("${api.repoInfoApi}")
+    private String repoInfoApi;
 
     public Map<String, Object> getSuggestion(String keyword, String lang) throws IOException {
         String saveIndex = s.index + "_" + lang;
@@ -429,5 +449,66 @@ public class SearchServiceImpl implements SearchService {
         return result;
     }
 
+    @Override
+    public String querySigName(String community, String lang) throws Exception {
+        lang = ParameterUtil.vaildLang(lang);
+        community = ParameterUtil.vaildCommunity(community);
+        String urlStr = String.format(sigNameApi, community, lang);  
+        return httpRequest(urlStr);
+    }
 
+    @Override
+    public String queryAll(String community) throws Exception {
+        community = ParameterUtil.vaildCommunity(community);
+        String urlStr = String.format(allApi, community);  
+        return httpRequest(urlStr);
+    }
+
+    @Override
+    public String querySigReadme(String community, String sig, String lang) throws Exception {
+        lang = ParameterUtil.vaildLang(lang);
+        community = ParameterUtil.vaildCommunity(community);
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<String> sigName = new ArrayList<>();
+        JsonNode sigNameList = objectMapper.readTree(querySigName(community, lang));
+        if (sigNameList.get("data") != null && sigNameList.get("data").get("SIG_list") != null) {
+            for (JsonNode bucket : sigNameList.get("data").get("SIG_list")) {
+                sigName.add(bucket.get("name").asText());
+            }
+        }
+        if (!sigName.contains(sig)) {
+            throw new IllegalArgumentException("Invalid sig parameter");
+        }
+        sig = sig.replaceAll("\\+", "%20").replaceAll(" ", "%20");
+        String urlStr = String.format(sigReadmeApi, community, sig, lang);
+        return httpRequest(urlStr);
+    }
+
+    @Override
+    public String getEcosystemRepoInfo(String community, String ecosystemType, String sortType, String sortOrder,
+            String page, String pageSize, String lang) throws Exception {     
+        lang = ParameterUtil.vaildLang(lang);
+        community = ParameterUtil.vaildCommunity(community);
+        ecosystemType = ParameterUtil.vaildEcosystemType(ecosystemType);
+        sortType = ParameterUtil.vaildSortType(sortType);
+        sortOrder = ParameterUtil.vaildSortOrder(sortOrder);
+        page = ParameterUtil.vaildPage(page);
+        pageSize = ParameterUtil.vaildPage(pageSize);
+        String urlStr = String.format(repoInfoApi, community, ecosystemType, sortType, sortOrder, page, pageSize, lang);
+        return httpRequest(urlStr);
+    }
+
+    public String httpRequest(String urlStr) throws Exception {
+        URL url = new URL(urlStr);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+        String line;
+        StringBuilder response = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            response.append(line);
+        }
+        reader.close();
+        return response.toString();
+    }
 }
