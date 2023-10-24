@@ -25,4 +25,13 @@ public interface SearchService {
     Map<String, Object> advancedSearch(Map<String, String> search) throws Exception;
 
     Map<String, Object> getTags(SearchTags searchTags) throws Exception;
+
+    String querySigName(String community, String lang) throws Exception;
+
+    String queryAll(String community) throws Exception;
+
+    String querySigReadme(String community, String sig, String lang) throws Exception;
+
+    String getEcosystemRepoInfo(String community, String ecosystemType, String sortType, String sortOrder, String page,
+            String pageSize, String lang) throws Exception;
 }

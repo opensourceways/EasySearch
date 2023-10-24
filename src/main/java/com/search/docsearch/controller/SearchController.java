@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.search.docsearch.aop.LimitRequest;
@@ -20,7 +21,7 @@ import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.entity.vo.SysResult;
 import com.search.docsearch.service.SearchService;
-import com.search.docsearch.utils.MapUtil;
+import com.search.docsearch.utils.ParameterUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,8 +46,8 @@ public class SearchController {
     @PostMapping("docs")
     @LimitRequest()
     public SysResult searchDocByKeyword(@RequestBody @Validated SearchCondition condition) {
-        MapUtil.vaildListMap(condition.getLimit());
-        MapUtil.vaildListMap(condition.getFilter());
+        ParameterUtil.vaildListMap(condition.getLimit());
+        ParameterUtil.vaildListMap(condition.getFilter());
         try {
             Map<String, Object> result = searchService.searchByCondition(condition);
             if (result == null) {
@@ -63,8 +64,8 @@ public class SearchController {
     @PostMapping("sugg")
     @LimitRequest()
     public SysResult getSuggestion(@RequestBody @Validated SearchCondition condition) {
-        MapUtil.vaildListMap(condition.getLimit());
-        MapUtil.vaildListMap(condition.getFilter());
+        ParameterUtil.vaildListMap(condition.getLimit());
+        ParameterUtil.vaildListMap(condition.getFilter());
         if (!StringUtils.hasText(condition.getKeyword())) {
             return SysResult.fail("keyword must not null", null);
         }
@@ -86,8 +87,8 @@ public class SearchController {
     @PostMapping("count")
     @LimitRequest()
     public SysResult getCount(@RequestBody @Validated SearchCondition condition) {
-        MapUtil.vaildListMap(condition.getLimit());
-        MapUtil.vaildListMap(condition.getFilter());
+        ParameterUtil.vaildListMap(condition.getLimit());
+        ParameterUtil.vaildListMap(condition.getFilter());
         try {
             Map<String, Object> result = searchService.getCount(condition);
             if (result == null) {
@@ -144,7 +145,7 @@ public class SearchController {
     @PostMapping("tags")
     @LimitRequest()
     public SysResult getTags(@RequestBody @Validated SearchTags searchTags) {
-        MapUtil.vaildMap(searchTags.getCondition());
+        ParameterUtil.vaildMap(searchTags.getCondition());
         try {
             Map<String, Object> result = searchService.getTags(searchTags);
             if (result == null) {
@@ -157,6 +158,35 @@ public class SearchController {
 
 
         return SysResult.fail("查询失败", null);
+    }
+
+    @RequestMapping("sig/name")
+    public String querySigName(@RequestParam(value = "community") String community,
+            @RequestParam(value = "lang", required = false) String lang) throws Exception {
+        return searchService.querySigName(community, lang);
+    }
+
+    @RequestMapping("all")
+    public String queryAll(@RequestParam(value = "community") String community) throws Exception {
+        return searchService.queryAll(community);
+    }
+
+    @RequestMapping("sig/readme")
+    public String querySigReadme(@RequestParam(value = "community") String community,
+            @RequestParam(value = "sig") String sig,
+            @RequestParam(value = "lang", required = false) String lang) throws Exception {
+        return searchService.querySigReadme(community, sig, lang);
+    }
+
+    @RequestMapping(value = "ecosystem/repo/info")
+    public String getEcosystemRepoInfo(@RequestParam(value = "community") String community,
+            @RequestParam(value = "ecosystem_type") String ecosystemType,
+            @RequestParam(value = "lang", required = false) String lang,
+            @RequestParam(value = "sort_type", required = false) String sortType,
+            @RequestParam(value = "sort_order", required = false) String sortOrder,
+            @RequestParam(value = "page", required = false) String page,
+            @RequestParam(value = "pageSize", required = false) String pageSize) throws Exception {
+        return searchService.getEcosystemRepoInfo(community, ecosystemType, sortType, sortOrder, page, pageSize, lang);
     }
 
 }

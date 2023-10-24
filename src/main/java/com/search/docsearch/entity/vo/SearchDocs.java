@@ -10,6 +10,7 @@ import java.io.Serializable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Range;
 @Data
@@ -33,8 +34,10 @@ public class SearchDocs implements Serializable {
     
     @NotBlank(message = "keyword can not be null")
     @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.\\-_]+$", message = "Keyword format is invalid")
+    @Size(max = 20)
     private String keyword;
     
-    @Pattern(regexp = "^[a-zA-Z0-9.\\-_]*$", message = "Version format is invalid.")
+    @Pattern(regexp = "^[\\x20a-zA-Z0-9.\\-_]*$", message = "Version format is invalid.")
+    @Size(max = 50)
     private String version;
 }
