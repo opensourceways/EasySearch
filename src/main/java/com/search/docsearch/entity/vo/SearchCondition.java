@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Range;
 
@@ -36,6 +37,7 @@ public class SearchCondition implements Serializable {
 
     @NotBlank(message = "keyword can not be null")
     @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.\\-_]+$", message = "Keyword format is invalid")
+    @Size(max = 20)
     private String keyword;
     
     @Pattern(regexp = "((^migration$|^news$|^forum$|^blog$|^docs$|^showcase$|^other$|^service$))", message = "Keyword format is invalid")
