@@ -20,6 +20,7 @@ import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.entity.vo.SysResult;
 import com.search.docsearch.service.SearchService;
+import com.search.docsearch.utils.MapUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +45,8 @@ public class SearchController {
     @PostMapping("docs")
     @LimitRequest()
     public SysResult searchDocByKeyword(@RequestBody @Validated SearchCondition condition) {
+        MapUtil.vaildListMap(condition.getLimit());
+        MapUtil.vaildListMap(condition.getFilter());
         try {
             Map<String, Object> result = searchService.searchByCondition(condition);
             if (result == null) {
@@ -60,6 +63,8 @@ public class SearchController {
     @PostMapping("sugg")
     @LimitRequest()
     public SysResult getSuggestion(@RequestBody @Validated SearchCondition condition) {
+        MapUtil.vaildListMap(condition.getLimit());
+        MapUtil.vaildListMap(condition.getFilter());
         if (!StringUtils.hasText(condition.getKeyword())) {
             return SysResult.fail("keyword must not null", null);
         }
@@ -81,6 +86,8 @@ public class SearchController {
     @PostMapping("count")
     @LimitRequest()
     public SysResult getCount(@RequestBody @Validated SearchCondition condition) {
+        MapUtil.vaildListMap(condition.getLimit());
+        MapUtil.vaildListMap(condition.getFilter());
         try {
             Map<String, Object> result = searchService.getCount(condition);
             if (result == null) {
@@ -137,6 +144,7 @@ public class SearchController {
     @PostMapping("tags")
     @LimitRequest()
     public SysResult getTags(@RequestBody @Validated SearchTags searchTags) {
+        MapUtil.vaildMap(searchTags.getCondition());
         try {
             Map<String, Object> result = searchService.getTags(searchTags);
             if (result == null) {
