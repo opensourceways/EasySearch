@@ -34,7 +34,7 @@ public class SearchController {
     private SearchService searchService;
     @Autowired
     @Qualifier("setConfig")
-    private MySystem s;
+    private MySystem mySystem;
 
     /**
      * 查询文档，首页大搜索
@@ -161,32 +161,37 @@ public class SearchController {
     }
 
     @RequestMapping("sig/name")
-    public String querySigName(@RequestParam(value = "community") String community,
-            @RequestParam(value = "lang", required = false) String lang) throws Exception {
-        return searchService.querySigName(community, lang);
+    public String querySigName(@RequestParam(value = "lang", required = false) String lang) throws Exception {
+        lang = ParameterUtil.vaildLang(lang);
+        return searchService.querySigName(lang);
     }
 
     @RequestMapping("all")
-    public String queryAll(@RequestParam(value = "community") String community) throws Exception {
-        return searchService.queryAll(community);
+    public String queryAll() throws Exception {
+        return searchService.queryAll();
     }
 
     @RequestMapping("sig/readme")
-    public String querySigReadme(@RequestParam(value = "community") String community,
-            @RequestParam(value = "sig") String sig,
+    public String querySigReadme(@RequestParam(value = "sig") String sig,
             @RequestParam(value = "lang", required = false) String lang) throws Exception {
-        return searchService.querySigReadme(community, sig, lang);
+        lang = ParameterUtil.vaildLang(lang);
+        return searchService.querySigReadme(sig, lang);
     }
 
     @RequestMapping(value = "ecosystem/repo/info")
-    public String getEcosystemRepoInfo(@RequestParam(value = "community") String community,
-            @RequestParam(value = "ecosystem_type") String ecosystemType,
+    public String getEcosystemRepoInfo(@RequestParam(value = "ecosystem_type") String ecosystemType,
             @RequestParam(value = "lang", required = false) String lang,
             @RequestParam(value = "sort_type", required = false) String sortType,
             @RequestParam(value = "sort_order", required = false) String sortOrder,
             @RequestParam(value = "page", required = false) String page,
             @RequestParam(value = "pageSize", required = false) String pageSize) throws Exception {
-        return searchService.getEcosystemRepoInfo(community, ecosystemType, sortType, sortOrder, page, pageSize, lang);
+        lang = ParameterUtil.vaildLang(lang);
+        ecosystemType = ParameterUtil.vaildEcosystemType(ecosystemType);
+        sortType = ParameterUtil.vaildSortType(sortType);
+        sortOrder = ParameterUtil.vaildSortOrder(sortOrder);
+        page = ParameterUtil.vaildPage(page);
+        pageSize = ParameterUtil.vaildPageSize(pageSize);
+        return searchService.getEcosystemRepoInfo(ecosystemType, sortType, sortOrder, page, pageSize, lang);
     }
 
 }

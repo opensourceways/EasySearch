@@ -26,12 +26,12 @@ public interface SearchService {
 
     Map<String, Object> getTags(SearchTags searchTags) throws Exception;
 
-    String querySigName(String community, String lang) throws Exception;
+    String querySigName(String lang) throws Exception;
 
-    String queryAll(String community) throws Exception;
+    String queryAll() throws Exception;
 
-    String querySigReadme(String community, String sig, String lang) throws Exception;
+    String querySigReadme(String sig, String lang) throws Exception;
 
-    String getEcosystemRepoInfo(String community, String ecosystemType, String sortType, String sortOrder, String page,
+    String getEcosystemRepoInfo(String ecosystemType, String sortType, String sortOrder, String page,
             String pageSize, String lang) throws Exception;
 }
