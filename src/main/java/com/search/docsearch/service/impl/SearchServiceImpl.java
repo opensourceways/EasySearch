@@ -48,7 +48,6 @@ import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.General;
-import com.search.docsearch.utils.ParameterUtil;
 
 
 @Service
@@ -60,7 +59,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Autowired
     @Qualifier("setConfig")
-    private MySystem s;
+    private MySystem mySystem;
 
     @Value("${api.allApi}")
     private String allApi;
@@ -75,7 +74,7 @@ public class SearchServiceImpl implements SearchService {
     private String repoInfoApi;
 
     public Map<String, Object> getSuggestion(String keyword, String lang) throws IOException {
-        String saveIndex = s.index + "_" + lang;
+        String saveIndex = mySystem.index + "_" + lang;
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         SuggestionBuilder<TermSuggestionBuilder> termSuggestionBuilder =
@@ -134,7 +133,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public Map<String, Object> searchByCondition(SearchCondition condition) throws IOException {
-        String saveIndex = s.index + "_" + condition.getLang();
+        String saveIndex = mySystem.index + "_" + condition.getLang();
 
         Map<String, Object> result = new HashMap<>();
         result.put("keyword", HtmlUtils.htmlEscape(condition.getKeyword()));
@@ -256,7 +255,7 @@ public class SearchServiceImpl implements SearchService {
 
 
     public Map<String, Object> getCount(SearchCondition condition) throws IOException {
-        String saveIndex = s.index + "_" + condition.getLang();
+        String saveIndex = mySystem.index + "_" + condition.getLang();
         SearchRequest request = new SearchRequest(saveIndex);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -339,10 +338,10 @@ public class SearchServiceImpl implements SearchService {
         String saveIndex;
         String lang = search.get("lang");
         if (lang != null) {
-            saveIndex = s.index + "_" + lang;
+            saveIndex = mySystem.index + "_" + lang;
         } else {
             //在没有传语言时默认为zh
-            saveIndex = s.index + "_zh";
+            saveIndex = mySystem.index + "_zh";
         }
         SearchRequest request = new SearchRequest(saveIndex);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -413,7 +412,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public Map<String, Object> getTags(SearchTags searchTags) throws Exception {
-        String saveIndex = s.index + "_" + searchTags.getLang();
+        String saveIndex = mySystem.index + "_" + searchTags.getLang();
 
         SearchRequest request = new SearchRequest(saveIndex);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -450,27 +449,25 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public String querySigName(String community, String lang) throws Exception {
-        lang = ParameterUtil.vaildLang(lang);
-        community = ParameterUtil.vaildCommunity(community);
+    public String querySigName(String lang) throws Exception {
+        String community = mySystem.getSystem();
         String urlStr = String.format(sigNameApi, community, lang);  
         return httpRequest(urlStr);
     }
 
     @Override
-    public String queryAll(String community) throws Exception {
-        community = ParameterUtil.vaildCommunity(community);
+    public String queryAll() throws Exception {
+        String community = mySystem.getSystem();
         String urlStr = String.format(allApi, community);  
         return httpRequest(urlStr);
     }
 
     @Override
-    public String querySigReadme(String community, String sig, String lang) throws Exception {
-        lang = ParameterUtil.vaildLang(lang);
-        community = ParameterUtil.vaildCommunity(community);
+    public String querySigReadme(String sig, String lang) throws Exception {
+        String community = mySystem.getSystem();
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> sigName = new ArrayList<>();
-        JsonNode sigNameList = objectMapper.readTree(querySigName(community, lang));
+        JsonNode sigNameList = objectMapper.readTree(querySigName(lang));
         if (sigNameList.get("data") != null && sigNameList.get("data").get("SIG_list") != null) {
             for (JsonNode bucket : sigNameList.get("data").get("SIG_list")) {
                 sigName.add(bucket.get("name").asText());
@@ -485,15 +482,9 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public String getEcosystemRepoInfo(String community, String ecosystemType, String sortType, String sortOrder,
+    public String getEcosystemRepoInfo(String ecosystemType, String sortType, String sortOrder,
             String page, String pageSize, String lang) throws Exception {     
-        lang = ParameterUtil.vaildLang(lang);
-        community = ParameterUtil.vaildCommunity(community);
-        ecosystemType = ParameterUtil.vaildEcosystemType(ecosystemType);
-        sortType = ParameterUtil.vaildSortType(sortType);
-        sortOrder = ParameterUtil.vaildSortOrder(sortOrder);
-        page = ParameterUtil.vaildPage(page);
-        pageSize = ParameterUtil.vaildPage(pageSize);
+        String community = mySystem.getSystem();
         String urlStr = String.format(repoInfoApi, community, ecosystemType, sortType, sortOrder, page, pageSize, lang);
         return httpRequest(urlStr);
     }
