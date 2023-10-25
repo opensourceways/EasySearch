@@ -109,12 +109,13 @@ public class SearchController {
     public SysResult getPop(String lang) {
         try {
             String[] result = null;
-            if (lang.equals("zh")) {
+            if ("zh".equals(lang)) {
                 result = new String[]{"迁移", "openGauss", "yum", "安装", "白皮书", "生命周期", "docker", "虚拟化"};
-            } else {
+            } else if ("en".equals(lang)){
                 result = new String[]{"migration", "openGauss", "doc", "openstack", "cla"};
+            } else {
+                return SysResult.fail("Invalid lang parameter", null);
             }
-
             return SysResult.ok("查询成功", result);
         } catch (Exception e) {
             log.error("getPop error is: " + e.getMessage());
