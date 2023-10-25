@@ -3,8 +3,10 @@ package com.search.docsearch.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.security.DrbgParameters;
 import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.security.DrbgParameters.Capability;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -48,7 +50,8 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
         try {
             TrustManager[] tm = {new MyX509TrustManager(cerFilePath, cerPassword)};
             sc = SSLContext.getInstance("SSL", "SunJSSE");
-            sc.init(null, tm, new SecureRandom());
+            sc.init(null, tm, SecureRandom.getInstance("DRBG", 
+                    DrbgParameters.instantiation(256, Capability.RESEED_ONLY, null)));
         } catch (Exception e) {
             e.printStackTrace();
         }
