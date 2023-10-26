@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import org.aspectj.lang.reflect.MethodSignature;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class LogUtil {
 
@@ -40,7 +41,7 @@ public class LogUtil {
             log.setOperationResource(action.OperationResource());
         }
 
-        log.setFunc(String.format("%s.%s", joinPoint.getSignature().getDeclaringTypeName(),
+        log.setFunc(String.format(Locale.ROOT, "%s.%s", joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName()));
 
         log.setRequestUrl(request.getRequestURI());
