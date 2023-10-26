@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.Serial;
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import org.aspectj.lang.reflect.MethodSignature;
 import java.time.LocalDateTime;
@@ -62,10 +60,7 @@ public class LogUtil {
     }
 
     @Data
-    public static class returnLog implements Serializable {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
+    public static class returnLog {
 
         private String traceId;
 
