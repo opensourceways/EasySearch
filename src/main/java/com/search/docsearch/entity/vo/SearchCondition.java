@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -20,10 +18,7 @@ import org.hibernate.validator.constraints.Range;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class SearchCondition implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class SearchCondition {
     
     @NotBlank(message = "lang can not be null")
     @Pattern(regexp = "((^zh$|^en$|^ZH$|^EN$))")
