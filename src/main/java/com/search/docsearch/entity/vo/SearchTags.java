@@ -1,7 +1,5 @@
 package com.search.docsearch.entity.vo;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
@@ -17,9 +15,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class SearchTags implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class SearchTags{
 
     @NotBlank(message = "lang can not be null")
     @Pattern(regexp = "((^zh$|^en$|^ZH$|^EN$))")
