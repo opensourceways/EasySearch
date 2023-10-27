@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.elasticsearch.action.search.SearchRequest;
@@ -451,14 +452,14 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public String querySigName(String lang) throws Exception {
         String community = mySystem.getSystem();
-        String urlStr = String.format(sigNameApi, community, lang);  
+        String urlStr = String.format(Locale.ROOT, sigNameApi, community, lang);  
         return httpRequest(urlStr);
     }
 
     @Override
     public String queryAll() throws Exception {
         String community = mySystem.getSystem();
-        String urlStr = String.format(allApi, community);  
+        String urlStr = String.format(Locale.ROOT, allApi, community);  
         return httpRequest(urlStr);
     }
 
@@ -477,7 +478,7 @@ public class SearchServiceImpl implements SearchService {
             throw new IllegalArgumentException("Invalid sig parameter");
         }
         sig = sig.replaceAll("\\+", "%20").replaceAll(" ", "%20");
-        String urlStr = String.format(sigReadmeApi, community, sig, lang);
+        String urlStr = String.format(Locale.ROOT, sigReadmeApi, community, sig, lang);
         return httpRequest(urlStr);
     }
 
@@ -485,7 +486,7 @@ public class SearchServiceImpl implements SearchService {
     public String getEcosystemRepoInfo(String ecosystemType, String sortType, String sortOrder,
             String page, String pageSize, String lang) throws Exception {     
         String community = mySystem.getSystem();
-        String urlStr = String.format(repoInfoApi, community, ecosystemType, sortType, sortOrder, page, pageSize, lang);
+        String urlStr = String.format(Locale.ROOT, repoInfoApi, community, ecosystemType, sortType, sortOrder, page, pageSize, lang);
         return httpRequest(urlStr);
     }
 

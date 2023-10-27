@@ -32,6 +32,7 @@ public class OPENGAUSS {
     public static final String SHOWCASE = "showcase";
     public static final String EVENTS = "events";
     public static final String USERPRACTICE = "userPractice";
+    private static final Pattern UN_DIGIT_PATTERN = Pattern.compile("\\D"); //匹配所有非数字
 
     public Map<String, Object> parse(File file) throws Exception {
         String originalPath = file.getPath();
@@ -168,8 +169,7 @@ public class OPENGAUSS {
                 } else {
                     dateString = value.toString();
                 }
-                Pattern pattern = Pattern.compile("\\D"); //匹配所有非数字
-                Matcher matcher = pattern.matcher(dateString);
+                Matcher matcher = UN_DIGIT_PATTERN.matcher(dateString);
                 dateString = matcher.replaceAll("-");
                 if (dateString.length() < 10) {
                     StringBuilder stringBuilder = new StringBuilder(dateString);
