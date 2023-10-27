@@ -46,6 +46,10 @@ WORKDIR ${WORKSPACE}
 COPY --chown=easysearch --from=Builder /EaseSearch/target ${WORKSPACE}/target
 COPY --chown=easysearch --from=Builder /docs-file/target ${WORKSPACE}/file/target
 
+RUN echo "umask 027" >> /home/easysearch/.bashrc
+RUN source /home/easysearch/.bashrc
+RUN chmod 550 -R /home/easysearch
+
 RUN dnf install -y wget \
     && wget https://download.bell-sw.com/java/17.0.9+11/bellsoft-jre17.0.9+11-linux-amd64.tar.gz -O jre-17.0.9.tar.gz \
     && tar -zxvf jre-17.0.9.tar.gz 
