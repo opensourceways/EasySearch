@@ -27,9 +27,12 @@ import org.springframework.data.elasticsearch.client.RestClients;
 import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
 @EnableElasticsearchRepositories
 @ComponentScan
+@Slf4j
 public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
     @Value("${elasticsearch.host}")
     public String elasticsearchUrl;
@@ -69,7 +72,7 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
             if (!file.isFile()) {
                 throw new Exception("Wrong Certification Path");
             }
-            System.out.println("Loading KeyStore " + file + "...");
+            log.info("Loading Keystore {} ...", file);
             InputStream in = new FileInputStream(file);
             KeyStore ks = KeyStore.getInstance("JKS");
             ks.load(in, cerPassword.toCharArray());
