@@ -1,6 +1,7 @@
 package com.search.docsearch.utils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ParameterUtil {
@@ -31,14 +32,14 @@ public class ParameterUtil {
         if (!lang.equalsIgnoreCase("zh") && !lang.equalsIgnoreCase("en")) {
             throw new IllegalArgumentException("Invalid lang parameter");
         }
-        return lang.toLowerCase();
+        return lang.toLowerCase(Locale.ROOT);
     }
 
     public static String vaildCommunity(String community) {
         if (!"mindspore".equalsIgnoreCase(community) && !"opengauss".equalsIgnoreCase(community) && !"openlookeng".equalsIgnoreCase(community)) {
             throw new IllegalArgumentException("Invalid community parameter");
         }
-        return community.toLowerCase();
+        return community.toLowerCase(Locale.ROOT);
     }
 
     public static String vaildEcosystemType(String ecosystemType) {

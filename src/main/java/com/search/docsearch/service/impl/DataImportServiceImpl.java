@@ -72,7 +72,7 @@ public class DataImportServiceImpl implements DataImportService {
 
         File indexFile = new File(s.getTargetPath());
         if (!indexFile.exists()) {
-            log.error(String.format("%s folder does not exist", indexFile.getPath()));
+            log.error(String.format(Locale.ROOT, "%s folder does not exist", indexFile.getPath()));
             globalUnlock();
             return;
         }

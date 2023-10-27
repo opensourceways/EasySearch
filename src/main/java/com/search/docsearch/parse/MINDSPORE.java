@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -318,7 +319,7 @@ public class MINDSPORE {
             }
 
 
-            path = String.format(MINDSPORE_OFFICIAL + "/api-server/selectNewsInfo?id=%d", id);
+            path = String.format(Locale.ROOT, MINDSPORE_OFFICIAL + "/api-server/selectNewsInfo?id=%d", id);
 
             try {
                 connection = sendGET(path, "GET");
