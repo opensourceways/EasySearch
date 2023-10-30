@@ -56,7 +56,7 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
             sc.init(null, tm, SecureRandom.getInstance("DRBG", 
                     DrbgParameters.instantiation(256, Capability.RESEED_ONLY, null)));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("cannot generate certification");
         }
         final ClientConfiguration clientConfiguration = ClientConfiguration.builder()
             .connectedTo(elasticsearchUrl + ":" + elasticsearchPort)
