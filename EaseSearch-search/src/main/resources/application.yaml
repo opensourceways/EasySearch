@@ -1,0 +1,17 @@
+index-prefix:
+
+elasticsearch:
+  host:
+  username:
+  password:
+  port:
+
+api:
+  mySystem:
+  allApi:
+  sigNameApi:
+  sigReadmeApi:
+  repoInfoApi:
+
+server:
+  port: 8080
