@@ -4,6 +4,8 @@ elasticsearch:
   username: ${esusername}
   password: ${espassword}
   port: ${esport}
+  cerFilePath:
+  cerPassword:
 
 #openEuler    openGauss    openLookeng    mindSpore
 system: ${searchsystem:openEuler}
