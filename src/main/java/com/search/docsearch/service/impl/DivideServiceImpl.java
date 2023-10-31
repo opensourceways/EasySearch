@@ -47,7 +47,7 @@ public class DivideServiceImpl implements DivideService {
 
 
     @Override
-    public Map<String, Object> advancedSearch(Map<String, String> search, String category) throws Exception {
+    public Map<String, Object> advancedSearch(Map<String, String> search, String category) throws IOException {
         String saveIndex;
         String lang = search.get("lang");
         if (lang != null) {

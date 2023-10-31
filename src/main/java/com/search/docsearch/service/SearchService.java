@@ -1,8 +1,10 @@
 package com.search.docsearch.service;
 
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 
@@ -14,16 +16,16 @@ public interface SearchService {
 
     Map<String, Object> getCount(SearchCondition condition) throws IOException;
 
-    Map<String, Object> advancedSearch(Map<String, String> search) throws Exception;
+    Map<String, Object> advancedSearch(Map<String, String> search) throws IOException;
 
-    Map<String, Object> getTags(SearchTags searchTags) throws Exception;
+    Map<String, Object> getTags(SearchTags searchTags) throws IOException;
 
-    String querySigName(String lang) throws Exception;
+    String querySigName(String lang) throws IOException;
 
-    String queryAll() throws Exception;
+    String queryAll() throws IOException;
 
-    String querySigReadme(String sig, String lang) throws Exception;
+    String querySigReadme(String sig, String lang) throws IOException;
 
     String getEcosystemRepoInfo(String ecosystemType, String sortType, String sortOrder, String page,
-            String pageSize, String lang) throws Exception;
+            String pageSize, String lang) throws IOException;
 }
