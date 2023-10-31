@@ -47,6 +47,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.config.MySystem;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
+import com.search.docsearch.except.ServiceImplException;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.General;
 
@@ -74,7 +75,7 @@ public class SearchServiceImpl implements SearchService {
     @Value("${api.repoInfoApi}")
     private String repoInfoApi;
 
-    public Map<String, Object> getSuggestion(String keyword, String lang) throws IOException {
+    public Map<String, Object> getSuggestion(String keyword, String lang) throws ServiceImplException {
         String saveIndex = mySystem.index + "_" + lang;
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -94,7 +95,13 @@ public class SearchServiceImpl implements SearchService {
 
         suggRequest.source(searchSourceBuilder.suggest(suggestBuilder));
 
-        SearchResponse suggResponse = restHighLevelClient.search(suggRequest, RequestOptions.DEFAULT);
+
+        SearchResponse suggResponse = null;
+        try {
+            suggResponse = restHighLevelClient.search(suggRequest, RequestOptions.DEFAULT);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
 
         List<String> suggestList = new ArrayList<>();
         for (int i = 0; i <= 3; i++) {
@@ -133,14 +140,19 @@ public class SearchServiceImpl implements SearchService {
 
 
     @Override
-    public Map<String, Object> searchByCondition(SearchCondition condition) throws IOException {
+    public Map<String, Object> searchByCondition(SearchCondition condition) throws ServiceImplException {
         String saveIndex = mySystem.index + "_" + condition.getLang();
 
         Map<String, Object> result = new HashMap<>();
         result.put("keyword", HtmlUtils.htmlEscape(condition.getKeyword()));
 
         SearchRequest request = BuildSearchRequest(condition, saveIndex);
-        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        SearchResponse response = null;
+        try {
+            response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
         List<Map<String, Object>> data = new ArrayList<>();
 
         for (SearchHit hit : response.getHits().getHits()) {
@@ -255,7 +267,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
 
-    public Map<String, Object> getCount(SearchCondition condition) throws IOException {
+    public Map<String, Object> getCount(SearchCondition condition) throws ServiceImplException {
         String saveIndex = mySystem.index + "_" + condition.getLang();
         SearchRequest request = new SearchRequest(saveIndex);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -315,7 +327,12 @@ public class SearchServiceImpl implements SearchService {
 
         sourceBuilder.aggregation(AggregationBuilders.terms("data").field("type.keyword"));
         request.source(sourceBuilder);
-        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        SearchResponse response = null;
+        try {
+            response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
         List<Map<String, Object>> numberList = new ArrayList<>();
         Map<String, Object> numberMap = new HashMap<>();
         numberMap.put("doc_count", response.getHits().getTotalHits().value);
@@ -335,7 +352,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public Map<String, Object> advancedSearch(Map<String, String> search) throws Exception {
+    public Map<String, Object> advancedSearch(Map<String, String> search) throws ServiceImplException {
         String saveIndex;
         String lang = search.get("lang");
         if (lang != null) {
@@ -395,8 +412,12 @@ public class SearchServiceImpl implements SearchService {
 
         request.source(sourceBuilder);
 
-
-        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        SearchResponse response = null;
+        try {
+            response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> data = new ArrayList<>();
         for (SearchHit hit : response.getHits().getHits()) {
@@ -412,7 +433,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public Map<String, Object> getTags(SearchTags searchTags) throws Exception {
+    public Map<String, Object> getTags(SearchTags searchTags) throws ServiceImplException {
         String saveIndex = mySystem.index + "_" + searchTags.getLang();
 
         SearchRequest request = new SearchRequest(saveIndex);
@@ -432,7 +453,12 @@ public class SearchServiceImpl implements SearchService {
         sourceBuilder.aggregation(AggregationBuilders.terms("data").field(searchTags.getWant() + ".keyword").size(10000).order(bucketOrder));
         sourceBuilder.query(boolQueryBuilder);
         request.source(sourceBuilder);
-        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        SearchResponse response = null;
+        try {
+            response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
         ParsedTerms aggregation = response.getAggregations().get("data");
         List<Map<String, Object>> numberList = new ArrayList<>();
         List<? extends Terms.Bucket> buckets = aggregation.getBuckets();
@@ -450,25 +476,42 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public String querySigName(String lang) throws Exception {
+    public String querySigName(String lang) throws ServiceImplException {
         String community = mySystem.getSystem();
         String urlStr = String.format(Locale.ROOT, sigNameApi, community, lang);  
-        return httpRequest(urlStr);
+        String res = null;
+        try {
+            res = httpRequest(urlStr);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
+        return res;
     }
 
     @Override
-    public String queryAll() throws Exception {
+    public String queryAll() throws ServiceImplException {
         String community = mySystem.getSystem();
         String urlStr = String.format(Locale.ROOT, allApi, community);  
-        return httpRequest(urlStr);
+        String res = null;
+        try {
+            res = httpRequest(urlStr);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
+        return res;
     }
 
     @Override
-    public String querySigReadme(String sig, String lang) throws Exception {
+    public String querySigReadme(String sig, String lang) throws ServiceImplException {
         String community = mySystem.getSystem();
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> sigName = new ArrayList<>();
-        JsonNode sigNameList = objectMapper.readTree(querySigName(lang));
+        JsonNode sigNameList = null;
+        try {
+            sigNameList = objectMapper.readTree(querySigName(lang));
+        } catch(IOException e) {
+            throw new ServiceImplException("can not read");
+        }
         if (sigNameList.get("data") != null && sigNameList.get("data").get("SIG_list") != null) {
             for (JsonNode bucket : sigNameList.get("data").get("SIG_list")) {
                 sigName.add(bucket.get("name").asText());
@@ -479,18 +522,30 @@ public class SearchServiceImpl implements SearchService {
         }
         sig = sig.replaceAll("\\+", "%20").replaceAll(" ", "%20");
         String urlStr = String.format(Locale.ROOT, sigReadmeApi, community, sig, lang);
-        return httpRequest(urlStr);
+        String res = null;
+        try {
+            res = httpRequest(urlStr);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
+        return res;
     }
 
     @Override
     public String getEcosystemRepoInfo(String ecosystemType, String sortType, String sortOrder,
-            String page, String pageSize, String lang) throws Exception {     
+            String page, String pageSize, String lang) throws ServiceImplException {     
         String community = mySystem.getSystem();
         String urlStr = String.format(Locale.ROOT, repoInfoApi, community, ecosystemType, sortType, sortOrder, page, pageSize, lang);
-        return httpRequest(urlStr);
+        String res = null;
+        try {
+            res = httpRequest(urlStr);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
+        return res;
     }
 
-    public String httpRequest(String urlStr) throws Exception {
+    public String httpRequest(String urlStr) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");

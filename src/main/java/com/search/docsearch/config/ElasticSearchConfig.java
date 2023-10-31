@@ -2,6 +2,7 @@ package com.search.docsearch.config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.security.DrbgParameters;
 import java.security.KeyStore;
@@ -26,6 +27,8 @@ import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.RestClients;
 import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+
+import com.search.docsearch.except.TrustManagerException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,25 +70,28 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
     }
     public static class MyX509TrustManager implements X509TrustManager {
         X509TrustManager sunJSSEX509TrustManager;
-        MyX509TrustManager(String cerFilePath, String cerPassword) throws Exception {
+        MyX509TrustManager(String cerFilePath, String cerPassword) throws TrustManagerException {
             File file = new File(cerFilePath);
-            if (!file.isFile()) {
-                throw new Exception("Wrong Certification Path");
-            }
-            log.info("Loading Keystore {} ...", file);
-            InputStream in = new FileInputStream(file);
-            KeyStore ks = KeyStore.getInstance("JKS");
-            ks.load(in, cerPassword.toCharArray());
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
-            tmf.init(ks);
-            TrustManager[] tms = tmf.getTrustManagers();
-            for (TrustManager tm : tms) {
-                if (tm instanceof X509TrustManager) {
-                    sunJSSEX509TrustManager = (X509TrustManager) tm;
-                    return;
+            try {
+                if (!file.isFile()) {
+                    throw new FileNotFoundException("Wrong Certification Path");
                 }
+                log.info("Loading Keystore {} ...", file);
+                InputStream in = new FileInputStream(file);
+                KeyStore ks = KeyStore.getInstance("JKS");
+                ks.load(in, cerPassword.toCharArray());
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
+                tmf.init(ks);
+                TrustManager[] tms = tmf.getTrustManagers();
+                for (TrustManager tm : tms) {
+                    if (tm instanceof X509TrustManager) {
+                        sunJSSEX509TrustManager = (X509TrustManager) tm;
+                        return;
+                    }
+                }
+            } catch(Exception e) {
+                throw new TrustManagerException("Couldn't initialize");
             }
-            throw new Exception("Couldn't initialize");
         }
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
