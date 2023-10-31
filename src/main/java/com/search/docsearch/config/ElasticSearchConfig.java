@@ -2,9 +2,13 @@ package com.search.docsearch.config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.DrbgParameters;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.DrbgParameters.Capability;
 import java.security.cert.CertificateException;
@@ -67,10 +71,10 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
     }
     public static class MyX509TrustManager implements X509TrustManager {
         X509TrustManager sunJSSEX509TrustManager;
-        MyX509TrustManager(String cerFilePath, String cerPassword) throws Exception {
+        MyX509TrustManager(String cerFilePath, String cerPassword) throws CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException {
             File file = new File(cerFilePath);
             if (!file.isFile()) {
-                throw new Exception("Wrong Certification Path");
+                throw new CertificateException("Wrong Certification Path");
             }
             log.info("Loading Keystore {} ...", file);
             InputStream in = new FileInputStream(file);
@@ -85,7 +89,7 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
                     return;
                 }
             }
-            throw new Exception("Couldn't initialize");
+            throw new CertificateException("Couldn't initialize");
         }
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {

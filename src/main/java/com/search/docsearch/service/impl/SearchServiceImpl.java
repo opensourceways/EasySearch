@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.config.MySystem;
@@ -335,7 +337,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public Map<String, Object> advancedSearch(Map<String, String> search) throws Exception {
+    public Map<String, Object> advancedSearch(Map<String, String> search) throws IOException {
         String saveIndex;
         String lang = search.get("lang");
         if (lang != null) {
@@ -412,7 +414,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public Map<String, Object> getTags(SearchTags searchTags) throws Exception {
+    public Map<String, Object> getTags(SearchTags searchTags) throws IOException {
         String saveIndex = mySystem.index + "_" + searchTags.getLang();
 
         SearchRequest request = new SearchRequest(saveIndex);
@@ -450,21 +452,21 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public String querySigName(String lang) throws Exception {
+    public String querySigName(String lang) throws IOException {
         String community = mySystem.getSystem();
         String urlStr = String.format(Locale.ROOT, sigNameApi, community, lang);  
         return httpRequest(urlStr);
     }
 
     @Override
-    public String queryAll() throws Exception {
+    public String queryAll() throws IOException {
         String community = mySystem.getSystem();
         String urlStr = String.format(Locale.ROOT, allApi, community);  
         return httpRequest(urlStr);
     }
 
     @Override
-    public String querySigReadme(String sig, String lang) throws Exception {
+    public String querySigReadme(String sig, String lang) throws IOException {
         String community = mySystem.getSystem();
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> sigName = new ArrayList<>();
@@ -484,13 +486,13 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public String getEcosystemRepoInfo(String ecosystemType, String sortType, String sortOrder,
-            String page, String pageSize, String lang) throws Exception {     
+            String page, String pageSize, String lang) throws IOException {     
         String community = mySystem.getSystem();
         String urlStr = String.format(Locale.ROOT, repoInfoApi, community, ecosystemType, sortType, sortOrder, page, pageSize, lang);
         return httpRequest(urlStr);
     }
 
-    public String httpRequest(String urlStr) throws Exception {
+    public String httpRequest(String urlStr) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");

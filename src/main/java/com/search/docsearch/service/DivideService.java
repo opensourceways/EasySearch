@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface DivideService {
 
-    Map<String, Object> advancedSearch(Map<String, String> search, String category) throws Exception;
+    Map<String, Object> advancedSearch(Map<String, String> search, String category) throws IOException;
 
     Map<String, Object> docsSearch(SearchDocs searchDocs) throws IOException;
 }

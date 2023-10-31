@@ -162,19 +162,19 @@ public class SearchController {
     }
 
     @RequestMapping("sig/name")
-    public String querySigName(@RequestParam(value = "lang", required = false) String lang) throws Exception {
+    public String querySigName(@RequestParam(value = "lang", required = false) String lang) throws IOException {
         lang = ParameterUtil.vaildLang(lang);
         return searchService.querySigName(lang);
     }
 
     @RequestMapping("all")
-    public String queryAll() throws Exception {
+    public String queryAll() throws IOException {
         return searchService.queryAll();
     }
 
     @RequestMapping("sig/readme")
     public String querySigReadme(@RequestParam(value = "sig") String sig,
-            @RequestParam(value = "lang", required = false) String lang) throws Exception {
+            @RequestParam(value = "lang", required = false) String lang) throws IOException {
         lang = ParameterUtil.vaildLang(lang);
         return searchService.querySigReadme(sig, lang);
     }
@@ -185,7 +185,7 @@ public class SearchController {
             @RequestParam(value = "sort_type", required = false) String sortType,
             @RequestParam(value = "sort_order", required = false) String sortOrder,
             @RequestParam(value = "page", required = false) String page,
-            @RequestParam(value = "pageSize", required = false) String pageSize) throws Exception {
+            @RequestParam(value = "pageSize", required = false) String pageSize) throws IOException {
         lang = ParameterUtil.vaildLang(lang);
         ecosystemType = ParameterUtil.vaildEcosystemType(ecosystemType);
         sortType = ParameterUtil.vaildSortType(sortType);
