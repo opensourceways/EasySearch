@@ -22,8 +22,6 @@ public class SearchTags{
     @Pattern(regexp = "((^zh$|^en$|^ZH$|^EN$))")
     private String lang;
 
-    @Pattern(regexp = "((^showcase$|^service$|^other$|^news$|^migration$|^forum$|^docs$|^blog$|^events$|^blogs$|^tutorials$|^install$|^information$|^api$|^video$|^activity$)|^$)", message = "Keyword format is invalid")
-    @Null
     private String category;
     
     @NotBlank(message = "want can not be null")

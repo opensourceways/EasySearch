@@ -35,9 +35,7 @@ public class SearchCondition {
     @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.\\-_]+$", message = "Keyword format is invalid")
     @Size(max = 20)
     private String keyword;
-    
-    @Pattern(regexp = "((^showcase$|^service$|^other$|^news$|^migration$|^forum$|^docs$|^blog$|^events$|^blogs$|^tutorials$|^install$|^information$|^api$|^video$|^activity$)|^$)", message = "Keyword format is invalid")
-    @Null
+
     private String type;
 
     private List<Map<String, String>> limit;
