@@ -34,10 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 @ComponentScan
 @Slf4j
 public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
-    @Value("${elasticsearch.host}")
+    @Value("${elasticsearch.url}")
     public String elasticsearchUrl;
-    @Value("${elasticsearch.port}")
-    public String elasticsearchPort;
     @Value("${elasticsearch.username}")
     public String elasticsearchUsername;
     @Value("${elasticsearch.password}")
@@ -59,7 +57,7 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
             e.printStackTrace();
         }
         final ClientConfiguration clientConfiguration = ClientConfiguration.builder()
-            .connectedTo(elasticsearchUrl + ":" + elasticsearchPort)
+            .connectedTo(elasticsearchUrl)
             .usingSsl(sc, new NullHostNameVerifier())
             .withBasicAuth(elasticsearchUsername, elasticsearchPassword)
             .build();
