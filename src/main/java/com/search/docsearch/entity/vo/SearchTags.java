@@ -3,6 +3,7 @@ package com.search.docsearch.entity.vo;
 import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -22,10 +23,10 @@ public class SearchTags{
     private String lang;
 
     @Pattern(regexp = "((^showcase$|^service$|^other$|^news$|^migration$|^forum$|^docs$|^blog$|^events$|^blogs$|^tutorials$|^install$|^information$|^api$|^video$|^activity$)|^$)", message = "Keyword format is invalid")
+    @Null
     private String category;
     
     @NotBlank(message = "want can not be null")
-    @Pattern(regexp = "((^showcase$|^service$|^other$|^news$|^migration$|^forum$|^docs$|^blog$|^events$|^blogs$|^tutorials$|^install$|^information$|^api$|^video$|^activity$)|^$)", message = "Keyword format is invalid")
     @Size(max = 20)
     private String want;
 

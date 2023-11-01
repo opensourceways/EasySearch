@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -36,6 +37,7 @@ public class SearchCondition {
     private String keyword;
     
     @Pattern(regexp = "((^showcase$|^service$|^other$|^news$|^migration$|^forum$|^docs$|^blog$|^events$|^blogs$|^tutorials$|^install$|^information$|^api$|^video$|^activity$)|^$)", message = "Keyword format is invalid")
+    @Null
     private String type;
 
     private List<Map<String, String>> limit;
