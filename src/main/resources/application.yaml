@@ -3,7 +3,6 @@ elasticsearch:
   url: ${esurl}
   username: ${esusername}
   password: ${espassword}
-  port: ${esport}
   cerFilePath:
   cerPassword:
 
