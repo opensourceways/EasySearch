@@ -35,7 +35,7 @@ public class SearchCondition {
     @Size(max = 20)
     private String keyword;
     
-    @Pattern(regexp = "((^migration$|^news$|^forum$|^blog$|^docs$|^showcase$|^other$|^service$))", message = "Keyword format is invalid")
+    @Pattern(regexp = "((^showcase$|^service$|^other$|^news$|^migration$|^forum$|^docs$|^blog$|^events$|^blogs$|^tutorials$|^install$|^information$|^api$|^video$|^activity$)|^$)", message = "Keyword format is invalid")
     private String type;
 
     private List<Map<String, String>> limit;
