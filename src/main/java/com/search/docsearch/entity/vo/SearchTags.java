@@ -21,11 +21,11 @@ public class SearchTags{
     @Pattern(regexp = "((^zh$|^en$|^ZH$|^EN$))")
     private String lang;
 
-    @Pattern(regexp = "((^migration$|^news$|^forum$|^blog$|^docs$|^showcase$|^other$|^service$))", message = "category format is invalid")
+    @Pattern(regexp = "((^showcase$|^service$|^other$|^news$|^migration$|^forum$|^docs$|^blog$|^events$|^blogs$|^tutorials$|^install$|^information$|^api$|^video$|^activity$)|^$)", message = "Keyword format is invalid")
     private String category;
     
     @NotBlank(message = "want can not be null")
-    @Pattern(regexp = "^[a-zA-Z0-9.\\-/_]+$", message = "want format is invalid.")
+    @Pattern(regexp = "((^showcase$|^service$|^other$|^news$|^migration$|^forum$|^docs$|^blog$|^events$|^blogs$|^tutorials$|^install$|^information$|^api$|^video$|^activity$)|^$)", message = "Keyword format is invalid")
     @Size(max = 20)
     private String want;
 
