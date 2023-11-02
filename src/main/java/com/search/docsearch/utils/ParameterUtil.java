@@ -8,7 +8,7 @@ public class ParameterUtil {
     public static void vaildMap(Map<String, String> condition) {
         if (condition != null && condition.size() > 0) {
             for (String key : condition.keySet()) {
-                if (!key.matches("^[a-zA-Z]+$") || key.length() > 50) {
+                if (!key.matches("^[\\x20\\u4E00-\\u9FA5A-Za-z0-9.\\-_]+$") || key.length() > 50) {
                     throw new IllegalArgumentException("Invalid key");
                 }
                 if (!condition.get(key).matches("^[\\x20\\u4E00-\\u9FA5A-Za-z0-9.\\-_]+$")
