@@ -21,7 +21,7 @@ public class ParameterVerificationMessage {
     @ResponseBody
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     @ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
-    public SysResult MethodArgumentNotValidHandler(HttpServletRequest request, MethodArgumentNotValidException exception) throws Exception {
+    public SysResult MethodArgumentNotValidHandler(HttpServletRequest request, MethodArgumentNotValidException exception) {
         BindingResult bindingResult = exception.getBindingResult();
         StringBuilder sb = new StringBuilder("Parameter verification failed:");
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
