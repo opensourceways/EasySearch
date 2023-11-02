@@ -20,6 +20,7 @@ import com.search.docsearch.config.MySystem;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.entity.vo.SysResult;
+import com.search.docsearch.except.ControllerException;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.ParameterUtil;
 
@@ -54,7 +55,7 @@ public class SearchController {
                 return SysResult.fail("内容不存在", null);
             }
             return SysResult.ok("查询成功", result);
-        } catch (Exception e) {
+        } catch (ControllerException e) {
             log.error("searchByCondition error is: " + e.getMessage());
         }
         return SysResult.fail("查询失败", null);
@@ -76,7 +77,7 @@ public class SearchController {
                 return SysResult.fail("内容不存在", null);
             }
             return SysResult.ok("查询成功", result);
-        } catch (IOException e) {
+        } catch (ControllerException e) {
             log.error("getSuggestion error is: " + e.getMessage());
         }
         return SysResult.fail("查询失败", null);
@@ -95,7 +96,7 @@ public class SearchController {
                 return SysResult.fail("内容不存在", null);
             }
             return SysResult.ok("查询成功", result);
-        } catch (Exception e) {
+        } catch (ControllerException e) {
             log.error("getCount error is: " + e.getMessage());
         }
         return SysResult.fail("查询失败", null);
@@ -134,7 +135,7 @@ public class SearchController {
                 return SysResult.fail("内容不存在", null);
             }
             return SysResult.ok("查询成功", result);
-        } catch (Exception e) {
+        } catch (ControllerException e) {
             log.error("advancedSearch error is: " + e.getMessage());
         }
 
@@ -153,7 +154,7 @@ public class SearchController {
                 return SysResult.fail("内容不存在", null);
             }
             return SysResult.ok("查询成功", result);
-        } catch (Exception e) {
+        } catch (ControllerException e) {
             log.error("getTags error is: " + e.getMessage());
         }
 
@@ -162,19 +163,19 @@ public class SearchController {
     }
 
     @RequestMapping("sig/name")
-    public String querySigName(@RequestParam(value = "lang", required = false) String lang) throws Exception {
+    public String querySigName(@RequestParam(value = "lang", required = false) String lang) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
         return searchService.querySigName(lang);
     }
 
     @RequestMapping("all")
-    public String queryAll() throws Exception {
+    public String queryAll() throws ControllerException {
         return searchService.queryAll();
     }
 
     @RequestMapping("sig/readme")
     public String querySigReadme(@RequestParam(value = "sig") String sig,
-            @RequestParam(value = "lang", required = false) String lang) throws Exception {
+            @RequestParam(value = "lang", required = false) String lang) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
         return searchService.querySigReadme(sig, lang);
     }
@@ -185,7 +186,7 @@ public class SearchController {
             @RequestParam(value = "sort_type", required = false) String sortType,
             @RequestParam(value = "sort_order", required = false) String sortOrder,
             @RequestParam(value = "page", required = false) String page,
-            @RequestParam(value = "pageSize", required = false) String pageSize) throws Exception {
+            @RequestParam(value = "pageSize", required = false) String pageSize) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
         ecosystemType = ParameterUtil.vaildEcosystemType(ecosystemType);
         sortType = ParameterUtil.vaildSortType(sortType);
