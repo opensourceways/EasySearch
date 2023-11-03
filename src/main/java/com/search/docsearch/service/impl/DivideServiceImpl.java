@@ -13,7 +13,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.common.text.Text;
-import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 
 import com.search.docsearch.config.MySystem;
 import com.search.docsearch.entity.vo.SearchDocs;
+import com.search.docsearch.except.ServiceImplException;
 import com.search.docsearch.service.DivideService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,12 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 public class DivideServiceImpl implements DivideService {
 
     @Autowired
-    @Qualifier("restHighLevelClient")
+    @Qualifier("elasticsearchClient")
     private RestHighLevelClient restHighLevelClient;
-
-    @Autowired
-    @Qualifier("trackerClient")
-    private RestHighLevelClient trackerClient;
 
     @Autowired
     @Qualifier("setConfig")
@@ -51,7 +48,7 @@ public class DivideServiceImpl implements DivideService {
 
 
     @Override
-    public Map<String, Object> advancedSearch(Map<String, String> search, String category) throws Exception {
+    public Map<String, Object> advancedSearch(Map<String, String> search, String category) throws ServiceImplException {
         String saveIndex;
         String lang = search.get("lang");
         if (lang != null) {
@@ -106,32 +103,17 @@ public class DivideServiceImpl implements DivideService {
 
         request.source(sourceBuilder);
 
-
-        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        SearchResponse response = null;
+        try {
+            response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
 
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> data = new ArrayList<>();
         for (SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> map = hit.getSourceAsMap();
-
-
-            if (category.equals("blog")) {
-                try {
-                    Object la = map.get("lang");
-                    Object up = map.get("path");
-                    String url_path = "/" + up + ".html";
-                    CountRequest countRequest = new CountRequest(s.trackerIndex);
-                    BoolQueryBuilder trackerBoolQueryBuilder = QueryBuilders.boolQuery();
-                    trackerBoolQueryBuilder.must(QueryBuilders.termQuery("event", "pageview")).must(QueryBuilders.termQuery("properties.$url_path.keyword", url_path));
-                    countRequest.query(trackerBoolQueryBuilder);
-                    CountResponse countResponse = trackerClient.count(countRequest, RequestOptions.DEFAULT);
-    
-                    map.put("views", countResponse.getCount());
-                } catch (Exception e) {
-                    log.error("get tracker error : " + e.getMessage());
-                }
-            }
-
 
             data.add(map);
         }
@@ -144,7 +126,7 @@ public class DivideServiceImpl implements DivideService {
     }
 
     @Override
-    public Map<String, Object> docsSearch(SearchDocs searchDocs) throws IOException {
+    public Map<String, Object> docsSearch(SearchDocs searchDocs) throws ServiceImplException {
         String saveIndex = s.index + "_" + searchDocs.getLang();
 
         Map<String, Object> result = new HashMap<>();
@@ -187,7 +169,12 @@ public class DivideServiceImpl implements DivideService {
         sourceBuilder.from(startIndex).size(searchDocs.getPageSize());
         sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
         request.source(sourceBuilder);
-        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        SearchResponse response = null;
+        try {
+            response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
 
         List<Map<String, Object>> data = new ArrayList<>();
 
