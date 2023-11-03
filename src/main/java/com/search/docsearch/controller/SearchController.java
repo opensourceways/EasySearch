@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.search.docsearch.aop.LimitRequest;
 import com.search.docsearch.aop.LogAction;
 import com.search.docsearch.config.MySystem;
+import com.search.docsearch.entity.vo.NpsBody;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.entity.vo.SysResult;
@@ -193,6 +194,11 @@ public class SearchController {
         page = ParameterUtil.vaildPage(page);
         pageSize = ParameterUtil.vaildPageSize(pageSize);
         return searchService.getEcosystemRepoInfo(ecosystemType, sortType, sortOrder, page, pageSize, lang);
+    }
+
+    @PostMapping(value = "nps")
+    public String getNps(@RequestBody NpsBody body) throws Exception {
+        return searchService.getNps(body);
     }
 
 }

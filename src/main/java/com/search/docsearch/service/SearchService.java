@@ -3,6 +3,7 @@ package com.search.docsearch.service;
 import java.io.IOException;
 import java.util.Map;
 
+import com.search.docsearch.entity.vo.NpsBody;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 
@@ -34,4 +35,6 @@ public interface SearchService {
 
     String getEcosystemRepoInfo(String ecosystemType, String sortType, String sortOrder, String page,
             String pageSize, String lang) throws Exception;
+    
+    String getNps(NpsBody body) throws Exception;
 }

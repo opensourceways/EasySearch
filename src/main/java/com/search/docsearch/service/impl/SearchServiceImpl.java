@@ -3,6 +3,7 @@ package com.search.docsearch.service.impl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import org.springframework.web.util.HtmlUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.config.MySystem;
+import com.search.docsearch.entity.vo.NpsBody;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.service.SearchService;
@@ -72,6 +74,9 @@ public class SearchServiceImpl implements SearchService {
 
     @Value("${api.repoInfoApi}")
     private String repoInfoApi;
+
+    @Value("${api.npsApi}")
+    private String npsApi;
 
     public Map<String, Object> getSuggestion(String keyword, String lang) throws IOException {
         String saveIndex = mySystem.index + "_" + lang;
@@ -489,10 +494,40 @@ public class SearchServiceImpl implements SearchService {
         return httpRequest(urlStr);
     }
 
+    @Override
+    public String getNps(NpsBody body) throws Exception {     
+        String community = mySystem.getSystem();
+        String urlStr = String.format(npsApi, community);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String bodyStr = objectMapper.writeValueAsString(body);
+        return postRequest(urlStr, bodyStr);
+    }
+
     public String httpRequest(String urlStr) throws Exception {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+        String line;
+        StringBuilder response = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            response.append(line);
+        }
+        reader.close();
+        return response.toString();
+    }
+
+    public String postRequest(String urlStr, String body) throws Exception {
+        URL url = new URL(urlStr);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
+        OutputStream outputStream = connection.getOutputStream();
+        outputStream.write(body.getBytes());
+        outputStream.close();
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
         String line;
         StringBuilder response = new StringBuilder();
