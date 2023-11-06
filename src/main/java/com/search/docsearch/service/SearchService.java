@@ -9,13 +9,10 @@ import com.search.docsearch.except.ServiceException;
 
 public interface SearchService {
 
-    Map<String, Object> getSuggestion(String keyword, String lang) throws ServiceException;
 
     Map<String, Object> searchByCondition(SearchCondition condition) throws ServiceException;
 
     Map<String, Object> getCount(SearchCondition condition) throws ServiceException;
-
-    Map<String, Object> advancedSearch(Map<String, String> search) throws ServiceException;
 
     Map<String, Object> getTags(SearchTags searchTags) throws ServiceException;
 
