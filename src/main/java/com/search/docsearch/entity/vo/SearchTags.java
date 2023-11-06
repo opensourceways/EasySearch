@@ -18,14 +18,10 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class SearchTags{
 
-    @NotBlank(message = "lang can not be null")
-    @Pattern(regexp = "((^zh$|^en$|^ZH$|^EN$))")
     private String lang;
 
     private String category;
-    
-    @NotBlank(message = "want can not be null")
-    @Size(max = 20)
+
     private String want;
 
     private Map<String, String> condition;

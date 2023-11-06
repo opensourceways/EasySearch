@@ -47,4 +47,8 @@ public class SysResult {
     public static SysResult fail() {
         return new SysResult(201, null, null);
     }
+
+    public static SysResult ParameterVerificationFailed() {
+        return new SysResult(201,"Parameter verification failed",null);
+    }
 }
