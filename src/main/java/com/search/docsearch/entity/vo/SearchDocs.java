@@ -27,11 +27,11 @@ public class SearchDocs {
     private int pageSize = 10;
     
     @NotBlank(message = "keyword can not be null")
-    @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.\\-_]+$", message = "Keyword format is invalid")
+    @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.\\-_ ]+$", message = "Keyword format is invalid")
     @Size(max = 20)
     private String keyword;
     
-    @Pattern(regexp = "^[\\x20a-zA-Z0-9.\\-_]*$", message = "Version format is invalid.")
+    @Pattern(regexp = "^[\\x20a-zA-Z0-9.\\-_ ]*$", message = "Version format is invalid.")
     @Size(max = 50)
     private String version;
 }
