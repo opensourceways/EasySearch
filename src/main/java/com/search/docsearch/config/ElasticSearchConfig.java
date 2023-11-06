@@ -75,9 +75,10 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
                     throw new FileNotFoundException("Wrong Certification Path");
                 }
                 log.info("Loading Keystore {} ...", file);
-                InputStream in = new FileInputStream(file);
                 KeyStore ks = KeyStore.getInstance("JKS");
-                ks.load(in, cerPassword.toCharArray());
+                try (InputStream in = new FileInputStream(file)) {
+                    ks.load(in, cerPassword.toCharArray());
+                }
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
                 tmf.init(ks);
                 TrustManager[] tms = tmf.getTrustManagers();
