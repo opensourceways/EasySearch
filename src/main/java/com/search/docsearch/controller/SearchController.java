@@ -62,29 +62,6 @@ public class SearchController {
         return SysResult.fail("查询失败", null);
     }
 
-    @LogAction(type = "Get aid", OperationResource = "Suggestion words")
-    @PostMapping("sugg")
-    @LimitRequest()
-    public SysResult getSuggestion(@RequestBody @Validated SearchCondition condition) {
-        ParameterUtil.vaildListMap(condition.getLimit());
-        ParameterUtil.vaildListMap(condition.getFilter());
-        if (!StringUtils.hasText(condition.getKeyword())) {
-            return SysResult.fail("keyword must not null", null);
-        }
-
-        try {
-            Map<String, Object> result = searchService.getSuggestion(condition.getKeyword(), condition.getLang());
-            if (result == null) {
-                return SysResult.fail("内容不存在", null);
-            }
-            return SysResult.ok("查询成功", result);
-        } catch (ControllerException e) {
-            log.error("getSuggestion error is: " + e.getMessage());
-        }
-        return SysResult.fail("查询失败", null);
-    }
-
-
     @LogAction(type = "Get statistics", OperationResource = "Statistics data")
     @PostMapping("count")
     @LimitRequest()
@@ -99,28 +76,6 @@ public class SearchController {
             return SysResult.ok("查询成功", result);
         } catch (ControllerException e) {
             log.error("getCount error is: " + e.getMessage());
-        }
-        return SysResult.fail("查询失败", null);
-    }
-
-
-
-    @LogAction(type = "Get aid", OperationResource = "Popular terms")
-    @PostMapping("pop")
-    @LimitRequest(callTime = 1, callCount = 1000)
-    public SysResult getPop(String lang) {
-        try {
-            String[] result = null;
-            if ("zh".equals(lang)) {
-                result = new String[]{"迁移", "openGauss", "yum", "安装", "白皮书", "生命周期", "docker", "虚拟化"};
-            } else if ("en".equals(lang)){
-                result = new String[]{"migration", "openGauss", "doc", "openstack", "cla"};
-            } else {
-                return SysResult.fail("Invalid lang parameter", null);
-            }
-            return SysResult.ok("查询成功", result);
-        } catch (Exception e) {
-            log.error("getPop error is: " + e.getMessage());
         }
         return SysResult.fail("查询失败", null);
     }
