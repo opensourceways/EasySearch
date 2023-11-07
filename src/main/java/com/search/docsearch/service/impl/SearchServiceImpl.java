@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.config.MySystem;
@@ -52,6 +53,7 @@ import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.except.ServiceImplException;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.General;
+import com.search.docsearch.utils.ParameterUtil;
 
 
 @Service
@@ -551,12 +553,18 @@ public class SearchServiceImpl implements SearchService {
 
 
     @Override
-    public String getNps(NpsBody body) throws Exception {     
-        String community = mySystem.getSystem();
+    public String getNps(String community, NpsBody body) throws ServiceImplException {     
+        community = ParameterUtil.vaildCommunity(community);
         String urlStr = String.format(npsApi, community);
         ObjectMapper objectMapper = new ObjectMapper();
-        String bodyStr = objectMapper.writeValueAsString(body);
-        return postRequest(urlStr, bodyStr);
+        try {
+            String bodyStr = objectMapper.writeValueAsString(body);
+            return postRequest(urlStr, bodyStr); 
+        } catch (JsonProcessingException e) {
+            throw new ServiceImplException("can not process json");
+        } catch (Exception e) {
+            throw new ServiceImplException("can not post data");
+        }
     }
 
 
