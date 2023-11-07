@@ -36,7 +36,8 @@ public class ParameterUtil {
     }
 
     public static String vaildCommunity(String community) {
-        if (!"mindspore".equalsIgnoreCase(community) && !"opengauss".equalsIgnoreCase(community) && !"openlookeng".equalsIgnoreCase(community)) {
+        if (!"mindspore".equalsIgnoreCase(community) && !"opengauss".equalsIgnoreCase(community)
+                && !"openlookeng".equalsIgnoreCase(community) && !"xihe".equalsIgnoreCase(community)) {
             throw new IllegalArgumentException("Invalid community parameter");
         }
         return community.toLowerCase(Locale.ROOT);
