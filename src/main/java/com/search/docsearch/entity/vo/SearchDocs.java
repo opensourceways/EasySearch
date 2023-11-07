@@ -20,7 +20,7 @@ public class SearchDocs {
     @Pattern(regexp = "((^zh$|^en$|^ZH$|^EN$))")
     private String lang;
 
-    @Range(min = 1, max = 100, message = "page must be greater than 0 and less than 100 ")
+    @Range(min = 1, max = 1000, message = "page must be greater than 0 and less than 100 ")
     private int page = 1;
 
     @Range(min = 5, max = 20, message = "pageSize must be greater than 5 and less than 20 ")
@@ -28,7 +28,7 @@ public class SearchDocs {
     
     @NotBlank(message = "keyword can not be null")
     @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.\\-_ ]+$", message = "Keyword format is invalid")
-    @Size(max = 20)
+    @Size(max = 100)
     private String keyword;
     
     @Pattern(regexp = "^[\\x20a-zA-Z0-9.\\-_ ]*$", message = "Version format is invalid.")
