@@ -184,17 +184,11 @@ public class SearchController {
     @RequestMapping(value = "ecosystem/repo/info")
     public String getEcosystemRepoInfo(@RequestParam(value = "ecosystem_type") String ecosystemType,
             @RequestParam(value = "lang", required = false) String lang,
-            @RequestParam(value = "sort_type", required = false) String sortType,
-            @RequestParam(value = "sort_order", required = false) String sortOrder,
-            @RequestParam(value = "page", required = false) String page,
-            @RequestParam(value = "pageSize", required = false) String pageSize) throws ControllerException {
+            @RequestParam(value = "page", required = false) String page) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
         ecosystemType = ParameterUtil.vaildEcosystemType(ecosystemType);
-        sortType = ParameterUtil.vaildSortType(sortType);
-        sortOrder = ParameterUtil.vaildSortOrder(sortOrder);
         page = ParameterUtil.vaildPage(page);
-        pageSize = ParameterUtil.vaildPageSize(pageSize);
-        return searchService.getEcosystemRepoInfo(ecosystemType, sortType, sortOrder, page, pageSize, lang);
+        return searchService.getEcosystemRepoInfo(ecosystemType, page, lang);
     }
 
     @PostMapping(value = "nps")
