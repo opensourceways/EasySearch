@@ -23,6 +23,8 @@ public interface SearchService {
 
     String queryAll() throws ServiceException;
 
+    String queryStars() throws ServiceException;
+
     String querySigReadme(String sig, String lang) throws ServiceException;
 
     String getEcosystemRepoInfo(String ecosystemType, String page, String lang) throws ServiceException;

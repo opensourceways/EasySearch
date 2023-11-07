@@ -174,6 +174,11 @@ public class SearchController {
         return searchService.queryAll();
     }
 
+    @RequestMapping("stars")
+    public String queryStars() throws ControllerException {
+        return searchService.queryStars();
+    }
+
     @RequestMapping("sig/readme")
     public String querySigReadme(@RequestParam(value = "sig") String sig,
             @RequestParam(value = "lang", required = false) String lang) throws ControllerException {
