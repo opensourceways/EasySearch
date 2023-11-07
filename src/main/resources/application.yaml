@@ -17,6 +17,13 @@ api:
   sigNameApi:
   sigReadmeApi:
   repoInfoApi:
+  npsApi:
 
 server:
   port: 8080
+
+search-interceptor:
+  allowedPath:
+    - /search/docs
+    - /search/count
+    - /search/tags
