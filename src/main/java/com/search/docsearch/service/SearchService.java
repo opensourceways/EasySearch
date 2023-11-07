@@ -27,6 +27,6 @@ public interface SearchService {
 
     String getEcosystemRepoInfo(String ecosystemType, String page, String lang) throws ServiceException;
     
-    String getNps(NpsBody body) throws Exception;
+    String getNps(String community, NpsBody body) throws ServiceException;
 
 }

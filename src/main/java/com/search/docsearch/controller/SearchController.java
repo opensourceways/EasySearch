@@ -192,8 +192,8 @@ public class SearchController {
     }
 
     @PostMapping(value = "nps")
-    public String getNps(@RequestBody NpsBody body) throws Exception {
-        return searchService.getNps(body);
+    public String getNps(@RequestParam(value = "community") String community, @RequestBody NpsBody body) throws ControllerException {
+        return searchService.getNps(community, body);
     }
 
 }
