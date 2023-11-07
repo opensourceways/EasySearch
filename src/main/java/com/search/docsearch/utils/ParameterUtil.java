@@ -50,22 +50,6 @@ public class ParameterUtil {
         return ecosystemType;
     }
 
-    public static String vaildSortType(String sortType) {
-        sortType = sortType == null ? "star" : sortType;
-        if (!"star".equalsIgnoreCase(sortType) && !"name".equalsIgnoreCase(sortType) && !"repo".equalsIgnoreCase(sortType)) {
-            throw new IllegalArgumentException("Invalid sortType parameter");
-        }
-        return sortType;
-    }
-
-    public static String vaildSortOrder(String sortOrder) {
-        sortOrder = sortOrder == null ? "desc" : sortOrder;
-        if (!"desc".equalsIgnoreCase(sortOrder) && !"asc".equalsIgnoreCase(sortOrder)) {
-            throw new IllegalArgumentException("Invalid sortOrder parameter");
-        }
-        return sortOrder;
-    }
-
     public static String vaildPage(String page) {
         page = page == null ? "1" : page;
         if (Integer.parseInt(page) > 100 || Integer.parseInt(page) < 1) {
@@ -74,11 +58,4 @@ public class ParameterUtil {
         return page;
     }
 
-    public static String vaildPageSize(String pageSize) {
-        pageSize = pageSize == null ? "20" : pageSize;
-        if (Integer.parseInt(pageSize) > 20 || Integer.parseInt(pageSize) < 5) {
-            throw new IllegalArgumentException("Invalid pageSize parameter");
-        }
-        return pageSize;
-    }
 }

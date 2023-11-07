@@ -25,8 +25,7 @@ public interface SearchService {
 
     String querySigReadme(String sig, String lang) throws ServiceException;
 
-    String getEcosystemRepoInfo(String ecosystemType, String sortType, String sortOrder, String page,
-            String pageSize, String lang) throws ServiceException;
+    String getEcosystemRepoInfo(String ecosystemType, String page, String lang) throws ServiceException;
     
     String getNps(NpsBody body) throws Exception;
 
