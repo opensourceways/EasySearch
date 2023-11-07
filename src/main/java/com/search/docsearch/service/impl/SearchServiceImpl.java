@@ -70,6 +70,9 @@ public class SearchServiceImpl implements SearchService {
     @Value("${api.allApi}")
     private String allApi;
 
+    @Value("${api.starsApi}")
+    private String starsApi;
+
     @Value("${api.sigNameApi}")
     private String sigNameApi;
 
@@ -499,6 +502,19 @@ public class SearchServiceImpl implements SearchService {
     public String queryAll() throws ServiceImplException {
         String community = mySystem.getSystem();
         String urlStr = String.format(Locale.ROOT, allApi, community);  
+        String res = null;
+        try {
+            res = httpRequest(urlStr);
+        } catch(IOException e) {
+            throw new ServiceImplException("can not search");
+        }
+        return res;
+    }
+
+    @Override
+    public String queryStars() throws ServiceImplException {
+        String community = mySystem.getSystem();
+        String urlStr = String.format(Locale.ROOT, starsApi, community);  
         String res = null;
         try {
             res = httpRequest(urlStr);
