@@ -537,10 +537,9 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public String getEcosystemRepoInfo(String ecosystemType, String sortType, String sortOrder,
-            String page, String pageSize, String lang) throws ServiceImplException {     
+    public String getEcosystemRepoInfo(String ecosystemType, String page, String lang) throws ServiceImplException {     
         String community = mySystem.getSystem();
-        String urlStr = String.format(Locale.ROOT, repoInfoApi, community, ecosystemType, sortType, sortOrder, page, pageSize, lang);
+        String urlStr = String.format(Locale.ROOT, repoInfoApi, community, ecosystemType, page, lang);
         String res = null;
         try {
             res = httpRequest(urlStr);
