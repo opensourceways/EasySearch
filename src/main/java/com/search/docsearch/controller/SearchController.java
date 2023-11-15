@@ -184,7 +184,7 @@ public class SearchController {
             @RequestParam(value = "lang", required = false) String lang) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
         String result = searchService.querySigReadme(sig, lang);
-        return SysCode.ok("查询成功", result);
+        return SysCode.ok("ok", result);
     }
 
     @RequestMapping(value = "ecosystem/repo/info")
