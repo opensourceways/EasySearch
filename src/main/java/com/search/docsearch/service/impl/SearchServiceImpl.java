@@ -44,6 +44,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.config.MySystem;
@@ -75,9 +76,6 @@ public class SearchServiceImpl implements SearchService {
 
     @Value("${api.sigNameApi}")
     private String sigNameApi;
-
-    @Value("${api.sigReadmeApi}")
-    private String sigReadmeApi;
 
     @Value("${api.repoInfoApi}")
     private String repoInfoApi;
@@ -526,32 +524,23 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public String querySigReadme(String sig, String lang) throws ServiceImplException {
-        String community = mySystem.getSystem();
+        lang = ParameterUtil.vaildLang(lang);
         ObjectMapper objectMapper = new ObjectMapper();
-        List<String> sigName = new ArrayList<>();
-        JsonNode sigNameList = null;
         try {
-            sigNameList = objectMapper.readTree(querySigName(lang));
-        } catch(IOException e) {
-            throw new ServiceImplException("can not read");
-        }
-        if (sigNameList.get("data") != null && sigNameList.get("data").get("SIG_list") != null) {
-            for (JsonNode bucket : sigNameList.get("data").get("SIG_list")) {
-                sigName.add(bucket.get("name").asText());
+            JsonNode sigNameList = objectMapper.readTree(querySigName(lang));
+            if (sigNameList.get("data") == null || sigNameList.get("data").get("SIG_list") == null) {
+                throw new IllegalArgumentException("Invalid sig parameter");
             }
-        }
-        if (!sigName.contains(sig)) {
-            throw new IllegalArgumentException("Invalid sig parameter");
-        }
-        sig = sig.replaceAll("\\+", "%20").replaceAll(" ", "%20");
-        String urlStr = String.format(Locale.ROOT, sigReadmeApi, community, sig, lang);
-        String res = null;
-        try {
-            res = httpRequest(urlStr);
-        } catch(IOException e) {
+            String urlStr = "";
+            for (JsonNode bucket : sigNameList.get("data").get("SIG_list")) {
+                if (bucket.get("name").asText().equalsIgnoreCase(sig)) {
+                    urlStr = bucket.get("links").asText().replace("/blob/", "/raw/").replace("/tree/", "/raw/");
+                }
+            }
+            return httpRequest(urlStr);
+        } catch (Exception e) {
             throw new ServiceImplException("can not search");
         }
-        return res;
     }
 
     @Override
