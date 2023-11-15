@@ -44,7 +44,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.config.MySystem;
