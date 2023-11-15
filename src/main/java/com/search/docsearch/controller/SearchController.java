@@ -1,7 +1,6 @@
 package com.search.docsearch.controller;
 
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import com.search.docsearch.config.MySystem;
 import com.search.docsearch.entity.vo.NpsBody;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
+import com.search.docsearch.entity.vo.SysCode;
 import com.search.docsearch.entity.vo.SysResult;
 import com.search.docsearch.except.ControllerException;
 import com.search.docsearch.service.SearchService;
@@ -180,10 +180,11 @@ public class SearchController {
     }
 
     @RequestMapping("sig/readme")
-    public String querySigReadme(@RequestParam(value = "sig") String sig,
+    public SysCode querySigReadme(@RequestParam(value = "sig") String sig,
             @RequestParam(value = "lang", required = false) String lang) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
-        return searchService.querySigReadme(sig, lang);
+        String result = searchService.querySigReadme(sig, lang);
+        return SysCode.ok("查询成功", result);
     }
 
     @RequestMapping(value = "ecosystem/repo/info")
