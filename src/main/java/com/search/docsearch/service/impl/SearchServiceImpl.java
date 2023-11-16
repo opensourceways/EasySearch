@@ -488,7 +488,7 @@ public class SearchServiceImpl implements SearchService {
         String urlStr = String.format(Locale.ROOT, sigNameApi, community, lang);  
         String res = null;
         try {
-            res = httpRequest(urlStr);
+            res = httpRequest(urlStr, false);
         } catch(IOException e) {
             throw new ServiceImplException("can not search");
         }
@@ -501,7 +501,7 @@ public class SearchServiceImpl implements SearchService {
         String urlStr = String.format(Locale.ROOT, allApi, community);  
         String res = null;
         try {
-            res = httpRequest(urlStr);
+            res = httpRequest(urlStr, false);
         } catch(IOException e) {
             throw new ServiceImplException("can not search");
         }
@@ -514,7 +514,7 @@ public class SearchServiceImpl implements SearchService {
         String urlStr = String.format(Locale.ROOT, starsApi, community);  
         String res = null;
         try {
-            res = httpRequest(urlStr);
+            res = httpRequest(urlStr, false);
         } catch(IOException e) {
             throw new ServiceImplException("can not search");
         }
@@ -536,7 +536,7 @@ public class SearchServiceImpl implements SearchService {
                     urlStr = bucket.get("links").asText().replace("/blob/", "/raw/").replace("/tree/", "/raw/");
                 }
             }
-            return httpRequest(urlStr);
+            return httpRequest(urlStr, true);
         } catch (Exception e) {
             throw new ServiceImplException("can not search");
         }
@@ -548,7 +548,7 @@ public class SearchServiceImpl implements SearchService {
         String urlStr = String.format(Locale.ROOT, repoInfoApi, community, ecosystemType, page, lang);
         String res = null;
         try {
-            res = httpRequest(urlStr);
+            res = httpRequest(urlStr, false);
         } catch(IOException e) {
             throw new ServiceImplException("can not search");
         }
@@ -572,7 +572,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
 
-    public String httpRequest(String urlStr) throws IOException {
+    public String httpRequest(String urlStr, Boolean flag) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -581,6 +581,9 @@ public class SearchServiceImpl implements SearchService {
         StringBuilder response = new StringBuilder();
         while ((line = reader.readLine()) != null) {
             response.append(line);
+            if (flag) {
+                response.append("\n");
+            }
         }
         reader.close();
         return response.toString();
