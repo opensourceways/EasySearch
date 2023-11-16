@@ -38,7 +38,7 @@ COPY --chown=easysearch --from=Builder /EaseSearch-search/target ${WORKSPACE}/ta
 
 RUN echo "umask 027" >> /home/easysearch/.bashrc \
     && source /home/easysearch/.bashrc \
-    && chmod 550 -R /home/easysearch \
+    && chmod 550 -R /home/easysearch
 
 RUN dnf install -y wget \
     && wget https://mirrors.tuna.tsinghua.edu.cn/Adoptium/17/jre/x64/linux/OpenJDK17U-jre_x64_linux_hotspot_17.0.9_9.tar.gz -O jre-17.0.9.tar.gz \
