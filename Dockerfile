@@ -6,8 +6,7 @@ RUN cd / \
     && tar -zxvf OpenJDK17U-jdk_x64_linux_hotspot_17.0.9_9.tar.gz \
     && wget https://repo.huaweicloud.com/apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz \
     && tar -zxvf apache-maven-3.8.1-bin.tar.gz \
-    && yum install -y git \
-    && yum install -y shadow
+    && yum install -y git
 
 COPY . /EaseSearch-search
 
@@ -25,6 +24,9 @@ RUN cp -r jdk-17.0.9+9 jre
 
 FROM openeuler/openeuler:22.03
 
+RUN yum update -y \
+    && yum install -y shadow
+
 RUN groupadd -g 1001 easysearch \
     && useradd -u 1001 -g easysearch -s /bin/bash -m easysearch
 
@@ -34,9 +36,9 @@ WORKDIR ${WORKSPACE}
 
 COPY --chown=easysearch --from=Builder /EaseSearch-search/target ${WORKSPACE}/target
 
-RUN echo "umask 027" >> /home/easysearch/.bashrc
-RUN source /home/easysearch/.bashrc
-RUN chmod 550 -R /home/easysearch
+RUN echo "umask 027" >> /home/easysearch/.bashrc \
+    && source /home/easysearch/.bashrc \
+    && chmod 550 -R /home/easysearch \
 
 RUN dnf install -y wget \
     && wget https://mirrors.tuna.tsinghua.edu.cn/Adoptium/17/jre/x64/linux/OpenJDK17U-jre_x64_linux_hotspot_17.0.9_9.tar.gz -O jre-17.0.9.tar.gz \
