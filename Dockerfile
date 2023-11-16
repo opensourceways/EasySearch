@@ -44,7 +44,7 @@ RUN dnf install -y wget \
     && wget https://mirrors.tuna.tsinghua.edu.cn/Adoptium/17/jre/x64/linux/OpenJDK17U-jre_x64_linux_hotspot_17.0.9_9.tar.gz -O jre-17.0.9.tar.gz \
     && tar -zxvf jre-17.0.9.tar.gz
 
-ENV JAVA_HOME=${WORKSPACE}/jre-17.0.9
+ENV JAVA_HOME=${WORKSPACE}/jdk-17.0.9+9-jre
 ENV PATH=${JAVA_HOME}/bin:$PATH
 ENV LANG="C.UTF-8"
 ENV NO_ID_USER=anonymous
