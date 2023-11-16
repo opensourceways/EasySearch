@@ -6,7 +6,8 @@ RUN cd / \
     && tar -zxvf jdk-17.0.7_linux-x64_bin.tar.gz \
     && wget https://repo.huaweicloud.com/apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz \
     && tar -zxvf apache-maven-3.8.1-bin.tar.gz \
-    && yum install -y git
+    && yum install -y git \
+    && yum install -y shadow
 
 COPY . /EaseSearch-search
 
