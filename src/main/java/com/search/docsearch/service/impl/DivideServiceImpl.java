@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.search.docsearch.utils.General;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -141,6 +142,7 @@ public class DivideServiceImpl implements DivideService {
         if (StringUtils.hasText(searchDocs.getVersion())) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("version.keyword", searchDocs.getVersion()));
         }
+        searchDocs.setKeyword(General.replacementCharacter(searchDocs.getKeyword()));
 
         MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", searchDocs.getKeyword()).analyzer("ik_max_word").slop(2);
         ptitleMP.boost(200);
