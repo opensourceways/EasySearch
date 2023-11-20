@@ -37,6 +37,7 @@ public class General {
             int ind = a;
 
             if (ind < 1 || ind > str.length() - 2) {
+                a = str.indexOf(key, a + 1);
                 continue;
             }
             if (!Character.isDigit(str.charAt(ind - 1)) || !Character.isDigit(str.charAt(ind + 1))) {
@@ -47,9 +48,22 @@ public class General {
 
         }
 
+        return insertSpaceBetweenNumbersAndLetters(str);
+    }
 
-        String reply = str;
-        return reply;
+
+    public static String insertSpaceBetweenNumbersAndLetters(String str) {
+        String regex = "\\d+\\.?\\d*";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+        StringBuilder output = new StringBuilder();
+        while (matcher.find()) {
+            String match = matcher.group();
+            matcher.appendReplacement(output, " " + match + " ");
+        }
+
+        matcher.appendTail(output);
+        return output.toString();
     }
 
 }
