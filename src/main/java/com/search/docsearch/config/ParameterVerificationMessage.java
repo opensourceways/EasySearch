@@ -20,7 +20,7 @@ public class ParameterVerificationMessage {
 
     @ResponseBody
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    @ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
+    @ResponseStatus(org.springframework.http.HttpStatus.OK)
     public SysResult MethodArgumentNotValidHandler(HttpServletRequest request, MethodArgumentNotValidException exception) {
         BindingResult bindingResult = exception.getBindingResult();
         StringBuilder sb = new StringBuilder("Parameter verification failed:");
@@ -30,7 +30,7 @@ public class ParameterVerificationMessage {
         }
         String msg = sb.toString();
         
-        return SysResult.fail(msg, null);
+        return SysResult.parameterVerificationFailed(msg);
     }
     
 }
