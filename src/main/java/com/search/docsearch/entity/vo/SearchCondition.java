@@ -29,7 +29,7 @@ public class SearchCondition {
     private int pageSize = 10;
 
     @NotBlank(message = "keyword can not be null")
-    @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.\\-_ ]+$", message = "Keyword format is invalid")
+    @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.()$\\-_ ]+$", message = "Search terms can only be Chinese, English, numbers and symbols: .   -   _   $   (   ), length less than 100")
     @Size(max = 100)
     private String keyword;
 

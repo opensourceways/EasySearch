@@ -44,6 +44,10 @@ public class SysResult {
         return new SysResult(201, msg, data);
     }
 
+    public static SysResult parameterVerificationFailed(String msg) {
+        return new SysResult(400, msg, null);
+    }
+
     public static SysResult fail() {
         return new SysResult(201, null, null);
     }
