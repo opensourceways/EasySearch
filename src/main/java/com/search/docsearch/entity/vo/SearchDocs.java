@@ -27,7 +27,7 @@ public class SearchDocs {
     private int pageSize = 10;
 
     @NotBlank(message = "keyword can not be null")
-    @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.()$\\-_ ]+$", message = "Search terms can only be Chinese, English, numbers and symbols: .   -   _   $   (   ), length less than 100")
+    @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.()$\\-_ ]+$", message = "Include only letters, digits, and special characters(_-()$.), Contain 1 to 100 characters.")
     @Size(max = 100)
     private String keyword;
 
