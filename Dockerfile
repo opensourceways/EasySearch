@@ -19,6 +19,15 @@ ENV PATH=${MAVEN_HOME}/bin:$PATH
 RUN cd /EaseSearch-search \
     && mvn clean install package -Dmaven.test.skip
 
+ARG PUBLIC_USER
+ARG PUBLIC_PASSWORD
+RUN cd / \
+    && git clone https://$PUBLIC_USER:$PUBLIC_PASSWORD@github.com/Open-Infra-Ops/plugins \
+    && cp plugins/armorrasp/rasp.tgz . \
+    && tar -zxf rasp.tgz \
+    && chown -R root:root rasp && chmod 755 -R rasp \
+    && rm -rf plugins
+
 RUN cp -r jdk-17.0.9+9 jre
 
 
@@ -35,6 +44,7 @@ ENV WORKSPACE=/home/easysearch
 WORKDIR ${WORKSPACE}
 
 COPY --chown=easysearch --from=Builder /EaseSearch-search/target ${WORKSPACE}/target
+COPY --chown=easysearch --from=Builder /rasp ${WORKSPACE}/rasp
 
 RUN echo "umask 027" >> /home/easysearch/.bashrc \
     && source /home/easysearch/.bashrc \
@@ -53,4 +63,4 @@ EXPOSE 8080
 
 USER easysearch
 
-CMD java -jar ${WORKSPACE}/target/EaseSearch-0.0.1-SNAPSHOT.jar --spring.config.location=${APPLICATION_PATH}
+CMD java -javaagent:${WORKSPACE}/rasp/rasp.jar -jar ${WORKSPACE}/target/EaseSearch-0.0.1-SNAPSHOT.jar --spring.config.location=${APPLICATION_PATH}
