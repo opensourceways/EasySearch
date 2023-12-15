@@ -1,0 +1,93 @@
+{
+  "lang":"zh",
+  "page":1,
+  "pageSize":6,
+  "keyword":"docker",
+  "type":"",
+  "limit":[
+    {
+      "components":"MindSpore",
+      "version":"r2.2"
+    },
+    {
+      "components":"MindSpore Lite",
+      "version":"r2.2"
+    },
+    {
+      "components":"MindSpore Pandas",
+      "version":"r0.2"
+    },
+    {
+      "components":"MindSpore Insight",
+      "version":"r2.2"
+    },
+    {
+      "components":"MindSpore Armour",
+      "version":"r2.0"
+    },
+    {
+      "components":"MindSpore Serving",
+      "version":"r2.0"
+    },
+    {
+      "components":"MindSpore Federated",
+      "version":"r0.1"
+    },
+    {
+      "components":"MindSpore Golden Stick",
+      "version":"r0.3"
+    },
+    {
+      "components":"MindSpore XAI",
+      "version":"r1.8"
+    },
+    {
+      "components":"MindSpore Dev Toolkit",
+      "version":"r2.2"
+    },
+    {
+      "components":"MindSpore Recommender",
+      "version":"r0.3"
+    },
+    {
+      "components":"MindSpore Graph Learning",
+      "version":"r0.2"
+    },
+    {
+      "components":"MindSpore Reinforcement",
+      "version":"r0.7"
+    },
+    {
+      "components":"MindSpore Probability",
+      "version":"r1.7"
+    },
+    {
+      "components":"MindSpore Hub",
+      "version":"r1.9"
+    },
+    {
+      "components":"MindSpore Elec",
+      "version":"r0.2"
+    },
+    {
+      "components":"MindSpore SPONGE",
+      "version":"r1.0"
+    },
+    {
+      "components":"MindSpore Flow",
+      "version":"r0.1"
+    },
+    {
+      "components":"MindSpore Earth",
+      "version":"r0.1"
+    },
+    {
+      "components":"MindSpore SciAI",
+      "version":"r0.1"
+    },
+    {
+      "components":"MindSpore Quantum",
+      "version":"r0.9"
+    }
+  ]
+}
