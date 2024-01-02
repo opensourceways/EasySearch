@@ -259,7 +259,9 @@ public class SearchServiceImpl implements SearchService {
         }
 
         sourceBuilder.query(boolQueryBuilder);
-
+        if(condition.getType() ==null || "".equals(condition.getType().trim())){
+            sourceBuilder.sort("type.keyword", SortOrder.ASC);
+        }
         HighlightBuilder highlightBuilder = new HighlightBuilder()
                 .field("textContent")
                 .field("title")
