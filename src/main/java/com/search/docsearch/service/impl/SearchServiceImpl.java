@@ -12,16 +12,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.search.docsearch.config.EsfunctionScoreConfig;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.lucene.search.function.CombineFunction;
+import org.elasticsearch.common.lucene.search.function.FunctionScoreQuery;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
@@ -81,7 +86,8 @@ public class SearchServiceImpl implements SearchService {
 
     @Value("${api.npsApi}")
     private String npsApi;
-
+    @Autowired
+    private EsfunctionScoreConfig esfunctionScoreConfig;
     public Map<String, Object> getSuggestion(String keyword, String lang) throws ServiceImplException {
         String saveIndex = mySystem.index + "_" + lang;
 
@@ -258,9 +264,19 @@ public class SearchServiceImpl implements SearchService {
             boolQueryBuilder.filter(zBuilder);
         }
 
-        sourceBuilder.query(boolQueryBuilder);
         if(condition.getType() ==null || "".equals(condition.getType().trim())){
-            sourceBuilder.sort("type.keyword", SortOrder.ASC);
+            FunctionScoreQueryBuilder.FilterFunctionBuilder[] functionBuilder = new  FunctionScoreQueryBuilder.FilterFunctionBuilder[esfunctionScoreConfig.functionscore.size()];
+            for (int i = 0; i < esfunctionScoreConfig.functionscore.size(); i++) {
+                Map<String, Object> eachFilter = esfunctionScoreConfig.functionscore.get(i);
+                functionBuilder[i]=new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.termQuery(eachFilter.get("termkey").toString(), eachFilter.get("value")), ScoreFunctionBuilders.weightFactorFunction(Float.parseFloat(String.valueOf(eachFilter.get("weight")))));
+            }
+            FunctionScoreQueryBuilder functionScoreQuery = QueryBuilders.functionScoreQuery(boolQueryBuilder,functionBuilder)
+                    .scoreMode(FunctionScoreQuery.ScoreMode.SUM)
+                    .boostMode(CombineFunction.MULTIPLY);
+            sourceBuilder.query(functionScoreQuery);
+
+        }else {
+            sourceBuilder.query(boolQueryBuilder);
         }
         HighlightBuilder highlightBuilder = new HighlightBuilder()
                 .field("textContent")
