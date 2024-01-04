@@ -12,16 +12,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.search.docsearch.config.EsfunctionScoreConfig;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.lucene.search.function.CombineFunction;
+import org.elasticsearch.common.lucene.search.function.FunctionScoreQuery;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
@@ -81,6 +86,8 @@ public class SearchServiceImpl implements SearchService {
 
     @Value("${api.npsApi}")
     private String npsApi;
+    @Autowired
+    private EsfunctionScoreConfig esfunctionScoreConfig;
 
     public Map<String, Object> getSuggestion(String keyword, String lang) throws ServiceImplException {
         String saveIndex = mySystem.index + "_" + lang;
@@ -106,7 +113,7 @@ public class SearchServiceImpl implements SearchService {
         SearchResponse suggResponse = null;
         try {
             suggResponse = restHighLevelClient.search(suggRequest, RequestOptions.DEFAULT);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
 
@@ -157,14 +164,14 @@ public class SearchServiceImpl implements SearchService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
         List<Map<String, Object>> data = new ArrayList<>();
 
         for (SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> map = hit.getSourceAsMap();
-            String text = (String)map.getOrDefault("textContent", "");
+            String text = (String) map.getOrDefault("textContent", "");
             if (null != text && text.length() > 200) {
                 text = text.substring(0, 200) + "......";
             }
@@ -258,8 +265,20 @@ public class SearchServiceImpl implements SearchService {
             boolQueryBuilder.filter(zBuilder);
         }
 
-        sourceBuilder.query(boolQueryBuilder);
+        if ((condition.getType() == null || "".equals(condition.getType().trim())) && esfunctionScoreConfig.functionscore != null && esfunctionScoreConfig.functionscore.size() > 0) {
+            FunctionScoreQueryBuilder.FilterFunctionBuilder[] functionBuilder = new FunctionScoreQueryBuilder.FilterFunctionBuilder[esfunctionScoreConfig.functionscore.size()];
+            for (int i = 0; i < esfunctionScoreConfig.functionscore.size(); i++) {
+                Map<String, Object> eachFilter = esfunctionScoreConfig.functionscore.get(i);
+                functionBuilder[i] = new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.termQuery(eachFilter.get("termkey").toString(), eachFilter.get("value")), ScoreFunctionBuilders.weightFactorFunction(Float.parseFloat(String.valueOf(eachFilter.get("weight")))));
+            }
+            FunctionScoreQueryBuilder functionScoreQuery = QueryBuilders.functionScoreQuery(boolQueryBuilder, functionBuilder)
+                    .scoreMode(FunctionScoreQuery.ScoreMode.SUM)
+                    .boostMode(CombineFunction.MULTIPLY);
+            sourceBuilder.query(functionScoreQuery);
 
+        } else {
+            sourceBuilder.query(boolQueryBuilder);
+        }
         HighlightBuilder highlightBuilder = new HighlightBuilder()
                 .field("textContent")
                 .field("title")
@@ -337,7 +356,7 @@ public class SearchServiceImpl implements SearchService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
         List<Map<String, Object>> numberList = new ArrayList<>();
@@ -422,7 +441,7 @@ public class SearchServiceImpl implements SearchService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
         Map<String, Object> result = new HashMap<>();
@@ -463,7 +482,7 @@ public class SearchServiceImpl implements SearchService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
         ParsedTerms aggregation = response.getAggregations().get("data");
@@ -485,11 +504,11 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public String querySigName(String lang) throws ServiceImplException {
         String community = mySystem.getSystem();
-        String urlStr = String.format(Locale.ROOT, sigNameApi, community, lang);  
+        String urlStr = String.format(Locale.ROOT, sigNameApi, community, lang);
         String res = null;
         try {
             res = httpRequest(urlStr, false);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
         return res;
@@ -498,11 +517,11 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public String queryAll() throws ServiceImplException {
         String community = mySystem.getSystem();
-        String urlStr = String.format(Locale.ROOT, allApi, community);  
+        String urlStr = String.format(Locale.ROOT, allApi, community);
         String res = null;
         try {
             res = httpRequest(urlStr, false);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
         return res;
@@ -511,11 +530,11 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public String queryStars() throws ServiceImplException {
         String community = mySystem.getSystem();
-        String urlStr = String.format(Locale.ROOT, starsApi, community);  
+        String urlStr = String.format(Locale.ROOT, starsApi, community);
         String res = null;
         try {
             res = httpRequest(urlStr, false);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
         return res;
@@ -543,13 +562,13 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public String getEcosystemRepoInfo(String ecosystemType, String page, String lang) throws ServiceImplException {     
+    public String getEcosystemRepoInfo(String ecosystemType, String page, String lang) throws ServiceImplException {
         String community = mySystem.getSystem();
         String urlStr = String.format(Locale.ROOT, repoInfoApi, community, ecosystemType, page, lang);
         String res = null;
         try {
             res = httpRequest(urlStr, false);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
         return res;
@@ -557,13 +576,13 @@ public class SearchServiceImpl implements SearchService {
 
 
     @Override
-    public String getNps(String community, NpsBody body) throws ServiceImplException {     
+    public String getNps(String community, NpsBody body) throws ServiceImplException {
         community = ParameterUtil.vaildCommunity(community);
         String urlStr = String.format(npsApi, community);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String bodyStr = objectMapper.writeValueAsString(body);
-            return postRequest(urlStr, bodyStr); 
+            return postRequest(urlStr, bodyStr);
         } catch (JsonProcessingException e) {
             throw new ServiceImplException("can not process json");
         } catch (Exception e) {
@@ -592,7 +611,7 @@ public class SearchServiceImpl implements SearchService {
     public String postRequest(String urlStr, String body) throws Exception {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        
+
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);

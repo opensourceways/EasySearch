@@ -5,6 +5,7 @@ elasticsearch:
   password:
   cerFilePath:
   cerPassword:
+  functionscore:
 
 #openEuler    openGauss    openLookeng    mindSpore
 system: ${searchsystem:openEuler}
