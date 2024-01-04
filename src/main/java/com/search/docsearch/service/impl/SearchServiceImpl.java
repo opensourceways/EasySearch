@@ -264,7 +264,7 @@ public class SearchServiceImpl implements SearchService {
             boolQueryBuilder.filter(zBuilder);
         }
 
-        if(condition.getType() ==null || "".equals(condition.getType().trim())){
+        if((condition.getType() ==null || "".equals(condition.getType().trim())) && esfunctionScoreConfig.functionscore !=null && esfunctionScoreConfig.functionscore.size()>0){
             FunctionScoreQueryBuilder.FilterFunctionBuilder[] functionBuilder = new  FunctionScoreQueryBuilder.FilterFunctionBuilder[esfunctionScoreConfig.functionscore.size()];
             for (int i = 0; i < esfunctionScoreConfig.functionscore.size(); i++) {
                 Map<String, Object> eachFilter = esfunctionScoreConfig.functionscore.get(i);
