@@ -12,4 +12,6 @@ import java.util.Map;
 @Data
 public class EsfunctionScoreConfig {
       public List<Map> functionscore;
+      public  float titleBoost;
+      public  float textContentBoost;
 }

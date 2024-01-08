@@ -5,6 +5,8 @@ elasticsearch:
   password:
   cerFilePath:
   cerPassword:
+  titleBoost:
+  textContentBoost:
   functionscore:
 
 #openEuler    openGauss    openLookeng    mindSpore
