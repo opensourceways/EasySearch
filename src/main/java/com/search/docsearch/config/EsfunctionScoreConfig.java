@@ -11,7 +11,7 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "elasticsearch")
 @Data
 public class EsfunctionScoreConfig {
-      public List<Map> functionscore;
-      public  Float titleBoost;
-      public  Float textContentBoost;
+    public List<Map> functionscore;
+    public Float titleBoost;
+    public Float textContentBoost;
 }

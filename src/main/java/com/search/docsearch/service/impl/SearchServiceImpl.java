@@ -215,9 +215,9 @@ public class SearchServiceImpl implements SearchService {
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
         MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", condition.getKeyword()).analyzer("ik_max_word").slop(2);
-        ptitleMP.boost(esfunctionScoreConfig.titleBoost==null? 200:esfunctionScoreConfig.titleBoost);
+        ptitleMP.boost(esfunctionScoreConfig.titleBoost == null ? 200 : esfunctionScoreConfig.titleBoost);
         MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", condition.getKeyword()).analyzer("ik_max_word").slop(2);
-        ptextContentMP.boost(esfunctionScoreConfig.textContentBoost==null?100: esfunctionScoreConfig.textContentBoost);
+        ptextContentMP.boost(esfunctionScoreConfig.textContentBoost == null ? 100 : esfunctionScoreConfig.textContentBoost);
 
         boolQueryBuilder.should(ptitleMP).should(ptextContentMP);
 
