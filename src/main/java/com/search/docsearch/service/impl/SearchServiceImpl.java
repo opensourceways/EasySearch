@@ -184,7 +184,9 @@ public class SearchServiceImpl implements SearchService {
                 }
                 map.put("textContent", highLight.toString());
             }
-
+            if ("whitepaper".equals(map.getOrDefault("type", "")) && !map.containsKey("title")) {
+                map.put("title", map.get("secondaryTitle"));
+            }
             if (highlightFields.containsKey("title")) {
                 map.put("title", highlightFields.get("title").getFragments()[0].toString());
             }
