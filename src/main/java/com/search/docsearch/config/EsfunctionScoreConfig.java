@@ -14,4 +14,5 @@ public class EsfunctionScoreConfig {
     public List<Map> functionscore;
     public Float titleBoost;
     public Float textContentBoost;
+    public String limitType;
 }
