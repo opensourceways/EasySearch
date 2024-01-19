@@ -4,12 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.security.DrbgParameters;
 import java.security.KeyStore;
 import java.security.SecureRandom;
-import java.security.DrbgParameters.Capability;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Objects;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -54,16 +53,15 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
         try {
             TrustManager[] tm = {new MyX509TrustManager(cerFilePath, cerPassword)};
             sc = SSLContext.getInstance("SSL", "SunJSSE");
-            sc.init(null, tm, SecureRandom.getInstance("DRBG", 
-                    DrbgParameters.instantiation(256, Capability.RESEED_ONLY, null)));
+            sc.init(null, tm, SecureRandom.getInstance("NativePRNGBlocking"));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString());
         }
         final ClientConfiguration clientConfiguration = ClientConfiguration.builder()
-            .connectedTo(elasticsearchUrl)
-            .usingSsl(sc, new NullHostNameVerifier())
-            .withBasicAuth(elasticsearchUsername, elasticsearchPassword)
-            .build();
+                .connectedTo(elasticsearchUrl)
+                .usingSsl(sc, new NullHostNameVerifier())
+                .withBasicAuth(elasticsearchUsername, elasticsearchPassword)
+                .build();
         return RestClients.create(clientConfiguration).rest();
     }
     public static class MyX509TrustManager implements X509TrustManager {
@@ -93,9 +91,21 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
         }
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            for (X509Certificate cert : chain) {
+                cert.checkValidity(); // 验证证书是否过期
+                boolean isCA = cert.getBasicConstraints() >= 0; // 检查是否为 CA 证书
+                if (!isCA) {
+                    throw new CertificateException("Invalid certificate: not a CA certificate.");
+                }
+            }
         }
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            for (X509Certificate cert : chain) {
+                if (cert.getNotAfter().getTime() < System.currentTimeMillis()) {
+                    throw new CertificateException("Server certificate has expired.");
+                }
+            }
         }
         @Override
         public X509Certificate[] getAcceptedIssuers() {
@@ -104,8 +114,8 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
     }
     public static class NullHostNameVerifier implements HostnameVerifier {
         @Override
-        public boolean verify(String arg0, SSLSession arg1) {
-            return true;
+        public boolean verify(String hostName, SSLSession session) {
+            return !Objects.isNull(hostName) || !Objects.isNull(session);
         }
     }
 }
