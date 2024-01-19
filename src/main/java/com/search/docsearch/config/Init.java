@@ -12,21 +12,20 @@ import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.FileUtils;
 
 import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Slf4j
 @RestController
-public class Init implements ApplicationRunner{
+public class Init implements ApplicationRunner {
 
-    
-    @Autowired
-    public SearchService searchService;
 
     @Autowired
     @Qualifier("setConfig")
     private MySystem s;
-        /**
+
+    /**
      * 该方法在项目启动时就会运行
-     * 
+     *
      * @param args
      */
     @Override

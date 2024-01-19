@@ -231,22 +231,23 @@ public class SearchServiceImpl implements SearchService {
 
         boolQueryBuilder.minimumShouldMatch(1);
 
-        if (condition.getLimit() != null) {
-            for (Map<String, String> map : condition.getLimit()) {
-                BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    String key = entry.getKey();
-                    String value = entry.getValue();
-                    if (key.equals("version")) {
-                        String[] versions = value.split(",");
-                        vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", versions));
-                    } else {
-                        vBuilder.must(QueryBuilders.termQuery(key + ".keyword", value));
+        if ((esfunctionScoreConfig.limitType != null && esfunctionScoreConfig.limitType.contains(condition.getType())) || StringUtils.isEmpty(condition.getType()))
+            if (condition.getLimit() != null) {
+                for (Map<String, String> map : condition.getLimit()) {
+                    BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
+                        String key = entry.getKey();
+                        String value = entry.getValue();
+                        if (key.equals("version")) {
+                            String[] versions = value.split(",");
+                            vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", versions));
+                        } else {
+                            vBuilder.must(QueryBuilders.termQuery(key + ".keyword", value));
+                        }
                     }
+                    boolQueryBuilder.mustNot(vBuilder);
                 }
-                boolQueryBuilder.mustNot(vBuilder);
             }
-        }
 
         if (condition.getFilter() != null) {
             BoolQueryBuilder zBuilder = QueryBuilders.boolQuery();
@@ -314,7 +315,7 @@ public class SearchServiceImpl implements SearchService {
         boolQueryBuilder.should(titleMP).should(textContentMP);
 
         boolQueryBuilder.minimumShouldMatch(1);
-
+        if ((esfunctionScoreConfig.limitType != null && esfunctionScoreConfig.limitType.contains(condition.getType())) || StringUtils.isEmpty(condition.getType()))
         if (condition.getLimit() != null) {
             for (Map<String, String> map : condition.getLimit()) {
                 BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
