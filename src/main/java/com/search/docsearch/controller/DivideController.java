@@ -1,27 +1,19 @@
 package com.search.docsearch.controller;
 
 
-import java.util.Map;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-
 import com.search.docsearch.aop.LimitRequest;
 import com.search.docsearch.aop.LogAction;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.search.docsearch.entity.vo.SearchDocs;
 import com.search.docsearch.entity.vo.SysResult;
 import com.search.docsearch.service.DivideService;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -31,11 +23,10 @@ public class DivideController {
     private DivideService divideService;
 
 
-
     @LogAction(type = "Category search", OperationResource = "Other Documents")
     @PostMapping("/{type}")
     @LimitRequest(callTime = 1, callCount = 30)
-    public SysResult DivideBLog(@PathVariable @NotBlank(message = "must have a type") String type, @RequestBody @NotEmpty(message = "Requires at least one condition") Map<String, String> m){
+    public SysResult DivideBLog(@PathVariable @NotBlank(message = "must have a type") String type, @RequestBody @NotEmpty(message = "Requires at least one condition") Map<String, String> m) {
 
         try {
             Map<String, Object> result = divideService.advancedSearch(m, type);
