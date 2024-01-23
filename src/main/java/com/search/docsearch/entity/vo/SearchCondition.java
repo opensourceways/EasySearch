@@ -32,10 +32,10 @@ public class SearchCondition {
     @Pattern(regexp = "^[\\u4E00-\\u9FA5A-Za-z0-9.()$\\-_ ]+$", message = "Include only letters, digits, and special characters(_-()$.), Contain 1 to 100 characters.")
     @Size(max = 100)
     private String keyword;
-
+    @Size(max = 15)
     private String type;
-
+    @Size(max = 20)
     private List<Map<String, String>> limit;
-
+    @Size(max = 20)
     private List<Map<String, String>> filter;
 }

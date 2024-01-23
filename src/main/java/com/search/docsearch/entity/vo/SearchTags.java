@@ -25,7 +25,7 @@ public class SearchTags {
     @NotBlank(message = "want can not be null")
     @Size(max = 20)
     private String want;
-
+    @Size(max = 50)
     private Map<String, String> condition;
 
 }

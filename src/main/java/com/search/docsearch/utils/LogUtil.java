@@ -2,7 +2,6 @@ package com.search.docsearch.utils;
 
 import com.alibaba.fastjson2.JSON;
 import com.search.docsearch.aop.LogAction;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -11,24 +10,27 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import jakarta.servlet.http.HttpServletRequest;
 public class LogUtil {
 
     public static final String TRACE_ID = "TRACE_ID";
 
     private static final Logger logger = LoggerFactory.getLogger(LogUtil.class);
 
-    public static void returnOperate(JoinPoint joinPoint, int status, String message, HttpServletRequest request) {
+    public static void returnOperate(JoinPoint joinPoint, int status, HttpServletRequest request, long startTime) {
         returnLog log = new returnLog();
         log.setTraceId(MDC.get(TRACE_ID));
 
-        LocalDateTime dateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        log.setTime(dateTime.format(formatter));
-
+        long endTime = System.currentTimeMillis();
+        log.setTimeConsumed((endTime - startTime) + "ms");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        java.util.Date date = new Date(startTime);
+        String str = sdf.format(date);
+        log.setStartTime(str);
         log.setUserId(System.getenv("NO_ID_USER"));
 
         log.setAccessIp(ClientIPUtil.getClientIpAddress(request));
@@ -50,6 +52,8 @@ public class LogUtil {
 
         log.setStatus(status);
 
+        log.setArgs(joinPoint.getArgs());
+
         if (status != 200) {
             log.setMessage("ERROR");
         } else {
@@ -65,7 +69,7 @@ public class LogUtil {
 
         private String traceId;
 
-        private String time;
+        private String startTime;
 
         private String userId;
 
@@ -86,6 +90,10 @@ public class LogUtil {
         private String message;
 
         private String ErrorLog;
+
+        private Object[] args;
+
+        private String timeConsumed;
 
     }
 
