@@ -51,6 +51,7 @@ public class LogUtil {
 
         log.setStatus(status);
 
+        log.setArgs(joinPoint.getArgs());
         if (status != 200) {
             log.setMessage("ERROR");
         } else {
@@ -87,6 +88,8 @@ public class LogUtil {
         private String message;
 
         private String ErrorLog;
+
+        private Object[] args;
 
     }
 
