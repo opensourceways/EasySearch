@@ -29,6 +29,8 @@ public class ManagementOperationLogAOP {
         long startTime = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         LogUtil.returnOperate(joinPoint, response.getStatus(), request, startTime);
+        String sessionId = request.getSession().getId();
+        response.setHeader("SET-COOKIE","SESSIONID="+sessionId+";HttpOnly");
         return result;
     }
 }
