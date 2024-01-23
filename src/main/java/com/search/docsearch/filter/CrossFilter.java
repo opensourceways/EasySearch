@@ -32,7 +32,7 @@ public class CrossFilter implements Filter {
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Cache-Control", "no-store");
         response.setHeader("Pragma", "no-cache");
-        log.info("*********************************跨域过滤器被使用**************************");
+        log.debug("*********************************跨域过滤器被使用**************************");
         filterChain.doFilter(request, response);
     }
 
