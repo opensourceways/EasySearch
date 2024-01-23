@@ -1,10 +1,11 @@
 package com.search.docsearch.aop;
 
 import com.search.docsearch.utils.LogUtil;
-import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,9 +24,11 @@ public class ManagementOperationLogAOP {
     }
 
 
-    @AfterReturning(value = "pointCut()", returning = "returnObject")
-    public void afterReturning(JoinPoint joinPoint, Object returnObject) {
-        LogUtil.returnOperate(joinPoint, response.getStatus(), "", request);
+    @Around(value = "pointCut()")
+    public Object afterReturning(ProceedingJoinPoint joinPoint) throws Throwable {
+        long startTime = System.currentTimeMillis();
+        Object result = joinPoint.proceed();
+        LogUtil.returnOperate(joinPoint, response.getStatus(), request, startTime);
+        return result;
     }
-
 }
