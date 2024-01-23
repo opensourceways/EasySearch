@@ -2,7 +2,6 @@ package com.search.docsearch.utils;
 
 import com.alibaba.fastjson2.JSON;
 import com.search.docsearch.aop.LogAction;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -10,17 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 
-import org.aspectj.lang.reflect.MethodSignature;
-
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
-
+import jakarta.servlet.http.HttpServletRequest;
 public class LogUtil {
 
     public static final String TRACE_ID = "TRACE_ID";

@@ -1,9 +1,10 @@
 package com.search.docsearch.filter;
 
+import jakarta.servlet.*;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
-import javax.servlet.*;
+
 import java.io.IOException;
 
 /**
