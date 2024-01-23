@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ControllerException.class)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void businessException(HttpServletRequest request, HttpServletResponse response, ControllerException e) {
+    public void controllerException(HttpServletRequest request, HttpServletResponse response, ControllerException e) {
         log.error("Controller异常:{}", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
@@ -43,21 +43,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ServiceException.class)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void authException(HttpServletRequest request, HttpServletResponse response, ServiceException e) {
+    public void serviceException(HttpServletRequest request, HttpServletResponse response, ServiceException e) {
         log.error("Service异常:{}", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
     @ExceptionHandler(value = TrustManagerException.class)
     @ResponseStatus(HttpStatus.OK)
-    public void verifyException(HttpServletRequest request, HttpServletResponse response, TrustManagerException e) {
+    public void trustManagerException(HttpServletRequest request, HttpServletResponse response, TrustManagerException e) {
         log.error("TrustManager异常:{}", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
     @ExceptionHandler(value = ServiceImplException.class)
     @ResponseStatus(HttpStatus.OK)
-    public void verifyException(HttpServletRequest request, HttpServletResponse response, ServiceImplException e) {
+    public void serviceImplException(HttpServletRequest request, HttpServletResponse response, ServiceImplException e) {
         log.error("ServiceImpl常:{}", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
@@ -79,7 +79,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void illegalArgumentException(HttpServletRequest request, HttpServletResponse response, IllegalArgumentException e) {
-        e.printStackTrace();
         log.error("参数异常:{}", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
@@ -98,7 +97,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void exception(HttpServletRequest request, HttpServletResponse response, Exception e) {
-        e.printStackTrace();
         log.error("全局异常:{}", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
