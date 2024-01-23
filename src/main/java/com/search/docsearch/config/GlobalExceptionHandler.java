@@ -1,0 +1,122 @@
+package com.search.docsearch.config;
+
+
+import com.search.docsearch.entity.vo.SysResult;
+import com.search.docsearch.except.ControllerException;
+import com.search.docsearch.except.ServiceException;
+import com.search.docsearch.except.ServiceImplException;
+import com.search.docsearch.except.TrustManagerException;
+import com.search.docsearch.utils.JacksonUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+
+/**
+ * 全局异常处理
+ */
+@Slf4j
+@RestControllerAdvice
+@Configuration
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(value = ControllerException.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void businessException(HttpServletRequest request, HttpServletResponse response, ControllerException e) {
+        log.error("Controller异常:{}", e.getMessage());
+        responseJson(request, response, SysResult.fail("查询失败", null));
+    }
+
+    @ExceptionHandler(value = ServiceException.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void authException(HttpServletRequest request, HttpServletResponse response, ServiceException e) {
+        log.error("Service异常:{}", e.getMessage());
+        responseJson(request, response, SysResult.fail("查询失败", null));
+    }
+
+    @ExceptionHandler(value = TrustManagerException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public void verifyException(HttpServletRequest request, HttpServletResponse response, TrustManagerException e) {
+        log.error("TrustManager异常:{}", e.getMessage());
+        responseJson(request, response, SysResult.fail("查询失败", null));
+    }
+
+    @ExceptionHandler(value = ServiceImplException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public void verifyException(HttpServletRequest request, HttpServletResponse response, ServiceImplException e) {
+        log.error("ServiceImpl常:{}", e.getMessage());
+        responseJson(request, response, SysResult.fail("查询失败", null));
+    }
+
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void methodArgumentNotValidException(HttpServletRequest request, HttpServletResponse response, MethodArgumentNotValidException e) {
+        log.error("参数校验异常:{}", e.getMessage());
+        BindingResult bindingResult = e.getBindingResult();
+        StringBuilder sb = new StringBuilder();
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            sb.append(fieldError.getDefaultMessage()).append("\n");
+        }
+        responseJson(request, response, SysResult.fail("查询失败", null));
+    }
+
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void illegalArgumentException(HttpServletRequest request, HttpServletResponse response, IllegalArgumentException e) {
+        e.printStackTrace();
+        log.error("参数异常:{}", e.getMessage());
+        responseJson(request, response, SysResult.fail("查询失败", null));
+    }
+
+
+    @ExceptionHandler(value = SQLException.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void sqlException(HttpServletRequest request, HttpServletResponse response, SQLException e) {
+        log.error("sql异常:{}", e.getMessage());
+        responseJson(request, response, SysResult.fail("查询失败", null));
+    }
+
+
+    @ExceptionHandler(value = Exception.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void exception(HttpServletRequest request, HttpServletResponse response, Exception e) {
+        e.printStackTrace();
+        log.error("全局异常:{}", e.getMessage());
+        responseJson(request, response, SysResult.fail("查询失败", null));
+    }
+
+    /**
+     * 响应json格式字符串
+     *
+     * @param request  {HttpServletRequest}
+     * @param response {HttpServletResponse}
+     * @param sysResult {SysResult}
+     */
+    private void responseJson(HttpServletRequest request, HttpServletResponse response, SysResult sysResult) {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json; charset=utf-8");
+        try (PrintWriter out = response.getWriter()) {
+            out.append(JacksonUtils.writeValueAsString(sysResult));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+}
