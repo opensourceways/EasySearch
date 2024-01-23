@@ -1,7 +1,7 @@
 package com.search.docsearch.config;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.search.docsearch.entity.vo.SysResult;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import com.search.docsearch.entity.vo.SysResult;
 
 /**
  * ParameterVerificationMessage
@@ -29,8 +27,8 @@ public class ParameterVerificationMessage {
             sb.append("[").append(fieldError.getField()).append("->").append(fieldError.getDefaultMessage()).append("]");
         }
         String msg = sb.toString();
-        
+
         return SysResult.parameterVerificationFailed(msg);
     }
-    
+
 }

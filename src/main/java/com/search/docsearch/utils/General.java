@@ -53,7 +53,7 @@ public class General {
 
 
     public static String insertSpaceBetweenNumbersAndLetters(String str) {
-        String regex = "\\d+\\.?\\d*";
+        String regex = "(\\d+\\.)+\\d*";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(str);
         StringBuilder output = new StringBuilder();
