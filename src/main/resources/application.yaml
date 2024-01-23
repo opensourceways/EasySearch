@@ -1,6 +1,8 @@
 #es用户名 密码等配置
 elasticsearch:
-  url:
+  host:
+  port:
+  protocol:
   username:
   password:
   cerFilePath:
