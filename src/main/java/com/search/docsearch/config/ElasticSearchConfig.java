@@ -73,7 +73,7 @@ public class ElasticSearchConfig {
             TrustManager[] tm = {new MyX509TrustManager(cerFilePath, cerPassword)};
             sc = SSLContext.getInstance("SSL", "SunJSSE");
             //也可以使用SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-            sc.init(null, tm, new SecureRandom());
+            sc.init(null, tm, SecureRandom.getInstance("SHA1PRNG"));
 
             SSLIOSessionStrategy sessionStrategy = new SSLIOSessionStrategy(sc, new NoopHostnameVerifier());
             SecuredHttpClientConfigCallback httpClientConfigCallback = new SecuredHttpClientConfigCallback(sessionStrategy,
