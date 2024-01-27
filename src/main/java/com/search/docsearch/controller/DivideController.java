@@ -6,6 +6,7 @@ import com.search.docsearch.aop.LogAction;
 import com.search.docsearch.entity.vo.SearchDocs;
 import com.search.docsearch.entity.vo.SysResult;
 import com.search.docsearch.service.DivideService;
+import com.search.docsearch.utils.ParameterUtil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class DivideController {
     public SysResult DivideBLog(@PathVariable @NotBlank(message = "must have a type") String type, @RequestBody @NotEmpty(message = "Requires at least one condition") Map<String, String> m) {
 
         try {
+            ParameterUtil.vailAndLimitRequestMap(m);
             Map<String, Object> result = divideService.advancedSearch(m, type);
             if (result == null) {
                 return SysResult.fail("内容不存在", null);

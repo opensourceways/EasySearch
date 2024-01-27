@@ -10,6 +10,7 @@ elasticsearch:
   titleBoost:
   textContentBoost:
   limitType:
+  esExistingKey:
   functionscore:
 
 #openEuler    openGauss    openLookeng    mindSpore
