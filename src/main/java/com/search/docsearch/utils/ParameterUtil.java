@@ -7,7 +7,7 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 public class ParameterUtil {
-    public static void vailAndLimitRequestMap(Map<String, String> condition) {
+    public static void vailAndLimitRequestMap(Map<String, String> condition,String esExistingKey) {
         if (CollectionUtils.isEmpty(condition))
             throw new IllegalArgumentException("Invalid request param");
         String page = vaildPage(condition.get("page"));
@@ -23,7 +23,7 @@ public class ParameterUtil {
                     || condition.get(key).length() > 20) {
                 throw new IllegalArgumentException("Invalid value");
             }
-            if (!StringUtils.isEmpty(EsfunctionScoreConfig.esExistingKey)&&!EsfunctionScoreConfig.esExistingKey.contains(key)) {
+            if (!StringUtils.isEmpty(esExistingKey)&&!esExistingKey.contains(key)) {
                 it.remove();
             }
         }

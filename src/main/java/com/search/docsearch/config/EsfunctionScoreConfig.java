@@ -15,5 +15,5 @@ public class EsfunctionScoreConfig {
     public Float titleBoost;
     public Float textContentBoost;
     public String limitType;
-    public static String esExistingKey;
+    public  String esExistingKey;
 }

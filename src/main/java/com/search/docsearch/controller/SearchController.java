@@ -3,6 +3,7 @@ package com.search.docsearch.controller;
 
 import java.util.Map;
 
+import com.search.docsearch.config.EsfunctionScoreConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.StringUtils;
@@ -38,6 +39,8 @@ public class SearchController {
     @Qualifier("setConfig")
     private MySystem mySystem;
 
+    @Autowired
+    EsfunctionScoreConfig esfunctionScoreConfig;
     /**
      * 查询文档，首页大搜索
      *
@@ -130,7 +133,7 @@ public class SearchController {
     @LimitRequest()
     public SysResult makeSort(@RequestBody Map<String, String> m) {
         try {
-            ParameterUtil.vailAndLimitRequestMap(m);
+            ParameterUtil.vailAndLimitRequestMap(m,esfunctionScoreConfig.getEsExistingKey());
             Map<String, Object> result = searchService.advancedSearch(m);
             if (result == null) {
                 return SysResult.fail("内容不存在", null);
