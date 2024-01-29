@@ -218,6 +218,19 @@ public class SearchServiceImpl implements SearchService {
 
         MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", condition.getKeyword()).analyzer("ik_max_word").slop(2);
         ptitleMP.boost(esfunctionScoreConfig.titleBoost == null ? 200 : esfunctionScoreConfig.titleBoost);
+        MatchPhraseQueryBuilder ph1MP = QueryBuilders.matchPhraseQuery("h1", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+        ptitleMP.boost(esfunctionScoreConfig.titleBoost == null ? 200 : esfunctionScoreConfig.titleBoost);
+        MatchPhraseQueryBuilder ph2MP = QueryBuilders.matchPhraseQuery("h2", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+        ptitleMP.boost(esfunctionScoreConfig.titleBoost == null ? 200 : esfunctionScoreConfig.titleBoost);
+        MatchPhraseQueryBuilder ph3MP = QueryBuilders.matchPhraseQuery("h3", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+        ptitleMP.boost(esfunctionScoreConfig.titleBoost == null ? 200 : esfunctionScoreConfig.titleBoost);
+        MatchPhraseQueryBuilder ph4MP = QueryBuilders.matchPhraseQuery("h4", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+        ptitleMP.boost(esfunctionScoreConfig.titleBoost == null ? 200 : esfunctionScoreConfig.titleBoost);
+        MatchPhraseQueryBuilder ph5MP = QueryBuilders.matchPhraseQuery("h5", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+        ptitleMP.boost(esfunctionScoreConfig.titleBoost == null ? 200 : esfunctionScoreConfig.titleBoost);
+        MatchPhraseQueryBuilder pstrongMP = QueryBuilders.matchPhraseQuery("strong", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+        ptitleMP.boost(150);
+
         MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", condition.getKeyword()).analyzer("ik_max_word").slop(2);
         ptextContentMP.boost(esfunctionScoreConfig.textContentBoost == null ? 100 : esfunctionScoreConfig.textContentBoost);
 
