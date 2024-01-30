@@ -9,8 +9,15 @@ elasticsearch:
   cerPassword:
   titleBoost:
   textContentBoost:
+  h1Boost:
+  h2Boost:
+  h3Boost:
+  h4Boost:
+  h5Boost:
+  strongBoost :
   limitType:
   functionscore:
+
 
 #openEuler    openGauss    openLookeng    mindSpore
 system: ${searchsystem:openEuler}
@@ -20,9 +27,10 @@ dep: ${depp:test}
 
 api:
   allApi:
+  starsApi:
   sigNameApi:
   sigReadmeApi:
   repoInfoApi:
-
+  npsApi:
 server:
   port: 8080
