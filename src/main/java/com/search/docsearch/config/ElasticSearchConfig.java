@@ -94,7 +94,6 @@ public class ElasticSearchConfig {
             return client;
         } catch (Exception e) {
             logger.error(e.getMessage());
-            e.printStackTrace();
             return null;
         }
     }
@@ -163,7 +162,6 @@ public class ElasticSearchConfig {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 throw new TrustManagerException("Couldn't initialize");
             }
         }
