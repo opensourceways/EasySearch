@@ -1,18 +1,21 @@
 package com.search.docsearch.service.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.config.EsfunctionScoreConfig;
+import com.search.docsearch.config.MySystem;
+import com.search.docsearch.entity.po.SearchKeyCount;
+import com.search.docsearch.entity.vo.NpsBody;
+import com.search.docsearch.entity.vo.SearchCondition;
+import com.search.docsearch.entity.vo.SearchTags;
+import com.search.docsearch.except.ServiceException;
+import com.search.docsearch.except.ServiceImplException;
+import com.search.docsearch.mapper.SearchKeyCountMapper;
+import com.search.docsearch.service.SearchService;
+import com.search.docsearch.utils.General;
+import com.search.docsearch.utils.ParameterUtil;
+import com.search.docsearch.utils.Trie;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -41,6 +44,8 @@ import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.SuggestionBuilder;
 import org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,21 +53,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.search.docsearch.config.MySystem;
-import com.search.docsearch.entity.vo.NpsBody;
-import com.search.docsearch.entity.vo.SearchCondition;
-import com.search.docsearch.entity.vo.SearchTags;
-import com.search.docsearch.except.ServiceImplException;
-import com.search.docsearch.service.SearchService;
-import com.search.docsearch.utils.General;
-import com.search.docsearch.utils.ParameterUtil;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
 
 
 @Service
 public class SearchServiceImpl implements SearchService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
 
     @Autowired
     @Qualifier("elasticsearchClient")
@@ -88,6 +91,12 @@ public class SearchServiceImpl implements SearchService {
     private String npsApi;
     @Autowired
     private EsfunctionScoreConfig esfunctionScoreConfig;
+
+    @Autowired
+    private SearchKeyCountMapper searchKeyCountMapper;
+
+    @Autowired
+    private Trie trie;
 
     public Map<String, Object> getSuggestion(String keyword, String lang) throws ServiceImplException {
         String saveIndex = mySystem.index + "_" + lang;
@@ -513,6 +522,25 @@ public class SearchServiceImpl implements SearchService {
         }
         Map<String, Object> result = new HashMap<>();
         result.put("totalNum", numberList);
+        return result;
+    }
+
+    @Override
+    public void saveWord() throws ServiceException {
+        List<SearchKeyCount> searchKeyCountList = searchKeyCountMapper.selectList(null);
+
+        for (SearchKeyCount searchKeyCount : searchKeyCountList) {
+            trie.insert(searchKeyCount.getSearchWord(), searchKeyCount.getSearchCount());
+        }
+        logger.info("word save Finish");
+    }
+
+    @Override
+    public Map<String, Object> findWord(String prefix) throws ServiceException {
+        List<Trie.KeyCountResult> keyCountResultList = trie.searchTopKWithPrefix(prefix, 10);
+        Map<String, Object> result = new HashMap<>();
+        result.put("word", keyCountResultList);
+
         return result;
     }
 

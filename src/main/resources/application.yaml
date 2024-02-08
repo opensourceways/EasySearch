@@ -14,7 +14,7 @@ elasticsearch:
   h3Boost:
   h4Boost:
   h5Boost:
-  strongBoost :
+  strongBoost:
   limitType:
   functionscore:
 
@@ -34,3 +34,11 @@ api:
   npsApi:
 server:
   port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    url:
+    username:
+    password:

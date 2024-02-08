@@ -19,6 +19,10 @@ public interface SearchService {
 
     Map<String, Object> getTags(SearchTags searchTags) throws ServiceException;
 
+    void saveWord() throws ServiceException;
+
+    Map<String, Object> findWord(String  prefix) throws ServiceException;
+
     String querySigName(String lang) throws ServiceException;
 
     String queryAll() throws ServiceException;
