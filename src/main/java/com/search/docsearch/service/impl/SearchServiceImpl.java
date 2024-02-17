@@ -5,19 +5,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.config.EsfunctionScoreConfig;
 import com.search.docsearch.config.MySystem;
-import com.search.docsearch.entity.po.SearchKeyCount;
 import com.search.docsearch.entity.vo.NpsBody;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.except.ServiceException;
 import com.search.docsearch.except.ServiceImplException;
-import com.search.docsearch.mapper.SearchKeyCountMapper;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.General;
 import com.search.docsearch.utils.ParameterUtil;
 import com.search.docsearch.utils.Trie;
+import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.lucene.search.function.CombineFunction;
@@ -30,6 +30,7 @@ import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
+import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
@@ -92,8 +93,6 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private EsfunctionScoreConfig esfunctionScoreConfig;
 
-    @Autowired
-    private SearchKeyCountMapper searchKeyCountMapper;
 
     @Autowired
     private Trie trie;
@@ -526,13 +525,50 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public void saveWord() throws ServiceException {
-        List<SearchKeyCount> searchKeyCountList = searchKeyCountMapper.selectList(null);
+    public void saveWord() throws ServiceException, IOException {
 
-        for (SearchKeyCount searchKeyCount : searchKeyCountList) {
-            trie.insert(searchKeyCount.getSearchWord(), searchKeyCount.getSearchCount());
+        int scrollSize = 500;
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        searchSourceBuilder.size(scrollSize);
+        Scroll scroll = new Scroll(TimeValue.timeValueMinutes(10));
+        SearchRequest searchRequest = new SearchRequest(mySystem.searchWordIndex);
+        searchRequest.source(searchSourceBuilder);
+        searchRequest.scroll(scroll);
+
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        String scrollId = searchResponse.getScrollId();
+        SearchHit[] hits = searchResponse.getHits().getHits();
+        for (SearchHit hit : hits) {
+            Map<String, Object> map = hit.getSourceAsMap();
+            String searchWord = map.get("searchWord").toString();
+            long searchCount = ((Integer) map.get("searchCount")).longValue();
+            System.out.println(searchWord + "--" + searchCount);
+
+            trie.insert(searchWord, searchCount);
         }
-        logger.info("word save Finish");
+
+        while (hits.length > 0) {
+            SearchScrollRequest searchScrollRequestS = new SearchScrollRequest(scrollId);
+            searchScrollRequestS.scroll(scroll);
+            SearchResponse searchScrollResponseS = restHighLevelClient.scroll(searchScrollRequestS, RequestOptions.DEFAULT);
+            scrollId = searchScrollResponseS.getScrollId();
+
+            hits = searchScrollResponseS.getHits().getHits();
+            for (SearchHit hit : hits) {
+                Map<String, Object> map = hit.getSourceAsMap();
+                String searchWord = map.get("searchWord").toString();
+                long searchCount = ((Integer) map.get("searchCount")).longValue();
+                System.out.println(searchWord + "--" + searchCount);
+
+                trie.insert(searchWord, searchCount);
+            }
+        }
+
+        ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+        clearScrollRequest.addScrollId(scrollId);
+
+        restHighLevelClient.clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
     }
 
     @Override

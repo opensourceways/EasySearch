@@ -12,7 +12,6 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 /**
  * 加载所有的filter并指定filter顺序
- *
  */
 @Slf4j
 @Configuration

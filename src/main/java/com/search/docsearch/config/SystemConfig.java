@@ -33,8 +33,8 @@ public class SystemConfig {
         } else {
             mySystem.setIndex(system + "_articles");
         }
-        mySystem.setTrackerIndex(system + "_tracker");
-
+        mySystem.setSearchWordIndex(system + "_search_word");
+        mySystem.setPageViewsIndex(system + "_page_views");
         return mySystem;
     }
 }
