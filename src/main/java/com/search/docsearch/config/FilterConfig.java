@@ -3,7 +3,6 @@ package com.search.docsearch.config;
 
 import com.search.docsearch.filter.ContentTypeFilter;
 import com.search.docsearch.filter.CrossFilter;
-import com.search.docsearch.filter.TraceIdFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -68,15 +67,4 @@ public class FilterConfig {
         return filterRegistrationBean;
     }
 
-
-    @Bean
-    public FilterRegistrationBean traceIdFilter() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        TraceIdFilter traceIdFilter = new TraceIdFilter();
-        log.info("traceIdFilter.....");
-        filterRegistrationBean.setFilter(traceIdFilter);
-        filterRegistrationBean.setOrder(4);
-        filterRegistrationBean.addUrlPatterns("/*");
-        return filterRegistrationBean;
-    }
 }

@@ -22,4 +22,5 @@ public class EsfunctionScoreConfig {
     public Float strongBoost;
 
     public String limitType;
+    public  String esExistingKey;
 }
