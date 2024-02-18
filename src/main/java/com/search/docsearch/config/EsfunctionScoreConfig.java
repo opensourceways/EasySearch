@@ -14,6 +14,13 @@ public class EsfunctionScoreConfig {
     public List<Map> functionscore;
     public Float titleBoost;
     public Float textContentBoost;
+    public Float h1Boost;
+    public Float h2Boost;
+    public Float h3Boost;
+    public Float h4Boost;
+    public Float h5Boost;
+    public Float strongBoost;
+
     public String limitType;
     public  String esExistingKey;
 }
