@@ -168,7 +168,6 @@ public class SearchController {
 
     @LogAction(type = "Get", OperationResource = "word")
     @PostMapping("word")
-    @LimitRequest
     public SysResult findWord(@RequestParam("query") String query) {
         try {
             Map<String, Object> result = searchService.findWord(query);
