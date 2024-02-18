@@ -1,5 +1,6 @@
 package com.search.docsearch.service;
 
+import java.io.IOException;
 import java.util.Map;
 
 import com.search.docsearch.entity.vo.NpsBody;
@@ -18,6 +19,10 @@ public interface SearchService {
     Map<String, Object> advancedSearch(Map<String, String> search) throws ServiceException;
 
     Map<String, Object> getTags(SearchTags searchTags) throws ServiceException;
+
+    void saveWord() throws ServiceException, IOException;
+
+    Map<String, Object> findWord(String  prefix) throws ServiceException;
 
     String querySigName(String lang) throws ServiceException;
 

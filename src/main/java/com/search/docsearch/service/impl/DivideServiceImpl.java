@@ -1,12 +1,11 @@
 package com.search.docsearch.service.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.search.docsearch.config.MySystem;
+import com.search.docsearch.entity.vo.SearchDocs;
+import com.search.docsearch.except.ServiceImplException;
+import com.search.docsearch.service.DivideService;
 import com.search.docsearch.utils.General;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -27,12 +26,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.search.docsearch.config.MySystem;
-import com.search.docsearch.entity.vo.SearchDocs;
-import com.search.docsearch.except.ServiceImplException;
-import com.search.docsearch.service.DivideService;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class DivideServiceImpl implements DivideService {
@@ -105,7 +104,7 @@ public class DivideServiceImpl implements DivideService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
 
@@ -172,7 +171,7 @@ public class DivideServiceImpl implements DivideService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
 
@@ -180,7 +179,7 @@ public class DivideServiceImpl implements DivideService {
 
         for (SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> map = hit.getSourceAsMap();
-            String text = (String)map.getOrDefault("textContent", "");
+            String text = (String) map.getOrDefault("textContent", "");
             if (text.length() > 200) {
                 text = text.substring(0, 200) + "......";
             }

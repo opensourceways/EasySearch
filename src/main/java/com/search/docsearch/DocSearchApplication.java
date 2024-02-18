@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 public class DocSearchApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(DocSearchApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(DocSearchApplication.class, args);
+    }
 
 }

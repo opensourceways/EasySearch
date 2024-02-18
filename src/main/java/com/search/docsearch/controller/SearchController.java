@@ -1,31 +1,21 @@
 package com.search.docsearch.controller;
 
 
-import java.util.Map;
-
+import com.search.docsearch.aop.LimitRequest;
+import com.search.docsearch.aop.LogAction;
+import com.search.docsearch.config.MySystem;
+import com.search.docsearch.entity.vo.*;
+import com.search.docsearch.except.ControllerException;
+import com.search.docsearch.service.SearchService;
+import com.search.docsearch.utils.ParameterUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.search.docsearch.aop.LimitRequest;
-import com.search.docsearch.aop.LogAction;
-import com.search.docsearch.config.MySystem;
-import com.search.docsearch.entity.vo.NpsBody;
-import com.search.docsearch.entity.vo.SearchCondition;
-import com.search.docsearch.entity.vo.SearchTags;
-import com.search.docsearch.entity.vo.SysCode;
-import com.search.docsearch.entity.vo.SysResult;
-import com.search.docsearch.except.ControllerException;
-import com.search.docsearch.service.SearchService;
-import com.search.docsearch.utils.ParameterUtil;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -104,7 +94,6 @@ public class SearchController {
     }
 
 
-
     @LogAction(type = "Get aid", OperationResource = "Popular terms")
     @PostMapping("pop")
     @LimitRequest(callTime = 1, callCount = 1000)
@@ -113,7 +102,7 @@ public class SearchController {
             String[] result = null;
             if ("zh".equals(lang)) {
                 result = new String[]{"迁移", "openGauss", "yum", "安装", "白皮书", "生命周期", "docker", "虚拟化"};
-            } else if ("en".equals(lang)){
+            } else if ("en".equals(lang)) {
                 result = new String[]{"migration", "openGauss", "doc", "openstack", "cla"};
             } else {
                 return SysResult.fail("Invalid lang parameter", null);
@@ -163,6 +152,22 @@ public class SearchController {
         return SysResult.fail("查询失败", null);
     }
 
+    @LogAction(type = "Get", OperationResource = "word")
+    @PostMapping("word")
+    @LimitRequest
+    public SysResult findWord(@RequestParam("query") String query) {
+        try {
+            Map<String, Object> result = searchService.findWord(query);
+            if (result == null) {
+                return SysResult.fail("内容不存在", null);
+            }
+            return SysResult.ok("查询成功", result);
+        } catch (ControllerException e) {
+            log.error("findWord error is: " + e.getMessage());
+        }
+        return SysResult.fail("查询失败", null);
+    }
+
     @RequestMapping("sig/name")
     public String querySigName(@RequestParam(value = "lang", required = false) String lang) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
@@ -181,7 +186,7 @@ public class SearchController {
 
     @RequestMapping("sig/readme")
     public SysCode querySigReadme(@RequestParam(value = "sig") String sig,
-            @RequestParam(value = "lang", required = false) String lang) throws ControllerException {
+                                  @RequestParam(value = "lang", required = false) String lang) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
         String result = searchService.querySigReadme(sig, lang);
         return SysCode.ok("ok", result);
@@ -189,8 +194,8 @@ public class SearchController {
 
     @RequestMapping(value = "ecosystem/repo/info")
     public String getEcosystemRepoInfo(@RequestParam(value = "ecosystem_type") String ecosystemType,
-            @RequestParam(value = "lang", required = false) String lang,
-            @RequestParam(value = "page", required = false) String page) throws ControllerException {
+                                       @RequestParam(value = "lang", required = false) String lang,
+                                       @RequestParam(value = "page", required = false) String page) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
         ecosystemType = ParameterUtil.vaildEcosystemType(ecosystemType);
         page = ParameterUtil.vaildPage(page);
