@@ -1,20 +1,23 @@
 package com.search.docsearch.service.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.config.EsfunctionScoreConfig;
+import com.search.docsearch.config.MySystem;
+import com.search.docsearch.entity.vo.NpsBody;
+import com.search.docsearch.entity.vo.SearchCondition;
+import com.search.docsearch.entity.vo.SearchTags;
+import com.search.docsearch.except.ServiceException;
+import com.search.docsearch.except.ServiceImplException;
+import com.search.docsearch.service.SearchService;
+import com.search.docsearch.utils.General;
+import com.search.docsearch.utils.ParameterUtil;
+import com.search.docsearch.utils.Trie;
+import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.lucene.search.function.CombineFunction;
@@ -27,6 +30,7 @@ import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
+import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
@@ -41,6 +45,8 @@ import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.SuggestionBuilder;
 import org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,21 +54,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.search.docsearch.config.MySystem;
-import com.search.docsearch.entity.vo.NpsBody;
-import com.search.docsearch.entity.vo.SearchCondition;
-import com.search.docsearch.entity.vo.SearchTags;
-import com.search.docsearch.except.ServiceImplException;
-import com.search.docsearch.service.SearchService;
-import com.search.docsearch.utils.General;
-import com.search.docsearch.utils.ParameterUtil;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
 
 
 @Service
 public class SearchServiceImpl implements SearchService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
 
     @Autowired
     @Qualifier("elasticsearchClient")
@@ -88,6 +92,10 @@ public class SearchServiceImpl implements SearchService {
     private String npsApi;
     @Autowired
     private EsfunctionScoreConfig esfunctionScoreConfig;
+
+
+    @Autowired
+    private Trie trie;
 
     public Map<String, Object> getSuggestion(String keyword, String lang) throws ServiceImplException {
         String saveIndex = mySystem.index + "_" + lang;
@@ -513,6 +521,61 @@ public class SearchServiceImpl implements SearchService {
         }
         Map<String, Object> result = new HashMap<>();
         result.put("totalNum", numberList);
+        return result;
+    }
+
+    @Override
+    public void saveWord() throws ServiceException, IOException {
+
+        int scrollSize = 500;
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        searchSourceBuilder.size(scrollSize);
+        Scroll scroll = new Scroll(TimeValue.timeValueMinutes(10));
+        SearchRequest searchRequest = new SearchRequest(mySystem.searchWordIndex);
+        searchRequest.source(searchSourceBuilder);
+        searchRequest.scroll(scroll);
+
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        String scrollId = searchResponse.getScrollId();
+        SearchHit[] hits = searchResponse.getHits().getHits();
+        for (SearchHit hit : hits) {
+            Map<String, Object> map = hit.getSourceAsMap();
+            String searchWord = map.get("searchWord").toString();
+            long searchCount = ((Integer) map.get("searchCount")).longValue();
+
+            trie.insert(searchWord, searchCount);
+        }
+
+        while (hits.length > 0) {
+            SearchScrollRequest searchScrollRequestS = new SearchScrollRequest(scrollId);
+            searchScrollRequestS.scroll(scroll);
+            SearchResponse searchScrollResponseS = restHighLevelClient.scroll(searchScrollRequestS, RequestOptions.DEFAULT);
+            scrollId = searchScrollResponseS.getScrollId();
+
+            hits = searchScrollResponseS.getHits().getHits();
+            for (SearchHit hit : hits) {
+                Map<String, Object> map = hit.getSourceAsMap();
+                String searchWord = map.get("searchWord").toString();
+                long searchCount = ((Integer) map.get("searchCount")).longValue();
+
+                trie.insert(searchWord, searchCount);
+            }
+        }
+
+        ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+        clearScrollRequest.addScrollId(scrollId);
+
+        restHighLevelClient.clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
+        logger.info("Search example updated");
+    }
+
+    @Override
+    public Map<String, Object> findWord(String prefix) throws ServiceException {
+        List<Trie.KeyCountResult> keyCountResultList = trie.searchTopKWithPrefix(prefix, 10);
+        Map<String, Object> result = new HashMap<>();
+        result.put("word", keyCountResultList);
+
         return result;
     }
 

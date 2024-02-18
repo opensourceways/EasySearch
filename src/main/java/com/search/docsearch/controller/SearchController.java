@@ -166,6 +166,22 @@ public class SearchController {
         return SysResult.fail("查询失败", null);
     }
 
+    @LogAction(type = "Get", OperationResource = "word")
+    @PostMapping("word")
+    @LimitRequest
+    public SysResult findWord(@RequestParam("query") String query) {
+        try {
+            Map<String, Object> result = searchService.findWord(query);
+            if (result == null) {
+                return SysResult.fail("内容不存在", null);
+            }
+            return SysResult.ok("查询成功", result);
+        } catch (ControllerException e) {
+            log.error("findWord error is: " + e.getMessage());
+        }
+        return SysResult.fail("查询失败", null);
+    }
+
     @RequestMapping("sig/name")
     public String querySigName(@RequestParam(value = "lang", required = false) String lang) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
