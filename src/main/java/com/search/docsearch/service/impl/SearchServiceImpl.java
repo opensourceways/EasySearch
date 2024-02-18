@@ -543,7 +543,6 @@ public class SearchServiceImpl implements SearchService {
             Map<String, Object> map = hit.getSourceAsMap();
             String searchWord = map.get("searchWord").toString();
             long searchCount = ((Integer) map.get("searchCount")).longValue();
-            System.out.println(searchWord + "--" + searchCount);
 
             trie.insert(searchWord, searchCount);
         }
@@ -559,7 +558,6 @@ public class SearchServiceImpl implements SearchService {
                 Map<String, Object> map = hit.getSourceAsMap();
                 String searchWord = map.get("searchWord").toString();
                 long searchCount = ((Integer) map.get("searchCount")).longValue();
-                System.out.println(searchWord + "--" + searchCount);
 
                 trie.insert(searchWord, searchCount);
             }
