@@ -3,6 +3,7 @@ package com.search.docsearch.controller;
 
 import java.util.Map;
 
+import com.search.docsearch.config.EsfunctionScoreConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.StringUtils;
@@ -38,6 +39,8 @@ public class SearchController {
     @Qualifier("setConfig")
     private MySystem mySystem;
 
+    @Autowired
+    EsfunctionScoreConfig esfunctionScoreConfig;
     /**
      * 查询文档，首页大搜索
      *
@@ -104,7 +107,6 @@ public class SearchController {
     }
 
 
-
     @LogAction(type = "Get aid", OperationResource = "Popular terms")
     @PostMapping("pop")
     @LimitRequest(callTime = 1, callCount = 1000)
@@ -113,7 +115,7 @@ public class SearchController {
             String[] result = null;
             if ("zh".equals(lang)) {
                 result = new String[]{"迁移", "openGauss", "yum", "安装", "白皮书", "生命周期", "docker", "虚拟化"};
-            } else if ("en".equals(lang)){
+            } else if ("en".equals(lang)) {
                 result = new String[]{"migration", "openGauss", "doc", "openstack", "cla"};
             } else {
                 return SysResult.fail("Invalid lang parameter", null);
@@ -131,6 +133,7 @@ public class SearchController {
     @LimitRequest()
     public SysResult makeSort(@RequestBody Map<String, String> m) {
         try {
+            ParameterUtil.vailAndLimitRequestMap(m,esfunctionScoreConfig.getEsExistingKey());
             Map<String, Object> result = searchService.advancedSearch(m);
             if (result == null) {
                 return SysResult.fail("内容不存在", null);
@@ -181,7 +184,7 @@ public class SearchController {
 
     @RequestMapping("sig/readme")
     public SysCode querySigReadme(@RequestParam(value = "sig") String sig,
-            @RequestParam(value = "lang", required = false) String lang) throws ControllerException {
+                                  @RequestParam(value = "lang", required = false) String lang) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
         String result = searchService.querySigReadme(sig, lang);
         return SysCode.ok("ok", result);
@@ -189,8 +192,8 @@ public class SearchController {
 
     @RequestMapping(value = "ecosystem/repo/info")
     public String getEcosystemRepoInfo(@RequestParam(value = "ecosystem_type") String ecosystemType,
-            @RequestParam(value = "lang", required = false) String lang,
-            @RequestParam(value = "page", required = false) String page) throws ControllerException {
+                                       @RequestParam(value = "lang", required = false) String lang,
+                                       @RequestParam(value = "page", required = false) String page) throws ControllerException {
         lang = ParameterUtil.vaildLang(lang);
         ecosystemType = ParameterUtil.vaildEcosystemType(ecosystemType);
         page = ParameterUtil.vaildPage(page);

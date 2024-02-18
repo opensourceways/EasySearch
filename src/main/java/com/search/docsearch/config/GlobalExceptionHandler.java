@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void controllerException(HttpServletRequest request, HttpServletResponse response, ControllerException e) {
-        log.error("Controller异常:{}", e.getMessage());
+        log.error("Controller异常:", e);
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
@@ -66,13 +66,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void methodArgumentNotValidException(HttpServletRequest request, HttpServletResponse response, MethodArgumentNotValidException e) {
-        log.error("参数校验异常:{}", e.getMessage());
+        log.error("参数校验异常:", e);
         BindingResult bindingResult = e.getBindingResult();
         StringBuilder sb = new StringBuilder();
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            sb.append(fieldError.getDefaultMessage()).append("\n");
+            sb.append("[").append(fieldError.getField()).append("->").append(fieldError.getDefaultMessage()).append("]");
         }
-        responseJson(request, response, SysResult.fail("查询失败", null));
+        responseJson(request, response, SysResult.fail("查询失败", sb.toString()));
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)
@@ -97,15 +97,15 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void exception(HttpServletRequest request, HttpServletResponse response, Exception e) {
-        log.error("全局异常:{}", e.getMessage());
+        log.error("异常:", e);
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
     /**
      * 响应json格式字符串
      *
-     * @param request  {HttpServletRequest}
-     * @param response {HttpServletResponse}
+     * @param request   {HttpServletRequest}
+     * @param response  {HttpServletResponse}
      * @param sysResult {SysResult}
      */
     private void responseJson(HttpServletRequest request, HttpServletResponse response, SysResult sysResult) {

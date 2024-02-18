@@ -16,6 +16,7 @@ elasticsearch:
   h5Boost:
   strongBoost :
   limitType:
+  esExistingKey:
   functionscore:
 
 
