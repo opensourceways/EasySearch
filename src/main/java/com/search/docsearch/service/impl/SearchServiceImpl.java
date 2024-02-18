@@ -567,6 +567,7 @@ public class SearchServiceImpl implements SearchService {
         clearScrollRequest.addScrollId(scrollId);
 
         restHighLevelClient.clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
+        logger.info("Search example updated");
     }
 
     @Override
