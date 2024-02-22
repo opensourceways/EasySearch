@@ -174,7 +174,6 @@ public class SearchServiceImpl implements SearchService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-            logger.info("ES response:"+ response);
         } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
@@ -321,6 +320,7 @@ public class SearchServiceImpl implements SearchService {
         HighlightBuilder highlightBuilder = new HighlightBuilder()
                 .field("textContent")
                 .field("title")
+                .field("secondaryTitle")
                 .fragmentSize(100)
                 .preTags("<span>")
                 .postTags("</span>");

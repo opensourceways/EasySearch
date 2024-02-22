@@ -44,12 +44,9 @@ public class Trie {
         double maxSimilarityResult = 0;
         for (int i = 0; i < searchWorldSortList.size() && i < compareNum; i++) {
             String word2 = searchWorldSortList.get(i);
-            double pinyinSimilarityResult = Similarity.pinyinSimilarity(word1, word2);
-            double conceptSimilarityResult = Similarity.conceptSimilarity(word1, word2);
-            double charBasedSimilarityResult = Similarity.charBasedSimilarity(word1, word2);
-            double countSimilarityResult =  pinyinSimilarityResult + conceptSimilarityResult + charBasedSimilarityResult;
-            if (countSimilarityResult > maxSimilarityResult) {
-                maxSimilarityResult = countSimilarityResult;
+            double phraseSimilarity = Similarity.phraseSimilarity(word1, word2);
+            if (phraseSimilarity > maxSimilarityResult) {
+                maxSimilarityResult = phraseSimilarity;
             }
         }
         return maxSimilarityResult;
