@@ -61,6 +61,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -195,6 +196,10 @@ public class SearchServiceImpl implements SearchService {
             if ("whitepaper".equals(map.getOrDefault("type", "")) && !map.containsKey("title")) {
                 map.put("title", map.get("secondaryTitle"));
             }
+            if (condition.getPage() == 1) {
+                Float score = hit.getScore();
+                map.put("score", score*trie.getWordSimilarityWithTopSearch(String.valueOf(map.get("title")), 10));
+            }
             if (highlightFields.containsKey("title")) {
                 map.put("title", highlightFields.get("title").getFragments()[0].toString());
             }
@@ -205,7 +210,9 @@ public class SearchServiceImpl implements SearchService {
             return null;
         }
 
-
+        if (condition.getPage() == 1) {
+            data = data.stream().sorted((a, b) -> Double.compare((Double) b.get("score"), (Double) a.get("score"))).collect(Collectors.toList());
+        }
         result.put("page", condition.getPage());
         result.put("pageSize", condition.getPageSize());
         result.put("records", data);
@@ -562,7 +569,7 @@ public class SearchServiceImpl implements SearchService {
                 trie.insert(searchWord, searchCount);
             }
         }
-
+        trie.sortSearchWorld();
         ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
         clearScrollRequest.addScrollId(scrollId);
 

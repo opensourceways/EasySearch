@@ -1,14 +1,19 @@
 package com.search.docsearch.utils;
 
 import org.springframework.stereotype.Component;
+import org.xm.Similarity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class Trie {
     private final TrieNode root;
+    private final Map<String, Long> searchCountMap = new HashMap<>();
+    private List<String> searchWorldSortList = new ArrayList<>();
 
     public Trie() {
         root = new TrieNode();
@@ -22,6 +27,30 @@ public class Trie {
         }
         node.isEndOfWord = true;
         node.searchCount = count;
+        this.searchCountMap.put(word, count);
+    }
+
+    public void sortSearchWorld() {
+        this.searchWorldSortList = searchCountMap.entrySet().stream()
+                //sort a Map by key and stored in resultSortedKey
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .map(x -> x.getKey())
+                .collect(Collectors.toList());
+    }
+
+    public double getWordSimilarityWithTopSearch(String word1, int compareNum) {
+        double maxSimilarityResult = 0;
+        for (int i = 0; i < searchWorldSortList.size() && i < compareNum; i++) {
+            String word2 = searchWorldSortList.get(i);
+            double pinyinSimilarityResult = Similarity.pinyinSimilarity(word1, word2);
+            double conceptSimilarityResult = Similarity.conceptSimilarity(word1, word2);
+            double charBasedSimilarityResult = Similarity.charBasedSimilarity(word1, word2);
+            double countSimilarityResult =  pinyinSimilarityResult + conceptSimilarityResult + charBasedSimilarityResult;
+            if (countSimilarityResult > maxSimilarityResult) {
+                maxSimilarityResult = countSimilarityResult;
+            }
+        }
+        return maxSimilarityResult;
     }
 
     public static class KeyCountResult {
