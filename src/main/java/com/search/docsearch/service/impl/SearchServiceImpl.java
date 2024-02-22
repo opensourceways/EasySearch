@@ -194,15 +194,11 @@ public class SearchServiceImpl implements SearchService {
                 }
                 map.put("textContent", highLight.toString());
             }
-            if (highlightFields.containsKey("secondaryTitle")) {
-                StringBuilder highLight = new StringBuilder();
-                for (Text secondaryTitle : highlightFields.get("secondaryTitle").getFragments()) {
-                    highLight.append(secondaryTitle.toString()).append("<br>");
-                }
-                map.put("secondaryTitle", highLight.toString());
-            }
             if ("whitepaper".equals(map.getOrDefault("type", "")) && !map.containsKey("title")) {
                 map.put("title", map.get("secondaryTitle"));
+            }
+            if ("service".equals(map.getOrDefault("type", ""))) {
+                map.put("secondaryTitle", map.get("textContent"));
             }
             if (condition.getPage() == 1) {
                 Float score = hit.getScore();
@@ -320,7 +316,6 @@ public class SearchServiceImpl implements SearchService {
         HighlightBuilder highlightBuilder = new HighlightBuilder()
                 .field("textContent")
                 .field("title")
-                .field("secondaryTitle")
                 .fragmentSize(100)
                 .preTags("<span>")
                 .postTags("</span>");
