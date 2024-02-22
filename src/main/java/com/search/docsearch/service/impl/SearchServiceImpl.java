@@ -1,5 +1,6 @@
 package com.search.docsearch.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -173,6 +174,7 @@ public class SearchServiceImpl implements SearchService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+            logger.info("ES response:"+ JSON.toJSONString(response));
         } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
