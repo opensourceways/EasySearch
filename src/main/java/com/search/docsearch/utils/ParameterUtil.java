@@ -89,7 +89,7 @@ public class ParameterUtil {
 
     public static String vaildPageSize(String pageSize) {
         pageSize = pageSize == null ? "10" : pageSize;
-        if (Integer.parseInt(pageSize) > 50 || Integer.parseInt(pageSize) < 5) {
+        if (Integer.parseInt(pageSize) > 100 || Integer.parseInt(pageSize) < 1) {
             throw new IllegalArgumentException("Invalid vaildPageSize parameter");
         }
         return pageSize;
