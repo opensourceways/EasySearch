@@ -174,7 +174,7 @@ public class SearchServiceImpl implements SearchService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-            logger.info("ES response:"+ JSON.toJSONString(response));
+            logger.info("ES response:"+ response);
         } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
@@ -194,6 +194,13 @@ public class SearchServiceImpl implements SearchService {
                     highLight.append(textContent.toString()).append("<br>");
                 }
                 map.put("textContent", highLight.toString());
+            }
+            if (highlightFields.containsKey("secondaryTitle")) {
+                StringBuilder highLight = new StringBuilder();
+                for (Text secondaryTitle : highlightFields.get("secondaryTitle").getFragments()) {
+                    highLight.append(secondaryTitle.toString()).append("<br>");
+                }
+                map.put("secondaryTitle", highLight.toString());
             }
             if ("whitepaper".equals(map.getOrDefault("type", "")) && !map.containsKey("title")) {
                 map.put("title", map.get("secondaryTitle"));
