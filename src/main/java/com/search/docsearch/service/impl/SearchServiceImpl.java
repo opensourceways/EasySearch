@@ -51,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
@@ -582,7 +583,17 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public Map<String, Object> findWord(String prefix) throws ServiceException {
-        List<Trie.KeyCountResult> keyCountResultList = trie.searchTopKWithPrefix(prefix, 10);
+        List<Trie.KeyCountResult> keyCountResultList = new ArrayList<>();
+        for (int i = 0; i < 3 && i<prefix.length() ; i++) {
+            keyCountResultList.addAll(trie.searchTopKWithPrefix(prefix.substring(0,prefix.length()-i), 10));
+            if(!CollectionUtils.isEmpty(keyCountResultList))
+                break;
+        }
+        //没查到根据相似度匹配
+        if (CollectionUtils.isEmpty(keyCountResultList)) {
+            String suggestCorrection = trie.suggestCorrection(prefix);
+            keyCountResultList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 10));
+        }
         Map<String, Object> result = new HashMap<>();
         result.put("word", keyCountResultList);
 
