@@ -203,7 +203,7 @@ public class SearchServiceImpl implements SearchService {
             }
             if (condition.getPage() == 1) {
                 Float score = hit.getScore();
-                map.put("score", score*trie.getWordSimilarityWithTopSearch(String.valueOf(map.get("title")), 10));
+                map.put("score", score * trie.getWordSimilarityWithTopSearch(String.valueOf(map.get("title")), 10));
             }
             if (highlightFields.containsKey("title")) {
                 map.put("title", highlightFields.get("title").getFragments()[0].toString());
@@ -585,10 +585,14 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public Map<String, Object> findWord(String prefix) throws ServiceException {
         List<Trie.KeyCountResult> keyCountResultList = new ArrayList<>();
-        for (int i = 0; i < 3 && i<prefix.length() ; i++) {
-            keyCountResultList.addAll(trie.searchTopKWithPrefix(prefix.substring(0,prefix.length()-i), 10));
-            if(!CollectionUtils.isEmpty(keyCountResultList))
+        for (int i = 0; i < 3 && i < prefix.length(); i++) {
+            keyCountResultList.addAll(trie.searchTopKWithPrefix(prefix.substring(0, prefix.length() - i), 10));
+            if (!CollectionUtils.isEmpty(keyCountResultList))
                 break;
+        }
+        //没查到根据相似度匹配
+        if (CollectionUtils.isEmpty(keyCountResultList)) {
+            keyCountResultList.add(new Trie.KeyCountResult(trie.suggestCorrection(prefix), 10));
         }
         Map<String, Object> result = new HashMap<>();
         result.put("word", keyCountResultList);
