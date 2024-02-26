@@ -592,7 +592,8 @@ public class SearchServiceImpl implements SearchService {
         }
         //没查到根据相似度匹配
         if (CollectionUtils.isEmpty(keyCountResultList)) {
-            keyCountResultList.add(new Trie.KeyCountResult(trie.suggestCorrection(prefix), 10));
+            String suggestCorrection = trie.suggestCorrection(prefix);
+            keyCountResultList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 10));
         }
         Map<String, Object> result = new HashMap<>();
         result.put("word", keyCountResultList);
