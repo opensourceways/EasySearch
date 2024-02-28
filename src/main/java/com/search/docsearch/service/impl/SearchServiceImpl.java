@@ -100,6 +100,23 @@ public class SearchServiceImpl implements SearchService {
     private Trie trie;
 
     public Map<String, Object> getSuggestion(String keyword, String lang) throws ServiceImplException {
+        List<String> suggestList = new ArrayList<>();
+        Map<String, Object> result = new HashMap<>();
+        result.put("suggestList", suggestList);
+        for (int i = 0; i < 3 && i < keyword.length(); i++) {
+            suggestList.addAll(trie.searchTopKWithPrefix(keyword.substring(0, keyword.length() - i), 5).stream().map(k-> "<em>"+k.getKey()+"</em>").collect(Collectors.toList()));
+            if (!CollectionUtils.isEmpty(suggestList))
+                break;
+
+        }
+        if (CollectionUtils.isEmpty(suggestList)) {
+            String suggestCorrection = trie.suggestCorrection(keyword);
+            suggestList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 5).stream().map(k-> "<em>"+k.getKey()+"</em>").collect(Collectors.toList()));
+        }
+
+        if (suggestList.size()>0)
+            return result;
+
         String saveIndex = mySystem.index + "_" + lang;
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -127,7 +144,7 @@ public class SearchServiceImpl implements SearchService {
             throw new ServiceImplException("can not search");
         }
 
-        List<String> suggestList = new ArrayList<>();
+
         for (int i = 0; i <= 3; i++) {
             StringBuilder sb = new StringBuilder();
             boolean isNew = false;
@@ -155,7 +172,7 @@ public class SearchServiceImpl implements SearchService {
                 suggestList.add(sb.toString().trim());
             }
         }
-        Map<String, Object> result = new HashMap<>();
+
         result.put("suggestList", suggestList);
         return result;
 
