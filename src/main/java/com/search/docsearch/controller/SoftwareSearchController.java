@@ -34,6 +34,7 @@ public class SoftwareSearchController {
 
         try {
             SoftwareSearchResponce result = searchService.searchByCondition(condition);
+            log.info("result:"+result);
             if (result == null) {
                 return SoftwareSysResult.fail("内容不存在", null);
             }
