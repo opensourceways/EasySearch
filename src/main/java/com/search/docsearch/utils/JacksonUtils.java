@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.search.docsearch.except.BusinessException;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -108,7 +109,7 @@ public class JacksonUtils {
         T obj = null;
 
         try {
-            if (json != null) {
+            if (StringUtils.isEmpty(json)) {
                 return null;
             } else {
                 obj = objectMapper.readValue(json, clazz);
