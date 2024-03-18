@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.search.docsearch.aop.LogAction;
+import com.search.docsearch.dto.software.SearchFindwordDto;
 import com.search.docsearch.dto.software.SearchTagsDto;
 import com.search.docsearch.entity.software.SoftwareSearchCondition;
 import com.search.docsearch.entity.software.SoftwareSearchResponce;
@@ -12,10 +13,7 @@ import com.search.docsearch.entity.software.SoftwareSysResult;
 import com.search.docsearch.service.ISoftwareEsSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +32,7 @@ public class SoftwareSearchController {
 
         try {
             SoftwareSearchResponce result = searchService.searchByCondition(condition);
-            log.info("result:"+result);
+            log.info("result:" + result);
             if (result == null) {
                 return SoftwareSysResult.fail("内容不存在", null);
             }
@@ -46,15 +44,15 @@ public class SoftwareSearchController {
     }
 
 
-    @PostMapping("getSuggest")
-    public SoftwareSysResult getSuggest(@RequestBody @Validated SoftwareSearchCondition condition) {
+    @PostMapping("word")
+    public SoftwareSysResult findWord(@RequestParam(value = "query") String query, @RequestParam(value = "dataType", required = false) String dataType) {
 
         try {
-            Map<String, Object> result = searchService.getCount(condition);
-            if (result == null) {
+            SearchFindwordDto word = searchService.findWord(query, dataType);
+            if (word == null) {
                 return SoftwareSysResult.fail("内容不存在", null);
             }
-            return SoftwareSysResult.ok("查询成功", result);
+            return SoftwareSysResult.ok("查询成功", word);
         } catch (Exception e) {
             log.error("getCount error is: " + e.getMessage());
         }

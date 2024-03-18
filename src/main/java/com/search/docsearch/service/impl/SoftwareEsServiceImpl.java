@@ -3,6 +3,7 @@ package com.search.docsearch.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.search.docsearch.config.SoftwareSearchConfig;
+import com.search.docsearch.constant.Constants;
 import com.search.docsearch.dto.software.*;
 import com.search.docsearch.entity.software.SoftwareSearchCondition;
 import com.search.docsearch.entity.software.SoftwareSearchResponce;
@@ -13,6 +14,7 @@ import com.search.docsearch.except.ServiceImplException;
 import com.search.docsearch.service.ISoftwareEsSearchService;
 import com.search.docsearch.utils.General;
 import com.search.docsearch.utils.JacksonUtils;
+import com.search.docsearch.utils.Trie;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -74,7 +76,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     }
 
     @Override
-    public List<SearchTagsDto>  getTags(SoftwareSearchTags searchTags) throws ServiceException {
+    public List<SearchTagsDto> getTags(SoftwareSearchTags searchTags) throws ServiceException {
         List<SearchTagsDto> numberList = new ArrayList<>();
         SearchRequest request = new SearchRequest(searchConfig.getIndex());
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -107,10 +109,28 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
             SearchTagsDto searchTagsDto = new SearchTagsDto();
             searchTagsDto.setCount(bucket.getDocCount());
-            searchTagsDto.setKey( bucket.getKeyAsString());
+            searchTagsDto.setKey(bucket.getKeyAsString());
             numberList.add(searchTagsDto);
         }
         return numberList;
+    }
+
+    @Override
+    public SearchFindwordDto findWord(String prefix, String dataType) throws ServiceException {
+        List<Trie.KeyCountResult> keyCountResultList = new ArrayList<>();
+        if (!StringUtils.isEmpty(dataType)) {
+            SoftwareTypeEnum enumByfrontDeskType = SoftwareTypeEnum.getEnumByfrontDeskType(dataType);
+            Trie trie = enumByfrontDeskType.getTrie();
+            for (int i = 0; i < 3 && i < prefix.length(); i++) {
+                keyCountResultList.addAll(trie.searchTopKWithPrefix(prefix.substring(0, prefix.length() - i), 10));
+                if (!CollectionUtils.isEmpty(keyCountResultList))
+                    break;
+            }
+        } else {
+            keyCountResultList.addAll(Constants.softwareTrie.searchTopKWithPrefix(prefix, 10));
+        }
+        SearchFindwordDto searchFindwordDto = new SearchFindwordDto(keyCountResultList);
+        return searchFindwordDto;
     }
 
 
