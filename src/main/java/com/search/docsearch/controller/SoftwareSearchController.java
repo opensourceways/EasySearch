@@ -45,6 +45,7 @@ public class SoftwareSearchController {
 
 
     @PostMapping("word")
+    @LogAction(type = "Get", OperationResource = "word")
     public SoftwareSysResult findWord(@RequestParam(value = "query") String query, @RequestParam(value = "dataType", required = false) String dataType) {
 
         try {
