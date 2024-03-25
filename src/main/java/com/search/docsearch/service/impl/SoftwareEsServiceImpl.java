@@ -178,8 +178,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                 continue;
             switch (value) {
                 case APPLICATION:
-                    searchResponce.setAll(convertAppMapToSoftwareAppDto(maps, "all"));
-                    searchResponce.setAppkg(convertAppMapToSoftwareAppDto(maps, null));
+                    searchResponce.setAppkg(convertAppMapToSoftwareAppDto(maps, Boolean.FALSE));
                     break;
                 case RPMPKG:
                     searchResponce.setRpmpkg(convertAppMapToSoftwareRpmDto(maps));
@@ -190,13 +189,20 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                     break;
             }
         }
-
-
+        handleAllType(data, searchResponce);
         return searchResponce;
     }
 
 
-    private List<SoftwareAppDto> convertAppMapToSoftwareAppDto(List<Map<String, Object>> maps, String type) {
+    private void handleAllType(List<Map<String, Object>> data, SoftwareSearchResponce searchResponce) {
+        data = data.stream().filter(d -> {
+            return SoftwareTypeEnum.APPLICATION.getType().equals(String.valueOf(d.get("dataType"))) || (!SoftwareTypeEnum.APPLICATION.getType().equals(String.valueOf(d.get("dataType"))) && !"其他".equals(String.valueOf(d.get("category"))));
+        }).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(data))
+            searchResponce.setAll(convertAppMapToSoftwareAppDto(data, Boolean.TRUE));
+    }
+
+    private List<SoftwareAppDto> convertAppMapToSoftwareAppDto(List<Map<String, Object>> maps, Boolean isAll) {
         List<SoftwareAppDto> softwareAppDtoList = new ArrayList<>();
         Map<String, List<Map<String, Object>>> categoryMap = maps.stream().collect(Collectors.groupingBy(m -> {
             return String.valueOf(m.get("category"));
@@ -206,13 +212,12 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             for (Map<String, Object> stringObjectMap : stringListEntry.getValue()) {
                 SoftwareAppChildrenDto softwareAppChildrenDto = JacksonUtils.toObject(SoftwareAppChildrenDto.class, JSONObject.toJSONString(stringObjectMap));
                 String tagsText = String.valueOf(stringObjectMap.get("tagsText"));
-                if (tagsText != null && "all".equals(type)) {
+                if (stringObjectMap.get("tagsText") != null && isAll) {
                     tagsText = tagsText.toUpperCase(Locale.ROOT);
                     softwareAppChildrenDto.setTags(Arrays.asList(tagsText.split(",")));
                 } else {
-                    softwareAppChildrenDto.setTags(Arrays.asList("IMAGE"));
+                    softwareAppChildrenDto.setTags(Arrays.asList(SoftwareTypeEnum.getTagByDataType(String.valueOf(stringObjectMap.get("dataType")))));
                 }
-
                 softwareAppDto.getChildren().add(softwareAppChildrenDto);
             }
             softwareAppDtoList.add(softwareAppDto);
@@ -263,7 +268,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         String typeByfrontDeskType = SoftwareTypeEnum.getTypeByfrontDeskType(condition.getDataType());
-        if (StringUtils.hasText(typeByfrontDeskType)) {
+        if (!StringUtils.isEmpty(typeByfrontDeskType)) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("dataType.keyword", typeByfrontDeskType));
         }
 
