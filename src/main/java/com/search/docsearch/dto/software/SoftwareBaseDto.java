@@ -26,5 +26,5 @@ public class SoftwareBaseDto {
     String binDownloadUrl;
 
     String installation;
-
+    String pkgId;
 }
