@@ -14,14 +14,14 @@ import java.util.List;
 public class SoftwareSearchResponce {
     List<SoftwareAppDto> all;
     List<SoftwareRpmDto> rpmpkg;
-    List<SoftwareAppDto> appkg;
+    List<SoftwareAppDto> apppkg;
     List<SoftwareEpkgDto> epkgpkg;
     long total;
 
     public SoftwareSearchResponce() {
         this.all = new ArrayList<>();
         this.rpmpkg = new ArrayList<>();
-        this.appkg = new ArrayList<>();
+        this.apppkg = new ArrayList<>();
         this.epkgpkg = new ArrayList<>();
     }
 }

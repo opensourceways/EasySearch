@@ -151,11 +151,11 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         ParsedTerms aggregation = response.getAggregations().get("data");
         List<? extends Terms.Bucket> buckets = aggregation.getBuckets();
-        long allTypeCount = 0L;
+        // long allTypeCount = 0L;
+        HashMap<String, Long> docCountMap = new HashMap<>();
         if (buckets != null)
             for (Terms.Bucket bucket : buckets) {
-
-                if (SoftwareTypeEnum.APPLICATION.getType().equals(bucket.getKeyAsString())) {
+              /*  if (SoftwareTypeEnum.APPLICATION.getType().equals(bucket.getKeyAsString())) {
                     allTypeCount += bucket.getDocCount();
                 } else {
                     ParsedTerms category = bucket.getAggregations().get("category");
@@ -164,17 +164,25 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                         if (!"其他".equals(subBucket.getKeyAsString()))
                             allTypeCount += subBucket.getDocCount();
                     }
-                }
-                SoftwareSearchCountResponce softwareSearchCountResponce = new SoftwareSearchCountResponce();
+                }*/
+
+                docCountMap.put(SoftwareTypeEnum.getFrontDeskTypeByType(bucket.getKeyAsString()), bucket.getDocCount());
+                /*SoftwareSearchCountResponce softwareSearchCountResponce = new SoftwareSearchCountResponce();
                 softwareSearchCountResponce.setDocCount(bucket.getDocCount());
                 softwareSearchCountResponce.setKey(SoftwareTypeEnum.getFrontDeskTypeByType(bucket.getKeyAsString()));
-                countList.add(softwareSearchCountResponce);
+                countList.add(softwareSearchCountResponce);*/
             }
 
-        if (allTypeCount > 0) {
+        /*if (allTypeCount > 0) {
             SoftwareSearchCountResponce softwareSearchCountResponce = new SoftwareSearchCountResponce();
             softwareSearchCountResponce.setDocCount(allTypeCount);
             softwareSearchCountResponce.setKey("all");
+            countList.add(softwareSearchCountResponce);
+        }*/
+        for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
+            SoftwareSearchCountResponce softwareSearchCountResponce = new SoftwareSearchCountResponce();
+            softwareSearchCountResponce.setDocCount(docCountMap.get(value.getFrontDeskType()) == null ? 0 : docCountMap.get(value.getFrontDeskType()));
+            softwareSearchCountResponce.setKey(value.getFrontDeskType());
             countList.add(softwareSearchCountResponce);
         }
 
@@ -226,7 +234,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                 continue;
             switch (value) {
                 case APPLICATION:
-                    searchResponce.setAppkg(convertAppMapToSoftwareAppDto(maps, Boolean.FALSE));
+                    searchResponce.setApppkg(convertAppMapToSoftwareAppDto(maps));
                     break;
                 case RPMPKG:
                     searchResponce.setRpmpkg(convertAppMapToSoftwareRpmDto(maps));
@@ -234,10 +242,13 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
                 case EKPG:
                     searchResponce.setEpkgpkg(convertAppMapToSoftwareEpkgDto(maps));
+
+                case ALL:
+                    searchResponce.setAll(convertAppMapToSoftwareAppDto(maps));
                     break;
             }
         }
-        handleAllType(data, searchResponce);
+        // handleAllType(data, searchResponce);
         return searchResponce;
     }
 
@@ -247,10 +258,10 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             return SoftwareTypeEnum.APPLICATION.getType().equals(String.valueOf(d.get("dataType"))) || (!SoftwareTypeEnum.APPLICATION.getType().equals(String.valueOf(d.get("dataType"))) && !"其他".equals(String.valueOf(d.get("category"))));
         }).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(data))
-            searchResponce.setAll(convertAppMapToSoftwareAppDto(data, Boolean.TRUE));
+            searchResponce.setAll(convertAppMapToSoftwareAppDto(data));
     }
 
-    private List<SoftwareAppDto> convertAppMapToSoftwareAppDto(List<Map<String, Object>> maps, Boolean isAll) {
+    private List<SoftwareAppDto> convertAppMapToSoftwareAppDto(List<Map<String, Object>> maps) {
         List<SoftwareAppDto> softwareAppDtoList = new ArrayList<>();
         Map<String, List<Map<String, Object>>> categoryMap = maps.stream().collect(Collectors.groupingBy(m -> {
             return String.valueOf(m.get("category"));
@@ -260,12 +271,16 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             for (Map<String, Object> stringObjectMap : stringListEntry.getValue()) {
                 SoftwareAppChildrenDto softwareAppChildrenDto = JacksonUtils.toObject(SoftwareAppChildrenDto.class, JSONObject.toJSONString(stringObjectMap));
                 String tagsText = String.valueOf(stringObjectMap.get("tagsText"));
-                if (stringObjectMap.get("tagsText") != null && isAll) {
+               /* if (stringObjectMap.get("tagsText") != null && isAll) {
                     tagsText = tagsText.toUpperCase(Locale.ROOT);
                     softwareAppChildrenDto.setTags(Arrays.asList(tagsText.split(",")));
                 } else {
                     softwareAppChildrenDto.setTags(Arrays.asList(SoftwareTypeEnum.getTagByDataType(String.valueOf(stringObjectMap.get("dataType")))));
+                }*/
+                if (stringObjectMap.get("tagsText") != null) {
+                    softwareAppChildrenDto.setTags(Arrays.asList(tagsText.split(",")));
                 }
+
                 softwareAppDto.getChildren().add(softwareAppChildrenDto);
             }
             softwareAppDtoList.add(softwareAppDto);

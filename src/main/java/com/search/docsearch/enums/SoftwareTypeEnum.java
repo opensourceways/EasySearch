@@ -10,11 +10,11 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public enum SoftwareTypeEnum {
-    APPLICATION("IMAGE", "application", "apppkg", "容器镜像", new Trie()),
-    EKPG("EPKG", "epkg", "epkgpkg", "openeuler软件包", new Trie()),
+    ALL("", "all", "all", "领域应用", new Trie()),
     RPMPKG("RPM", "rpmpkg", "rpmpkg", "rpm软件包", new Trie()),
-    ALL("", "", "all", "领域应用", new Trie());
-    private final  String tag;
+    APPLICATION("IMAGE", "application", "apppkg", "容器镜像", new Trie()),
+    EKPG("EPKG", "epkg", "epkgpkg", "openeuler软件包", new Trie());
+    private final String tag;
     private final String type;
     private final String frontDeskType;
     private final String message;
