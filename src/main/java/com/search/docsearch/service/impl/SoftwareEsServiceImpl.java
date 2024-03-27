@@ -359,11 +359,11 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
-        MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+        MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_smart").slop(2);
         titleMP.boost(1000);
-        MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
+        MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_smart");
         descriptionBuilder.boost(500);
-        MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_max_word");
+        MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_smart");
         summaryBuilder.boost(500);
         ;
         boolQueryBuilder.should(titleMP).should(descriptionBuilder).should(summaryBuilder);
