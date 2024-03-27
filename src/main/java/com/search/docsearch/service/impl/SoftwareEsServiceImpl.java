@@ -6,6 +6,7 @@ import com.search.docsearch.config.SoftwareSearchConfig;
 import com.search.docsearch.constant.Constants;
 import com.search.docsearch.dto.software.*;
 import com.search.docsearch.entity.software.SoftwareSearchCondition;
+import com.search.docsearch.entity.software.SoftwareSearchCountResponce;
 import com.search.docsearch.entity.software.SoftwareSearchResponce;
 import com.search.docsearch.entity.software.SoftwareSearchTags;
 import com.search.docsearch.enums.SoftwareTypeEnum;
@@ -23,9 +24,12 @@ import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -70,10 +74,6 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         return null;
     }
 
-    @Override
-    public Map<String, Object> getCount(SoftwareSearchCondition condition) throws ServiceException {
-        return null;
-    }
 
     @Override
     public List<SearchTagsDto> getTags(SoftwareSearchTags searchTags) throws ServiceException {
@@ -131,6 +131,54 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         }
         SearchFindwordDto searchFindwordDto = new SearchFindwordDto(keyCountResultList);
         return searchFindwordDto;
+    }
+
+    @Override
+    public List<SoftwareSearchCountResponce> getCountByCondition(SoftwareSearchCondition condition) throws ServiceException {
+        List<SoftwareSearchCountResponce> countList = new ArrayList<>();
+        SearchRequest request = new SearchRequest(searchConfig.getIndex());
+        SearchSourceBuilder searchSourceBuilder = buildSearchSourceBuilderByCondition(condition);
+        searchSourceBuilder.aggregation(AggregationBuilders.terms("data").field("dataType.keyword").subAggregation(AggregationBuilders.terms("category").field("category.keyword")));
+        request.source(searchSourceBuilder);
+        SearchResponse response = null;
+
+        try {
+            response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new ServiceImplException("can not search");
+        }
+
+
+        ParsedTerms aggregation = response.getAggregations().get("data");
+        List<? extends Terms.Bucket> buckets = aggregation.getBuckets();
+        long allTypeCount = 0L;
+        if (buckets != null)
+            for (Terms.Bucket bucket : buckets) {
+
+                if (SoftwareTypeEnum.APPLICATION.getType().equals(bucket.getKeyAsString())) {
+                    allTypeCount += bucket.getDocCount();
+                } else {
+                    ParsedTerms category = bucket.getAggregations().get("category");
+                    List<? extends Terms.Bucket> subBuckets = category.getBuckets();
+                    for (Terms.Bucket subBucket : subBuckets) {
+                        if (!"其他".equals(subBucket.getKeyAsString()))
+                            allTypeCount += subBucket.getDocCount();
+                    }
+                }
+                SoftwareSearchCountResponce softwareSearchCountResponce = new SoftwareSearchCountResponce();
+                softwareSearchCountResponce.setDocCount(bucket.getDocCount());
+                softwareSearchCountResponce.setKey(SoftwareTypeEnum.getFrontDeskTypeByType(bucket.getKeyAsString()));
+                countList.add(softwareSearchCountResponce);
+            }
+
+        if (allTypeCount > 0) {
+            SoftwareSearchCountResponce softwareSearchCountResponce = new SoftwareSearchCountResponce();
+            softwareSearchCountResponce.setDocCount(allTypeCount);
+            softwareSearchCountResponce.setKey("all");
+            countList.add(softwareSearchCountResponce);
+        }
+
+        return countList;
     }
 
 
@@ -264,6 +312,28 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     private SearchRequest buildSearchRequest(SoftwareSearchCondition condition, String index) {
         int startIndex = (condition.getPageNum() - 1) * condition.getPageSize();
         SearchRequest request = new SearchRequest(index);
+        SearchSourceBuilder sourceBuilder = buildSearchSourceBuilderByCondition(condition);
+        buildHighlightBuilder(sourceBuilder);
+        sourceBuilder.from(startIndex).size(condition.getPageSize());
+        sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
+        request.source(sourceBuilder);
+        return request;
+    }
+
+
+    private void buildHighlightBuilder(SearchSourceBuilder sourceBuilder) {
+        HighlightBuilder highlightBuilder = new HighlightBuilder()
+                .field("description")
+                .field("name")
+                .field("summary")
+                .fragmentSize(100)
+                .preTags("<span>")
+                .postTags("</span>");
+        sourceBuilder.highlighter(highlightBuilder);
+    }
+
+
+    private SearchSourceBuilder buildSearchSourceBuilderByCondition(SoftwareSearchCondition condition) {
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
@@ -309,19 +379,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             vBuilder.mustNot(QueryBuilders.termsQuery("os.keyword", condition.getOs()));
             boolQueryBuilder.mustNot(vBuilder);
         }
-
         sourceBuilder.query(boolQueryBuilder);
-        HighlightBuilder highlightBuilder = new HighlightBuilder()
-                .field("description")
-                .field("name")
-                .field("summary")
-                .fragmentSize(100)
-                .preTags("<span>")
-                .postTags("</span>");
-        sourceBuilder.highlighter(highlightBuilder);
-        sourceBuilder.from(startIndex).size(condition.getPageSize());
-        sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
-        request.source(sourceBuilder);
-        return request;
+
+        return sourceBuilder;
+
     }
 }

@@ -10,10 +10,10 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public enum SoftwareTypeEnum {
-    APPLICATION("IMAGE","application", "apppkg", "容器镜像", new Trie()),
-    EKPG("EPKG","epkg", "epkgpkg", "openeuler软件包", new Trie()),
-    RPMPKG("RPM","rpmpkg", "rpmpkg", "rpm软件包", new Trie()),
-    ALL("","", "all", "领域应用", new Trie());
+    APPLICATION("IMAGE", "application", "apppkg", "容器镜像", new Trie()),
+    EKPG("EPKG", "epkg", "epkgpkg", "openeuler软件包", new Trie()),
+    RPMPKG("RPM", "rpmpkg", "rpmpkg", "rpm软件包", new Trie()),
+    ALL("", "", "all", "领域应用", new Trie());
     private final  String tag;
     private final String type;
     private final String frontDeskType;
@@ -60,5 +60,16 @@ public enum SoftwareTypeEnum {
             }
         }
         return softwareTypeEnum.getTag();
+    }
+
+    public static String getFrontDeskTypeByType(String type) {
+        String frontDeskType = null;
+        for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
+            if (value.getType().equals(type)) {
+                frontDeskType = value.getFrontDeskType();
+                break;
+            }
+        }
+        return frontDeskType;
     }
 }

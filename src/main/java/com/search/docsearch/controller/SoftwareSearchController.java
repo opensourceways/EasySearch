@@ -6,10 +6,7 @@ import java.util.Map;
 import com.search.docsearch.aop.LogAction;
 import com.search.docsearch.dto.software.SearchFindwordDto;
 import com.search.docsearch.dto.software.SearchTagsDto;
-import com.search.docsearch.entity.software.SoftwareSearchCondition;
-import com.search.docsearch.entity.software.SoftwareSearchResponce;
-import com.search.docsearch.entity.software.SoftwareSearchTags;
-import com.search.docsearch.entity.software.SoftwareSysResult;
+import com.search.docsearch.entity.software.*;
 import com.search.docsearch.service.ISoftwareEsSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -64,6 +61,21 @@ public class SoftwareSearchController {
     public SoftwareSysResult getTags(@RequestBody @Validated SoftwareSearchTags searchTags) {
         try {
             List<SearchTagsDto> result = searchService.getTags(searchTags);
+            if (result == null) {
+                return SoftwareSysResult.fail("内容不存在", null);
+            }
+            return SoftwareSysResult.ok("查询成功", result);
+        } catch (Exception e) {
+            log.error("getTags error is: " + e.getMessage());
+        }
+
+
+        return SoftwareSysResult.fail("查询失败", null);
+    }
+    @PostMapping("count")
+    public SoftwareSysResult getCount(@RequestBody @Validated SoftwareSearchCondition condition) {
+        try {
+            List<SoftwareSearchCountResponce> result = searchService.getCountByCondition(condition);
             if (result == null) {
                 return SoftwareSysResult.fail("内容不存在", null);
             }
