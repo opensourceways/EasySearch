@@ -242,6 +242,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
                 case EKPG:
                     searchResponce.setEpkgpkg(convertAppMapToSoftwareEpkgDto(maps));
+                    break;
 
                 case ALL:
                     searchResponce.setAll(convertAppMapToSoftwareAppDto(maps));
