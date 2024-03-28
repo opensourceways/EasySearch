@@ -29,6 +29,8 @@ public class SoftwareInit implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         List<SearchTagsDto> alltypeTags = new ArrayList<>();
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
+            if(SoftwareTypeEnum.RPMPKG.equals(value))
+                continue;
             SoftwareSearchTags softwareSearchTags = new SoftwareSearchTags(value.getType(), "name", null);
             try {
                 List<SearchTagsDto> typeTags = searchService.getTags(softwareSearchTags);
