@@ -362,19 +362,19 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
-        if (condition.getKeywordType() == null || "name".equals(condition.getKeywordType())) {
+        if (StringUtils.isEmpty(condition.getKeywordType()) || "name".equals(condition.getKeywordType())) {
             MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_max_word").slop(2);
             titleMP.boost(1000);
             boolQueryBuilder.should(titleMP);
 
         }
-        if (condition.getKeywordType() != null && "description".equals(condition.getKeywordType())) {
+        if (StringUtils.isEmpty(condition.getKeywordType()) || "description".equals(condition.getKeywordType())) {
             MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
             descriptionBuilder.boost(500);
             boolQueryBuilder.should(descriptionBuilder);
         }
 
-        if (condition.getKeywordType() != null && "summary".equals(condition.getKeywordType())) {
+        if (StringUtils.isEmpty(condition.getKeywordType()) || "summary".equals(condition.getKeywordType())) {
             MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_max_word");
             summaryBuilder.boost(500);
             boolQueryBuilder.should(summaryBuilder);
@@ -401,7 +401,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             boolQueryBuilder.mustNot(vBuilder);
         }
 
-        if (condition.getOs() != null) {
+        if (!StringUtils.isEmpty(condition.getOs())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("os.keyword", condition.getOs()));
             boolQueryBuilder.mustNot(vBuilder);
