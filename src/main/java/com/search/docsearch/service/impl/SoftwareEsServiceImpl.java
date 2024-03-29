@@ -362,31 +362,40 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
-        MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_max_word").slop(2);
-        titleMP.boost(1000);
-        MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
-        descriptionBuilder.boost(500);
-        MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_max_word");
-        summaryBuilder.boost(500);
-        ;
-        boolQueryBuilder.should(titleMP).should(descriptionBuilder).should(summaryBuilder);
+        if (condition.getKeywordType() == null || "name".equals(condition.getKeywordType())) {
+            MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+            titleMP.boost(1000);
+            boolQueryBuilder.should(titleMP);
+
+        }
+        if (condition.getKeywordType() != null && "description".equals(condition.getKeywordType())) {
+            MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
+            descriptionBuilder.boost(500);
+            boolQueryBuilder.should(descriptionBuilder);
+        }
+
+        if (condition.getKeywordType() != null && "summary".equals(condition.getKeywordType())) {
+            MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_max_word");
+            summaryBuilder.boost(500);
+            boolQueryBuilder.should(summaryBuilder);
+        }
         boolQueryBuilder.minimumShouldMatch(1);
 
-        if (condition.getArch() != null) {
+        if (!StringUtils.isEmpty(condition.getArch())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("arch.keyword", condition.getArch()));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
 
-        if (condition.getCategory() != null) {
+        if (!StringUtils.isEmpty(condition.getCategory())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("category.keyword", condition.getCategory()));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
 
-        if (condition.getVersion() != null) {
+        if (!StringUtils.isEmpty(condition.getVersion())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", condition.getVersion()));
             boolQueryBuilder.mustNot(vBuilder);

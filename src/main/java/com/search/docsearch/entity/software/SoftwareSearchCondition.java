@@ -36,5 +36,6 @@ public class SoftwareSearchCondition {
     private String os;
     private String arch;
     private String category;
-
+    @Pattern(regexp = "((^name$|^description$|^summary$|^EN$))")
+    private  String  keywordType;
 }
