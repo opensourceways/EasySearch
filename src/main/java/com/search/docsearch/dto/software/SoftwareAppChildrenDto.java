@@ -9,5 +9,5 @@ public class SoftwareAppChildrenDto extends SoftwareBaseDto{
     List<String> tags;
     String iconUrl;
     String category;
-
+    SoftwarePkgIdsDto pkgIds;
 }

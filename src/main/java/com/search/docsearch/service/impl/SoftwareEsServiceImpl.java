@@ -105,8 +105,6 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         List<? extends Terms.Bucket> buckets = aggregation.getBuckets();
         for (Terms.Bucket bucket : buckets) {
-
-
             SearchTagsDto searchTagsDto = new SearchTagsDto();
             searchTagsDto.setCount(bucket.getDocCount());
             searchTagsDto.setKey(bucket.getKeyAsString());
@@ -281,7 +279,11 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                 if (stringObjectMap.get("tagsText") != null) {
                     softwareAppChildrenDto.setTags(Arrays.asList(tagsText.split(",")));
                 }
-
+                SoftwarePkgIdsDto softwarePkgIdsDto = new SoftwarePkgIdsDto();
+                softwarePkgIdsDto.setEPKG(stringObjectMap.get("EPKG") == null ? "" : String.valueOf(stringObjectMap.get("EPKG")));
+                softwarePkgIdsDto.setIMAGE(stringObjectMap.get("IMAGE") == null ? "" : String.valueOf(stringObjectMap.get("IMAGE")));
+                softwarePkgIdsDto.setRPM(stringObjectMap.get("RPM") == null ? "" : String.valueOf(stringObjectMap.get("RPM")));
+                softwareAppChildrenDto.setPkgIds(softwarePkgIdsDto);
                 softwareAppDto.getChildren().add(softwareAppChildrenDto);
             }
             softwareAppDtoList.add(softwareAppDto);
@@ -360,11 +362,11 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
-        MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_smart").slop(2);
+        MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_max_word").slop(2);
         titleMP.boost(1000);
-        MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_smart");
+        MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
         descriptionBuilder.boost(500);
-        MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_smart");
+        MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_max_word");
         summaryBuilder.boost(500);
         ;
         boolQueryBuilder.should(titleMP).should(descriptionBuilder).should(summaryBuilder);
