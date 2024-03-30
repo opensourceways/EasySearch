@@ -22,10 +22,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -363,8 +360,12 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
         if (StringUtils.isEmpty(condition.getKeywordType()) || "name".equals(condition.getKeywordType())) {
+
             MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_max_word").slop(2);
             titleMP.boost(1000);
+
+            WildcardQueryBuilder field = QueryBuilders.wildcardQuery("name",  "*" +condition.getKeyword()+ "*" );
+            boolQueryBuilder.should(field);
             boolQueryBuilder.should(titleMP);
 
         }
