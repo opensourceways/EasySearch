@@ -13,5 +13,6 @@ public class MySystem {
 
     public String system;
     public String index;
-    public String trackerIndex;
+    public String searchWordIndex;
+    public String pageViewsIndex;
 }
