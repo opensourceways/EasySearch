@@ -22,6 +22,7 @@ import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.entity.vo.SysCode;
 import com.search.docsearch.entity.vo.SysResult;
+import com.search.docsearch.entity.vo.WordQuery;
 import com.search.docsearch.except.ControllerException;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.ParameterUtil;
@@ -168,8 +169,12 @@ public class SearchController {
 
     @LogAction(type = "Get", OperationResource = "word")
     @PostMapping("word")
-    public SysResult findWord(@RequestParam("query") String query) {
+    public SysResult findWord(@RequestParam("query") String query, @RequestBody WordQuery wordQuery) {
         try {
+            if (StringUtils.hasText(wordQuery.getQuery())) {
+                query = wordQuery.getQuery();
+            }
+
             Map<String, Object> result = searchService.findWord(query);
             if (result == null) {
                 return SysResult.fail("内容不存在", null);
