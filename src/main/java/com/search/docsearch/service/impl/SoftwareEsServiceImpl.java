@@ -10,6 +10,7 @@ import com.search.docsearch.entity.software.SoftwareSearchCountResponce;
 import com.search.docsearch.entity.software.SoftwareSearchResponce;
 import com.search.docsearch.entity.software.SoftwareSearchTags;
 import com.search.docsearch.enums.SoftwareTypeEnum;
+import com.search.docsearch.enums.SoftwarekeywordTypeEnum;
 import com.search.docsearch.except.ServiceException;
 import com.search.docsearch.except.ServiceImplException;
 import com.search.docsearch.service.ISoftwareEsSearchService;
@@ -359,7 +360,8 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
-        if (StringUtils.isEmpty(condition.getKeywordType()) || "name".equals(condition.getKeywordType())) {
+        boolean supportKeywordType = SoftwarekeywordTypeEnum.isSupportKeywordType(condition.getKeywordType());
+        if (!supportKeywordType|| "name".equals(condition.getKeywordType())) {
 
             MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_max_word").slop(2);
             titleMP.boost(1000);
@@ -369,13 +371,13 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             boolQueryBuilder.should(titleMP);
 
         }
-        if (StringUtils.isEmpty(condition.getKeywordType()) || "description".equals(condition.getKeywordType())) {
+        if (!supportKeywordType || "description".equals(condition.getKeywordType())) {
             MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
             descriptionBuilder.boost(500);
             boolQueryBuilder.should(descriptionBuilder);
         }
 
-        if (StringUtils.isEmpty(condition.getKeywordType()) || "summary".equals(condition.getKeywordType())) {
+        if (!supportKeywordType|| "summary".equals(condition.getKeywordType())) {
             MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_max_word");
             summaryBuilder.boost(500);
             boolQueryBuilder.should(summaryBuilder);
