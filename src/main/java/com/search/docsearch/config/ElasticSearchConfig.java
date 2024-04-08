@@ -38,7 +38,7 @@ import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -67,19 +67,23 @@ public class ElasticSearchConfig {
     @Bean(destroyMethod = "close")
     public RestHighLevelClient elasticsearchClient() {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(elasticsearchUsername, elasticsearchPassword));
+        credentialsProvider.setCredentials(AuthScope.ANY,
+                new UsernamePasswordCredentials(elasticsearchUsername, elasticsearchPassword));
         SSLContext sc = null;
         try {
-            TrustManager[] tm = {new MyX509TrustManager(cerFilePath, cerPassword)};
+            TrustManager[] tm = { new MyX509TrustManager(cerFilePath, cerPassword) };
             sc = SSLContext.getInstance("SSL", "SunJSSE");
-            //也可以使用SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+            // 也可以使用SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
             sc.init(null, tm, SecureRandom.getInstance("NativePRNGBlocking"));
 
             SSLIOSessionStrategy sessionStrategy = new SSLIOSessionStrategy(sc, new NoopHostnameVerifier());
-            SecuredHttpClientConfigCallback httpClientConfigCallback = new SecuredHttpClientConfigCallback(sessionStrategy,
+            SecuredHttpClientConfigCallback httpClientConfigCallback = new SecuredHttpClientConfigCallback(
+                    sessionStrategy,
                     credentialsProvider);
 
-            RestClientBuilder builder = RestClient.builder(constructHttpHosts(Collections.singletonList(elasticsearchHost), elasticsearchPort, elasticsearchProtocol))
+            RestClientBuilder builder = RestClient
+                    .builder(constructHttpHosts(convertIPsToList(elasticsearchHost), elasticsearchPort,
+                            elasticsearchProtocol))
                     .setRequestConfigCallback(requestConfig -> requestConfig.setConnectTimeout(5 * 1000)
                             .setConnectionRequestTimeout(5 * 1000)
                             .setSocketTimeout(30 * 1000))
@@ -96,6 +100,10 @@ public class ElasticSearchConfig {
             logger.error(e.getMessage());
             return null;
         }
+    }
+
+    public static List<String> convertIPsToList(String ipAddresses) {
+        return Arrays.asList(ipAddresses.split(","));
     }
 
     /**
@@ -115,7 +123,7 @@ public class ElasticSearchConfig {
         private final SSLIOSessionStrategy sslStrategy;
 
         SecuredHttpClientConfigCallback(final SSLIOSessionStrategy sslStrategy,
-                                        @Nullable final CredentialsProvider credentialsProvider) {
+                @Nullable final CredentialsProvider credentialsProvider) {
             this.sslStrategy = Objects.requireNonNull(sslStrategy);
             this.credentialsProvider = credentialsProvider;
         }
