@@ -9,12 +9,12 @@ public class SysResult {
 
     private Integer status;
     private String msg;
-    private Object obj;
+    private Object data;
 
-    public SysResult(Integer status, String msg, Object obj) {
+    public SysResult(Integer status, String msg, Object data) {
         this.status = status;
         this.msg = msg;
-        this.obj = obj;
+        this.data = data;
     }
 
     public SysResult() {
