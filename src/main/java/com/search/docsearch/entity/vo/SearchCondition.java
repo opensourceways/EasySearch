@@ -34,8 +34,8 @@ public class SearchCondition {
     private String keyword;
     @Size(max = 15)
     private String type;
-    @Size(max = 20)
+    @Size(max = 30)
     private List<Map<String, String>> limit;
-    @Size(max = 20)
+    @Size(max = 30)
     private List<Map<String, String>> filter;
 }
