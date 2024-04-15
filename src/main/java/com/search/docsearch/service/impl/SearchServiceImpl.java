@@ -606,11 +606,11 @@ public class SearchServiceImpl implements SearchService {
             if(!CollectionUtils.isEmpty(keyCountResultList))
                 break;
         }
-        //没查到根据相似度匹配
+        /*//没查到根据相似度匹配
         if (CollectionUtils.isEmpty(keyCountResultList)) {
             String suggestCorrection = trie.suggestCorrection(prefix);
             keyCountResultList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 10));
-        }
+        }*/
         Map<String, Object> result = new HashMap<>();
         result.put("word", keyCountResultList);
 
