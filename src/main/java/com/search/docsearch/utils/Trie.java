@@ -20,8 +20,6 @@ public class Trie {
     }
 
     public void insert(String word, long count) {
-        if(count<5)
-            return;
         TrieNode node = root;
         for (int i = 0; i < word.length(); i++) {
             char currentChar = word.charAt(i);
