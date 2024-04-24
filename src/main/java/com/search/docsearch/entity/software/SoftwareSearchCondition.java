@@ -15,7 +15,7 @@ import org.hibernate.validator.constraints.Range;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class SoftwareSearchCondition {
+public class SoftwareSearchCondition  implements Cloneable {
 
     @Range(min = 1, max = 1000, message = "page must be greater than 0 and less than 1000 ")
     private int pageNum = 1;
@@ -38,4 +38,14 @@ public class SoftwareSearchCondition {
     private String category;
 
     private  String  keywordType;
+    @Override
+    public SoftwareSearchCondition clone() {
+        SoftwareSearchCondition condition = null;
+        try {
+            condition = (SoftwareSearchCondition) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return condition;
+    }
 }

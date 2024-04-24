@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.search.docsearch.config.SoftwareSearchConfig;
 import com.search.docsearch.constant.Constants;
 import com.search.docsearch.dto.software.*;
-import com.search.docsearch.entity.software.SoftwareSearchCondition;
-import com.search.docsearch.entity.software.SoftwareSearchCountResponce;
-import com.search.docsearch.entity.software.SoftwareSearchResponce;
-import com.search.docsearch.entity.software.SoftwareSearchTags;
+import com.search.docsearch.entity.software.*;
 import com.search.docsearch.enums.SoftwareTypeEnum;
 import com.search.docsearch.enums.SoftwarekeywordTypeEnum;
 import com.search.docsearch.except.ServiceException;
@@ -35,12 +32,14 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 
@@ -52,6 +51,8 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
     @Autowired
     SoftwareSearchConfig searchConfig;
+    @Autowired
+    ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Override
     public SoftwareSearchResponce searchByCondition(SoftwareSearchCondition condition) throws ServiceException {
@@ -183,6 +184,75 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         }
 
         return countList;
+    }
+
+    @Override
+    public List<SoftwareDocsAllResponce> searchAllByCondition(SoftwareSearchCondition condition) throws ServiceException {
+        List<SoftwareDocsAllResponce> responce = new ArrayList<>();
+        CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length);
+        for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
+            threadPoolTaskExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        SoftwareSearchCondition clone = condition.clone();
+                        clone.setDataType(value.getFrontDeskType());
+                        SoftwareSearchResponce softwareSearchResponce = searchByCondition(clone);
+                        if (softwareSearchResponce.getTotal() > 0) {
+                            ArrayList<String> nameList = new ArrayList<>();
+                            switch (value) {
+                                case APPLICATION:
+                                    List<SoftwareAppDto> apppkg = softwareSearchResponce.getApppkg();
+
+                                    apppkg.stream().forEach(a -> {
+                                        a.getChildren().stream().forEach(children -> {
+                                            nameList.add(children.getName());
+                                        });
+                                    });
+                                    break;
+
+                                case RPMPKG:
+                                    List<SoftwareRpmDto> rpmpkg = softwareSearchResponce.getRpmpkg();
+                                    rpmpkg.stream().forEach(a -> nameList.add(a.getName()));
+                                    break;
+
+                                case EKPG:
+                                    List<SoftwareEpkgDto> epkgpkg = softwareSearchResponce.getEpkgpkg();
+                                    epkgpkg.stream().forEach(a -> nameList.add(a.getName()));
+                                    break;
+
+                                case ALL:
+                                    List<SoftwareAppDto> all = softwareSearchResponce.getAll();
+                                    all.stream().forEach(a -> {
+                                        a.getChildren().stream().forEach(children -> {
+                                            nameList.add(children.getName());
+                                        });
+                                    });
+                                    break;
+                            }
+                            SoftwareDocsAllResponce softwareDocsAllResponce = new SoftwareDocsAllResponce(value.getFrontDeskType(), softwareSearchResponce.getTotal(), nameList);
+                            responce.add(softwareDocsAllResponce);
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        countDownLatch.countDown();
+                    }
+                }
+
+            });
+        }
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (responce.size() > 0)
+            responce.sort((a, b) -> a.getDocCount().compareTo(b.getDocCount()));
+
+
+        return responce;
     }
 
 
@@ -361,12 +431,12 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
         boolean supportKeywordType = SoftwarekeywordTypeEnum.isSupportKeywordType(condition.getKeywordType());
-        if (!supportKeywordType|| "name".equals(condition.getKeywordType())) {
+        if (!supportKeywordType || "name".equals(condition.getKeywordType())) {
 
             MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_max_word").slop(2);
             titleMP.boost(1000);
 
-            WildcardQueryBuilder field = QueryBuilders.wildcardQuery("name",  "*" +condition.getKeyword()+ "*" );
+            WildcardQueryBuilder field = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword() + "*");
             boolQueryBuilder.should(field);
             boolQueryBuilder.should(titleMP);
 
@@ -377,7 +447,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             boolQueryBuilder.should(descriptionBuilder);
         }
 
-        if (!supportKeywordType|| "summary".equals(condition.getKeywordType())) {
+        if (!supportKeywordType || "summary".equals(condition.getKeywordType())) {
             MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_max_word");
             summaryBuilder.boost(500);
             boolQueryBuilder.should(summaryBuilder);
@@ -386,27 +456,27 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         if (!StringUtils.isEmpty(condition.getArch())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
-            vBuilder.mustNot(QueryBuilders.termsQuery("arch.keyword", condition.getArch()));
+            vBuilder.mustNot(QueryBuilders.termsQuery("arch.keyword", condition.getArch().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
 
         if (!StringUtils.isEmpty(condition.getCategory())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
-            vBuilder.mustNot(QueryBuilders.termsQuery("category.keyword", condition.getCategory()));
+            vBuilder.mustNot(QueryBuilders.termsQuery("category.keyword", condition.getCategory().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
 
         if (!StringUtils.isEmpty(condition.getVersion())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
-            vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", condition.getVersion()));
+            vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", condition.getVersion().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
         if (!StringUtils.isEmpty(condition.getOs())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
-            vBuilder.mustNot(QueryBuilders.termsQuery("os.keyword", condition.getOs()));
+            vBuilder.mustNot(QueryBuilders.termsQuery("os.keyword", condition.getOs().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
         }
         sourceBuilder.query(boolQueryBuilder);

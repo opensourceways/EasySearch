@@ -87,6 +87,21 @@ public class SoftwareSearchController {
 
         return SoftwareSysResult.fail("查询失败", null);
     }
+
+    @PostMapping("docsAll")
+    public SoftwareSysResult searchAllByKeyword(@RequestBody @Validated SoftwareSearchCondition condition) {
+
+        try {
+            List<SoftwareDocsAllResponce> result = searchService.searchAllByCondition(condition);
+            if (result == null) {
+                return SoftwareSysResult.fail("内容不存在", null);
+            }
+            return SoftwareSysResult.ok("查询成功", result);
+        } catch (Exception e) {
+            log.error("searchAllByKeyword error is: " + e.getMessage());
+        }
+        return SoftwareSysResult.fail("查询失败", null);
+    }
 }
 
 
