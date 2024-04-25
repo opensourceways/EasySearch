@@ -189,8 +189,11 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     @Override
     public List<SoftwareDocsAllResponce> searchAllByCondition(SoftwareSearchCondition condition) throws ServiceException {
         List<SoftwareDocsAllResponce> responce = new ArrayList<>();
-        CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length);
+        CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 1);
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
+            if (SoftwareTypeEnum.ALL.equals(value))
+                continue;
+
             threadPoolTaskExecutor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -199,36 +202,43 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                         clone.setDataType(value.getFrontDeskType());
                         SoftwareSearchResponce softwareSearchResponce = searchByCondition(clone);
                         if (softwareSearchResponce.getTotal() > 0) {
-                            ArrayList<String> nameList = new ArrayList<>();
+                            List<SoftwareNameDocsDto> nameList = new ArrayList<>();
                             switch (value) {
                                 case APPLICATION:
                                     List<SoftwareAppDto> apppkg = softwareSearchResponce.getApppkg();
-
                                     apppkg.stream().forEach(a -> {
                                         a.getChildren().stream().forEach(children -> {
-                                            nameList.add(children.getName());
+                                            String name = children.getName();
+                                            if (children.getVersion() != null) {
+                                                name=name+":"+children.getVersion();
+                                            }
+                                            nameList.add(new SoftwareNameDocsDto(name, children.getPkgIds().getIMAGE()));
                                         });
                                     });
                                     break;
 
                                 case RPMPKG:
                                     List<SoftwareRpmDto> rpmpkg = softwareSearchResponce.getRpmpkg();
-                                    rpmpkg.stream().forEach(a -> nameList.add(a.getName()));
+                                    rpmpkg.stream().forEach(a -> {
+                                        String name = a.getName();
+                                        if (a.getVersion() != null) {
+                                            name=name+":"+a.getVersion();
+                                        }
+                                        nameList.add(new SoftwareNameDocsDto(name, a.getPkgId()));
+                                    });
                                     break;
 
                                 case EKPG:
                                     List<SoftwareEpkgDto> epkgpkg = softwareSearchResponce.getEpkgpkg();
-                                    epkgpkg.stream().forEach(a -> nameList.add(a.getName()));
-                                    break;
-
-                                case ALL:
-                                    List<SoftwareAppDto> all = softwareSearchResponce.getAll();
-                                    all.stream().forEach(a -> {
-                                        a.getChildren().stream().forEach(children -> {
-                                            nameList.add(children.getName());
-                                        });
+                                    epkgpkg.stream().forEach(a -> {
+                                        String name = a.getName();
+                                        if (a.getVersion() != null) {
+                                            name=name+":"+a.getVersion();
+                                        }
+                                        nameList.add(new SoftwareNameDocsDto(name, a.getPkgId()));
                                     });
                                     break;
+
                             }
                             SoftwareDocsAllResponce softwareDocsAllResponce = new SoftwareDocsAllResponce(value.getFrontDeskType(), softwareSearchResponce.getTotal(), nameList);
                             responce.add(softwareDocsAllResponce);
