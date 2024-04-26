@@ -26,7 +26,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -188,6 +190,13 @@ public class ElasticSearchConfig {
         @Override
         public X509Certificate[] getAcceptedIssuers() {
             return new X509Certificate[0];
+        }
+    }
+
+    public static class NullHostNameVerifier implements HostnameVerifier {
+        @Override
+        public boolean verify(String hostName, SSLSession session) {
+            return !Objects.isNull(hostName) || !Objects.isNull(session);
         }
     }
 
