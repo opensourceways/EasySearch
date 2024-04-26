@@ -6,9 +6,11 @@ import lombok.Data;
 public class SoftwareNameDocsDto {
     String name;
     String pkgId;
+    String version;
 
-    public SoftwareNameDocsDto(String name,String pkgId){
+    public SoftwareNameDocsDto(String name,String pkgId,String version){
         this.name=name;
         this.pkgId=pkgId;
+        this.version=version;
     }
 }

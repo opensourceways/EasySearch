@@ -208,11 +208,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                                     List<SoftwareAppDto> apppkg = softwareSearchResponce.getApppkg();
                                     apppkg.stream().forEach(a -> {
                                         a.getChildren().stream().forEach(children -> {
-                                            String name = children.getName();
-                                            if (children.getVersion() != null) {
-                                                name=name+":"+children.getVersion();
-                                            }
-                                            nameList.add(new SoftwareNameDocsDto(name, children.getPkgIds().getIMAGE()));
+                                            nameList.add(new SoftwareNameDocsDto(children.getName(), children.getPkgIds().getIMAGE(),children.getVersion()));
                                         });
                                     });
                                     break;
@@ -220,22 +216,14 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                                 case RPMPKG:
                                     List<SoftwareRpmDto> rpmpkg = softwareSearchResponce.getRpmpkg();
                                     rpmpkg.stream().forEach(a -> {
-                                        String name = a.getName();
-                                        if (a.getVersion() != null) {
-                                            name=name+":"+a.getVersion();
-                                        }
-                                        nameList.add(new SoftwareNameDocsDto(name, a.getPkgId()));
+                                        nameList.add(new SoftwareNameDocsDto(a.getName(), a.getPkgId(),a.getVersion()));
                                     });
                                     break;
 
                                 case EKPG:
                                     List<SoftwareEpkgDto> epkgpkg = softwareSearchResponce.getEpkgpkg();
                                     epkgpkg.stream().forEach(a -> {
-                                        String name = a.getName();
-                                        if (a.getVersion() != null) {
-                                            name=name+":"+a.getVersion();
-                                        }
-                                        nameList.add(new SoftwareNameDocsDto(name, a.getPkgId()));
+                                        nameList.add(new SoftwareNameDocsDto(a.getName(), a.getPkgId(),a.getVersion()));
                                     });
                                     break;
 
