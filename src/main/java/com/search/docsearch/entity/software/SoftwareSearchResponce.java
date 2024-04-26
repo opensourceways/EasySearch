@@ -1,6 +1,7 @@
 package com.search.docsearch.entity.software;
 
 
+import com.search.docsearch.dto.software.SoftwareAppChildrenDto;
 import com.search.docsearch.dto.software.SoftwareAppDto;
 import com.search.docsearch.dto.software.SoftwareEpkgDto;
 import com.search.docsearch.dto.software.SoftwareRpmDto;
@@ -14,7 +15,7 @@ import java.util.List;
 public class SoftwareSearchResponce {
     List<SoftwareAppDto> all;
     List<SoftwareRpmDto> rpmpkg;
-    List<SoftwareAppDto> apppkg;
+    List<SoftwareAppChildrenDto>  apppkg;
     List<SoftwareEpkgDto> epkgpkg;
     long total;
 

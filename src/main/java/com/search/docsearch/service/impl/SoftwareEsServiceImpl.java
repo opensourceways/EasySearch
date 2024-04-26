@@ -205,25 +205,23 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                             List<SoftwareNameDocsDto> nameList = new ArrayList<>();
                             switch (value) {
                                 case APPLICATION:
-                                    List<SoftwareAppDto> apppkg = softwareSearchResponce.getApppkg();
+                                    List<SoftwareAppChildrenDto> apppkg = softwareSearchResponce.getApppkg();
                                     apppkg.stream().forEach(a -> {
-                                        a.getChildren().stream().forEach(children -> {
-                                            nameList.add(new SoftwareNameDocsDto(children.getName(), children.getPkgIds().getIMAGE(),children.getVersion()));
-                                        });
+                                        nameList.add(new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
                                     break;
 
                                 case RPMPKG:
                                     List<SoftwareRpmDto> rpmpkg = softwareSearchResponce.getRpmpkg();
                                     rpmpkg.stream().forEach(a -> {
-                                        nameList.add(new SoftwareNameDocsDto(a.getName(), a.getPkgId(),a.getVersion()));
+                                        nameList.add(new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
                                     break;
 
                                 case EKPG:
                                     List<SoftwareEpkgDto> epkgpkg = softwareSearchResponce.getEpkgpkg();
                                     epkgpkg.stream().forEach(a -> {
-                                        nameList.add(new SoftwareNameDocsDto(a.getName(), a.getPkgId(),a.getVersion()));
+                                        nameList.add(new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
                                     break;
 
@@ -298,7 +296,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                 continue;
             switch (value) {
                 case APPLICATION:
-                    searchResponce.setApppkg(convertAppMapToSoftwareAppDto(maps));
+                    searchResponce.setApppkg(convertAppMapToSoftwareDto(maps));
                     break;
                 case RPMPKG:
                     searchResponce.setRpmpkg(convertAppMapToSoftwareRpmDto(maps));
@@ -325,6 +323,27 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         if (!CollectionUtils.isEmpty(data))
             searchResponce.setAll(convertAppMapToSoftwareAppDto(data));
     }
+
+    private List<SoftwareAppChildrenDto> convertAppMapToSoftwareDto(List<Map<String, Object>> maps) {
+        List<SoftwareAppChildrenDto> softwareAppDtoList = new ArrayList<>();
+        maps.stream().forEach(m -> {
+                    SoftwareAppChildrenDto softwareAppChildrenDto = JacksonUtils.toObject(SoftwareAppChildrenDto.class, JSONObject.toJSONString(m));
+                    if (m.get("tagsText") != null) {
+                        String tagsText = String.valueOf(m.get("tagsText"));
+                        softwareAppChildrenDto.setTags(Arrays.asList(tagsText.split(",")));
+                    }
+                    SoftwarePkgIdsDto softwarePkgIdsDto = new SoftwarePkgIdsDto();
+                    softwarePkgIdsDto.setEPKG(m.get("EPKG") == null ? "" : String.valueOf(m.get("EPKG")));
+                    softwarePkgIdsDto.setIMAGE(m.get("IMAGE") == null ? "" : String.valueOf(m.get("IMAGE")));
+                    softwarePkgIdsDto.setRPM(m.get("RPM") == null ? "" : String.valueOf(m.get("RPM")));
+                    softwareAppChildrenDto.setPkgIds(softwarePkgIdsDto);
+                    softwareAppDtoList.add(softwareAppChildrenDto);
+                }
+
+        );
+        return softwareAppDtoList;
+    }
+
 
     private List<SoftwareAppDto> convertAppMapToSoftwareAppDto(List<Map<String, Object>> maps) {
         List<SoftwareAppDto> softwareAppDtoList = new ArrayList<>();
