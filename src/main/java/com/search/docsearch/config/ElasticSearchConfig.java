@@ -142,14 +142,13 @@ public class ElasticSearchConfig {
     public static class MyX509TrustManager implements X509TrustManager {
         X509TrustManager sunJSSEX509TrustManager;
 
-        MyX509TrustManager(String cerFilePath, String cerPassword) throws TrustManagerException {
+        MyX509TrustManager(String cerFilePath, String cerPassword) throws TrustManagerException, FileNotFoundException {
             File file = new File(cerFilePath);
-            try {
-                if (!file.isFile()) {
-                    throw new FileNotFoundException("Wrong Certification Path");
-                }
+            if (!file.isFile()) {
+                throw new FileNotFoundException("Wrong Certification Path");
+            }
+            try (InputStream in = new FileInputStream(file)) {
                 log.info("Loading Keystore {} ...", file);
-                InputStream in = new FileInputStream(file);
                 KeyStore ks = KeyStore.getInstance("JKS");
                 ks.load(in, cerPassword.toCharArray());
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
