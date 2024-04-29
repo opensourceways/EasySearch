@@ -10,4 +10,5 @@ public class SoftwareAppChildrenDto extends SoftwareBaseDto{
     String iconUrl;
     String category;
     SoftwarePkgIdsDto pkgIds;
+    String appVer;
 }
