@@ -13,7 +13,7 @@ import java.util.List;
 
 @Data
 public class SoftwareSearchResponce {
-    List<SoftwareAppDto> all;
+    List<SoftwareAppChildrenDto>  all;
     List<SoftwareRpmDto> rpmpkg;
     List<SoftwareAppChildrenDto>  apppkg;
     List<SoftwareEpkgDto> epkgpkg;

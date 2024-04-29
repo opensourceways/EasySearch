@@ -307,7 +307,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                     break;
 
                 case ALL:
-                    searchResponce.setAll(convertAppMapToSoftwareAppDto(maps));
+                    searchResponce.setAll(convertAppMapToSoftwareDto(maps));
                     break;
             }
         }
@@ -316,13 +316,13 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     }
 
 
-    private void handleAllType(List<Map<String, Object>> data, SoftwareSearchResponce searchResponce) {
+    /*private void handleAllType(List<Map<String, Object>> data, SoftwareSearchResponce searchResponce) {
         data = data.stream().filter(d -> {
             return SoftwareTypeEnum.APPLICATION.getType().equals(String.valueOf(d.get("dataType"))) || (!SoftwareTypeEnum.APPLICATION.getType().equals(String.valueOf(d.get("dataType"))) && !"其他".equals(String.valueOf(d.get("category"))));
         }).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(data))
             searchResponce.setAll(convertAppMapToSoftwareAppDto(data));
-    }
+    }*/
 
     private List<SoftwareAppChildrenDto> convertAppMapToSoftwareDto(List<Map<String, Object>> maps) {
         List<SoftwareAppChildrenDto> softwareAppDtoList = new ArrayList<>();
