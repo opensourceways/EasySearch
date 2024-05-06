@@ -24,7 +24,7 @@ EaseSearch是对外提供elasticsearch查询相关接口服务
    > java -jar target/EaseSearch-0.0.1-SNAPSHOT.jar
 
 
-##### 容器安装~~~~
+##### 容器安装~~~~ 
 
 1. 克隆工程
    > git clone https://gitee.com/opensourceway/EaseSearch.git
