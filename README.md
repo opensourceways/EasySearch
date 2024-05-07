@@ -18,7 +18,7 @@ EaseSearch是对外提供elasticsearch查询相关接口服务
    > git clone https://gitee.com/opensourceway/EaseSearch.git
 
 2. 打包方式
-   > mvn clean install package -Dmaven.test.skip
+   > mvn clean install package -Dmaven.test.skip 
 
 3. 启动应用
    > java -jar target/EaseSearch-0.0.1-SNAPSHOT.jar
