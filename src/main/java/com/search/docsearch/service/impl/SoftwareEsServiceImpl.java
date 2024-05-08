@@ -458,13 +458,13 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             boolQueryBuilder.should(titleMP);
 
         }
-        if (!supportKeywordType || "description".equals(condition.getKeywordType())) {
+        if (supportKeywordType && "description".equals(condition.getKeywordType())) {
             MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
             descriptionBuilder.boost(500);
             boolQueryBuilder.should(descriptionBuilder);
         }
 
-        if (!supportKeywordType || "summary".equals(condition.getKeywordType())) {
+        if (supportKeywordType &&  "summary".equals(condition.getKeywordType())) {
             MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_max_word");
             summaryBuilder.boost(500);
             boolQueryBuilder.should(summaryBuilder);
