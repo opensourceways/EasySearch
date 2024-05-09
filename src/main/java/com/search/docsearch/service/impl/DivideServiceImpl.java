@@ -1,16 +1,19 @@
 package com.search.docsearch.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.search.docsearch.entity.vo.SearchTags;
+import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.General;
+import lombok.SneakyThrows;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -45,7 +48,10 @@ public class DivideServiceImpl implements DivideService {
     @Qualifier("setConfig")
     private MySystem s;
 
+    @Autowired
+    SearchService searchService;
 
+    @SneakyThrows
     @Override
     public Map<String, Object> advancedSearch(Map<String, String> search, String category) throws ServiceImplException {
         String saveIndex;
@@ -105,7 +111,7 @@ public class DivideServiceImpl implements DivideService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
 
@@ -117,6 +123,7 @@ public class DivideServiceImpl implements DivideService {
             data.add(map);
         }
 
+
         result.put("page", page);
         result.put("pageSize", pageSize);
         result.put("count", response.getHits().getTotalHits().value);
@@ -124,6 +131,7 @@ public class DivideServiceImpl implements DivideService {
         return result;
     }
 
+    @SneakyThrows
     @Override
     public Map<String, Object> docsSearch(SearchDocs searchDocs) throws ServiceImplException {
         String saveIndex = s.index + "_" + searchDocs.getLang();
@@ -172,7 +180,7 @@ public class DivideServiceImpl implements DivideService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
 
@@ -180,7 +188,8 @@ public class DivideServiceImpl implements DivideService {
 
         for (SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> map = hit.getSourceAsMap();
-            String text = (String)map.getOrDefault("textContent", "");
+            map.put("score", hit.getScore());
+            String text = (String) map.getOrDefault("textContent", "");
             if (text.length() > 200) {
                 text = text.substring(0, 200) + "......";
             }
@@ -199,6 +208,37 @@ public class DivideServiceImpl implements DivideService {
             }
 
             data.add(map);
+        }
+
+        if (s.index.contains("opengauss") && data.size() > 2) {
+            SearchTags searchTags = new SearchTags();
+            searchTags.setCategory("docs");
+            searchTags.setLang(searchDocs.getLang());
+            searchTags.setWant("version");
+            Map<String, Object> tags = searchService.getTags(searchTags);
+            ArrayList<String> versionList = new ArrayList<>();
+            if (tags != null) {
+                List totalNumList = (List) tags.get("totalNum");
+                for (Object o : totalNumList) {
+                    Map o1 = (Map) o;
+                    versionList.add(o1.get("key") + "");
+                }
+            }
+            ArrayList<Map> scoreList = new ArrayList<>();
+
+            Map<String, List<Map<String, Object>>> articleName = data.stream().collect(Collectors.groupingBy(m -> {
+                return String.valueOf(m.get("articleName"));
+            }));
+            articleName.forEach((k, v) -> {
+                v.sort((u1, u2) -> Float.compare(Float.parseFloat(String.valueOf(u2.get("score"))), Float.parseFloat(String.valueOf(u1.get("score")))));
+                scoreList.add(v.get(0));
+                v.sort((u1, u2) -> Integer.compare(versionList.indexOf(String.valueOf(u1.get("version"))), versionList.indexOf(String.valueOf(u2.get("version")))));
+            });
+            scoreList.sort((u1, u2) -> Float.compare(Float.parseFloat(String.valueOf(u2.get("score"))), Float.parseFloat(String.valueOf(u1.get("score")))));
+            data.clear();
+            scoreList.stream().forEach(a -> {
+                data.addAll(articleName.get(a.get("articleName")));
+            });
         }
         if (data.isEmpty()) {
             return null;
