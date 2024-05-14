@@ -459,6 +459,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             MatchPhraseQueryBuilder provide = QueryBuilders.matchPhraseQuery("providesText", condition.getKeyword()).analyzer("ik_max_word");
             provide.boost(1);
             boolQueryBuilder.should(provide);
+            WildcardQueryBuilder providesWildcard = QueryBuilders.wildcardQuery("providesText", "*" + condition.getKeyword() + "*");
+            providesWildcard.boost(1);
+            boolQueryBuilder.should(providesWildcard);
         }
         if (!supportKeywordType || "description".equals(condition.getKeywordType())) {
             MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
