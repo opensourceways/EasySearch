@@ -462,6 +462,12 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             WildcardQueryBuilder providesWildcard = QueryBuilders.wildcardQuery("providesText", "*" + condition.getKeyword() + "*");
             providesWildcard.boost(1);
             boolQueryBuilder.should(providesWildcard);
+            MatchPhraseQueryBuilder requires = QueryBuilders.matchPhraseQuery("requiresText", condition.getKeyword()).analyzer("ik_max_word");
+            requires.boost(1);
+            boolQueryBuilder.should(requires);
+            WildcardQueryBuilder requiresWildcard = QueryBuilders.wildcardQuery("requiresText", "*" + condition.getKeyword() + "*");
+            requiresWildcard.boost(1);
+            boolQueryBuilder.should(requiresWildcard);
         }
         if (!supportKeywordType || "description".equals(condition.getKeywordType())) {
             MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
