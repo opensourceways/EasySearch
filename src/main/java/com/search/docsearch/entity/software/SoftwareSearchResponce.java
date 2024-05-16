@@ -1,10 +1,7 @@
 package com.search.docsearch.entity.software;
 
 
-import com.search.docsearch.dto.software.SoftwareAppChildrenDto;
-import com.search.docsearch.dto.software.SoftwareAppDto;
-import com.search.docsearch.dto.software.SoftwareEpkgDto;
-import com.search.docsearch.dto.software.SoftwareRpmDto;
+import com.search.docsearch.dto.software.*;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -13,7 +10,7 @@ import java.util.List;
 
 @Data
 public class SoftwareSearchResponce {
-    List<SoftwareAppChildrenDto>  all;
+    List<SoftwareAllDto>  all;
     List<SoftwareRpmDto> rpmpkg;
     List<SoftwareAppChildrenDto>  apppkg;
     List<SoftwareEpkgDto> epkgpkg;

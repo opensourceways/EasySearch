@@ -307,7 +307,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                     break;
 
                 case ALL:
-                    searchResponce.setAll(convertAppMapToSoftwareDto(maps));
+                    searchResponce.setAll(convertAllMapToSoftwareDto(maps));
                     break;
             }
         }
@@ -323,6 +323,27 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         if (!CollectionUtils.isEmpty(data))
             searchResponce.setAll(convertAppMapToSoftwareAppDto(data));
     }*/
+
+
+    private List<SoftwareAllDto> convertAllMapToSoftwareDto(List<Map<String, Object>> maps) {
+        List<SoftwareAllDto> softwareAllDtoList = new ArrayList<>();
+        maps.stream().forEach(m -> {
+                    if (m.containsKey("pkgIds")) {
+                        m.put("pkgIds", JSONObject.parseObject(m.get("pkgIds") + ""));
+
+                    }
+                    if (m.containsKey("tags")) {
+                        m.put("tags", JSONObject.parseArray(m.get("tags") + ""));
+
+                    }
+                    SoftwareAllDto softwareAllDto = JacksonUtils.toObject(SoftwareAllDto.class, JSONObject.toJSONString(m));
+                    softwareAllDtoList.add(softwareAllDto);
+                }
+
+        );
+        return softwareAllDtoList;
+    }
+
 
     private List<SoftwareAppChildrenDto> convertAppMapToSoftwareDto(List<Map<String, Object>> maps) {
         List<SoftwareAppChildrenDto> softwareAppDtoList = new ArrayList<>();
