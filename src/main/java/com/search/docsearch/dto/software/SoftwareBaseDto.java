@@ -27,4 +27,6 @@ public class SoftwareBaseDto {
 
     String installation;
     String pkgId;
+
+    String category;
 }
