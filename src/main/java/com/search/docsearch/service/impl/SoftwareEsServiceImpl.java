@@ -244,9 +244,10 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (responce.size() > 0)
-            responce.sort((a, b) -> a.getDocCount().compareTo(b.getDocCount()));
-
+        if (responce.size() > 0) {
+            List<String> sortKeyList = Arrays.asList("rpmpkg", "apppkg", "epkgpkg");
+            responce.sort((a, b) -> Integer.compare(sortKeyList.indexOf(a.getKey()),sortKeyList.indexOf(b.getKey())));
+        }
 
         return responce;
     }
