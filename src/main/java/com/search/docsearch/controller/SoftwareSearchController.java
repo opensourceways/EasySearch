@@ -34,8 +34,10 @@ public class SoftwareSearchController {
         try {
             // preprocess of query
             QueryTyepEnum queryType = recgService.ClassifyQuery(condition);
-            SoftwareSearchCondition clsCondition = recgService.ProcessQuery(condition, queryType);
 
+            SoftwareSearchCondition clsCondition = recgService.ProcessQuery(condition, queryType);
+            log.info("===========classifyed query:" + clsCondition);
+            log.info("===========origin query:" + condition);
             SoftwareSearchResponce result = searchService.searchByCondition(clsCondition);
             log.info("result:" + result);
             if (result == null) {
