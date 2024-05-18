@@ -467,7 +467,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             boolQueryBuilder.filter(QueryBuilders.termQuery("dataType.keyword", typeByfrontDeskType));
         }
 
-        condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
+      //  condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
         boolean supportKeywordType = SoftwarekeywordTypeEnum.isSupportKeywordType(condition.getKeywordType());
         if (!supportKeywordType || "name".equals(condition.getKeywordType())) {
