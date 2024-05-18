@@ -16,7 +16,7 @@ public class RexRecognitionImpl implements RecognitionService {
     @Override
     public QueryTyepEnum ClassifyQuery(SoftwareSearchCondition condition) throws ServiceException {
         String query = condition.getKeyword();
-        if (query.contains("command")) {
+        if (query.toLowerCase().contains("command")) {
             return QueryTyepEnum.ERROR_QUERY;
         }
 
