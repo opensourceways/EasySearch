@@ -1,5 +1,9 @@
 FROM openeuler/openeuler:22.03-lts-sp1 as BUILDER
 
+RUN sed -i "s|repo.openeuler.org|mirrors.nju.edu.cn/openeuler|g" /etc/yum.repos.d/openEuler.repo \
+    && sed -i '/metalink/d' /etc/yum.repos.d/openEuler.repo \
+    && sed -i '/metadata_expire/d' /etc/yum.repos.d/openEuler.repo 
+
 RUN cd / \
     && yum install -y wget \
     && wget https://mirrors.tuna.tsinghua.edu.cn/Adoptium/17/jdk/x64/linux/OpenJDK17U-jdk_x64_linux_hotspot_17.0.11_9.tar.gz \
@@ -19,6 +23,10 @@ RUN cd /EaseSearch-search \
     && mvn clean install package -Dmaven.test.skip
 
 FROM openeuler/openeuler:22.03-lts-sp1
+
+RUN sed -i "s|repo.openeuler.org|mirrors.nju.edu.cn/openeuler|g" /etc/yum.repos.d/openEuler.repo \
+    && sed -i '/metalink/d' /etc/yum.repos.d/openEuler.repo \
+    && sed -i '/metadata_expire/d' /etc/yum.repos.d/openEuler.repo 
 
 RUN yum update -y \
     && yum install -y shadow passwd
@@ -47,9 +55,7 @@ RUN passwd -l easysearch \
     && usermod -s /sbin/nologin easysearch \
     && echo "export TMOUT=1800 readonly TMOUT" >> /etc/profile
 
-RUN sed -i "s|repo.openeuler.org|mirrors.nju.edu.cn/openeuler|g" /etc/yum.repos.d/openEuler.repo \
-    && sed -i '/metalink/d' /etc/yum.repos.d/openEuler.repo \
-    && sed -i '/metadata_expire/d' /etc/yum.repos.d/openEuler.repo \
+
 
 RUN dnf install -y wget \
     && wget https://mirrors.tuna.tsinghua.edu.cn/Adoptium/17/jre/x64/linux/OpenJDK17U-jre_x64_linux_hotspot_17.0.11_9.tar.gz \
