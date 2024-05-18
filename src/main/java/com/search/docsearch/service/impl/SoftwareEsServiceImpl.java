@@ -478,16 +478,16 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             WildcardQueryBuilder field = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword() + "*");
             boolQueryBuilder.should(field);
             boolQueryBuilder.should(titleMP);
-            MatchQueryBuilder provide = QueryBuilders.matchQuery("providesText", condition.getKeyword());
+           /* MatchQueryBuilder provide = QueryBuilders.matchQuery("providesText", condition.getKeyword());
             provide.boost(1);
-            boolQueryBuilder.should(provide);
+            boolQueryBuilder.should(provide);*/
             WildcardQueryBuilder providesWildcard = QueryBuilders.wildcardQuery("providesText", "*" + condition.getKeyword() + "*");
             providesWildcard.boost(1);
             boolQueryBuilder.should(providesWildcard);
 
-            MatchQueryBuilder requires = QueryBuilders.matchQuery("requiresText", condition.getKeyword());
+           /* MatchQueryBuilder requires = QueryBuilders.matchQuery("requiresText", condition.getKeyword());
             requires.boost(1);
-            boolQueryBuilder.should(requires);
+            boolQueryBuilder.should(requires);*/
             WildcardQueryBuilder requiresWildcard = QueryBuilders.wildcardQuery("requiresText", "*" + condition.getKeyword() + "*");
             requiresWildcard.boost(1);
             boolQueryBuilder.should(requiresWildcard);
