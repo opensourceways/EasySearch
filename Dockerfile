@@ -1,4 +1,4 @@
-FROM openeuler/openeuler:22.03-lts-sp1 as BUILDER
+FROM openeuler/openeuler:22.03 as BUILDER
 
 RUN cd / \
     && yum install -y wget \
@@ -18,7 +18,7 @@ ENV PATH=${MAVEN_HOME}/bin:$PATH
 RUN cd /EaseSearch-search \
     && mvn clean install package -Dmaven.test.skip
 
-FROM openeuler/openeuler:22.03-lts-sp1
+FROM openeuler/openeuler:22.03
 
 RUN yum update -y \
     && yum install -y shadow passwd
