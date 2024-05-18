@@ -7,11 +7,12 @@ import com.search.docsearch.aop.LogAction;
 import com.search.docsearch.dto.software.SearchFindwordDto;
 import com.search.docsearch.dto.software.SearchTagsDto;
 import com.search.docsearch.entity.software.*;
+import com.search.docsearch.enums.QueryTyepEnum;
+import com.search.docsearch.recognition.RecognitionService;
 import com.search.docsearch.service.ISoftwareEsSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,12 +24,19 @@ public class SoftwareSearchController {
     @Autowired
     private ISoftwareEsSearchService searchService;
 
+    @Autowired
+    private RecognitionService recgService;
+
     @LogAction(type = "software Global search", OperationResource = "Documents")
     @PostMapping("docs")
     public SoftwareSysResult searchByKeyword(@RequestBody @Validated SoftwareSearchCondition condition) {
 
         try {
-            SoftwareSearchResponce result = searchService.searchByCondition(condition);
+            // preprocess of query
+            QueryTyepEnum queryType = recgService.ClassifyQuery(condition);
+            SoftwareSearchCondition clsCondition = recgService.ProcessQuery(condition, queryType);
+
+            SoftwareSearchResponce result = searchService.searchByCondition(clsCondition);
             log.info("result:" + result);
             if (result == null) {
                 return SoftwareSysResult.fail("内容不存在", null);
@@ -40,10 +48,10 @@ public class SoftwareSearchController {
         return SoftwareSysResult.fail("查询失败", null);
     }
 
-
     @PostMapping("word")
     @LogAction(type = "Get", OperationResource = "word")
-    public SoftwareSysResult findWord(@RequestParam(value = "query") String query, @RequestParam(value = "dataType", required = false) String dataType) {
+    public SoftwareSysResult findWord(@RequestParam(value = "query") String query,
+            @RequestParam(value = "dataType", required = false) String dataType) {
 
         try {
             SearchFindwordDto word = searchService.findWord(query, dataType);
@@ -69,9 +77,9 @@ public class SoftwareSearchController {
             log.error("getTags error is: " + e.getMessage());
         }
 
-
         return SoftwareSysResult.fail("查询失败", null);
     }
+
     @PostMapping("count")
     public SoftwareSysResult getCount(@RequestBody @Validated SoftwareSearchCondition condition) {
         try {
@@ -83,7 +91,6 @@ public class SoftwareSearchController {
         } catch (Exception e) {
             log.error("getTags error is: " + e.getMessage());
         }
-
 
         return SoftwareSysResult.fail("查询失败", null);
     }
@@ -103,5 +110,3 @@ public class SoftwareSearchController {
         return SoftwareSysResult.fail("查询失败", null);
     }
 }
-
-
