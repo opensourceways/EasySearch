@@ -34,7 +34,6 @@ public class SoftwareSearchController {
         try {
             // preprocess of query
             QueryTyepEnum queryType = recgService.ClassifyQuery(condition);
-
             SoftwareSearchCondition clsCondition = recgService.ProcessQuery(condition, queryType);
             log.info("===========classifyed query:" + clsCondition.getKeyword());
             log.info("===========origin query:" + condition.getKeyword());
@@ -85,7 +84,10 @@ public class SoftwareSearchController {
     @PostMapping("count")
     public SoftwareSysResult getCount(@RequestBody @Validated SoftwareSearchCondition condition) {
         try {
-            List<SoftwareSearchCountResponce> result = searchService.getCountByCondition(condition);
+            // preprocess of query
+            QueryTyepEnum queryType = recgService.ClassifyQuery(condition);
+            SoftwareSearchCondition clsCondition = recgService.ProcessQuery(condition, queryType);
+            List<SoftwareSearchCountResponce> result = searchService.getCountByCondition(clsCondition);
             if (result == null) {
                 return SoftwareSysResult.fail("内容不存在", null);
             }
