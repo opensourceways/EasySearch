@@ -47,6 +47,10 @@ RUN passwd -l easysearch \
     && usermod -s /sbin/nologin easysearch \
     && echo "export TMOUT=1800 readonly TMOUT" >> /etc/profile
 
+RUN sed -i "s|repo.openeuler.org|mirrors.nju.edu.cn/openeuler|g" /etc/yum.repos.d/openEuler.repo \
+    && sed -i '/metalink/d' /etc/yum.repos.d/openEuler.repo \
+    && sed -i '/metadata_expire/d' /etc/yum.repos.d/openEuler.repo \
+
 RUN dnf install -y wget \
     && wget https://mirrors.tuna.tsinghua.edu.cn/Adoptium/17/jre/x64/linux/OpenJDK17U-jre_x64_linux_hotspot_17.0.11_9.tar.gz \
     && tar -zxvf OpenJDK17U-jre_x64_linux_hotspot_17.0.11_9.tar.gz \
