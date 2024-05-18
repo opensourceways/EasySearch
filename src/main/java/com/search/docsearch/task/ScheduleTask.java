@@ -1,4 +1,4 @@
-package com.search.docsearch.config;
+package com.search.docsearch.task;
 
 import com.search.docsearch.service.SearchService;
 import org.slf4j.Logger;
