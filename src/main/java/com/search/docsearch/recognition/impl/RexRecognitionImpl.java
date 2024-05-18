@@ -7,9 +7,10 @@ import com.search.docsearch.except.ServiceException;
 import com.search.docsearch.recognition.RecognitionService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.springframework.stereotype.Service;
 import org.springframework.boot.SpringApplication;
 
+@Service
 public class RexRecognitionImpl implements RecognitionService {
 
     @Override
