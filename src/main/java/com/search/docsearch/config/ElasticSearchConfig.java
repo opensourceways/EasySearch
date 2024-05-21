@@ -26,7 +26,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -73,7 +75,7 @@ public class ElasticSearchConfig {
             TrustManager[] tm = {new MyX509TrustManager(cerFilePath, cerPassword)};
             sc = SSLContext.getInstance("SSL", "SunJSSE");
             //也可以使用SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-            sc.init(null, tm, SecureRandom.getInstance("NativePRNGBlocking"));
+            sc.init(null, tm, SecureRandom.getInstanceStrong());
 
             SSLIOSessionStrategy sessionStrategy = new SSLIOSessionStrategy(sc, new NoopHostnameVerifier());
             SecuredHttpClientConfigCallback httpClientConfigCallback = new SecuredHttpClientConfigCallback(sessionStrategy,
@@ -142,14 +144,13 @@ public class ElasticSearchConfig {
     public static class MyX509TrustManager implements X509TrustManager {
         X509TrustManager sunJSSEX509TrustManager;
 
-        MyX509TrustManager(String cerFilePath, String cerPassword) throws TrustManagerException {
+        MyX509TrustManager(String cerFilePath, String cerPassword) throws TrustManagerException, FileNotFoundException {
             File file = new File(cerFilePath);
-            try {
-                if (!file.isFile()) {
-                    throw new FileNotFoundException("Wrong Certification Path");
-                }
+            if (!file.isFile()) {
+                throw new FileNotFoundException("Wrong Certification Path");
+            }
+            try (InputStream in = new FileInputStream(file)) {
                 log.info("Loading Keystore {} ...", file);
-                InputStream in = new FileInputStream(file);
                 KeyStore ks = KeyStore.getInstance("JKS");
                 ks.load(in, cerPassword.toCharArray());
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
@@ -189,6 +190,13 @@ public class ElasticSearchConfig {
         @Override
         public X509Certificate[] getAcceptedIssuers() {
             return new X509Certificate[0];
+        }
+    }
+
+    public static class NullHostNameVerifier implements HostnameVerifier {
+        @Override
+        public boolean verify(String hostName, SSLSession session) {
+            return !Objects.isNull(hostName) || !Objects.isNull(session);
         }
     }
 
