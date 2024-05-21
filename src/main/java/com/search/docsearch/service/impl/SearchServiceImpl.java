@@ -719,7 +719,7 @@ public class SearchServiceImpl implements SearchService {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        int timeout = 5000; // 设置超时时间为5秒
+        int timeout = 15000; // 设置超时时间为15秒
         connection.setConnectTimeout(timeout);
         connection.setReadTimeout(timeout);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),
@@ -739,7 +739,7 @@ public class SearchServiceImpl implements SearchService {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
-        int timeout = 5000; // 设置超时时间为5秒
+        int timeout = 15000; // 设置超时时间为15秒
         connection.setConnectTimeout(timeout);
         connection.setReadTimeout(timeout);
         connection.setRequestProperty("Content-Type", "application/json");
