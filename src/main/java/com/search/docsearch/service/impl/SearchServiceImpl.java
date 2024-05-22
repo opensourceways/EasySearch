@@ -56,12 +56,20 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 
@@ -711,37 +719,46 @@ public class SearchServiceImpl implements SearchService {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-        String line;
-        StringBuilder response = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            response.append(line);
-            if (flag) {
-                response.append("\n");
+        int timeout = 15000; // 设置超时时间为15秒
+        connection.setConnectTimeout(timeout);
+        connection.setReadTimeout(timeout);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),
+                StandardCharsets.UTF_8))) {
+            String line;
+            StringJoiner response = new StringJoiner(flag ? "\n" : "");
+            while ((line = reader.readLine()) != null) {
+                response.add(line);
             }
+            return response.toString();
+        } finally {
+            connection.disconnect(); // 断开连接
         }
-        reader.close();
-        return response.toString();
     }
 
-    public String postRequest(String urlStr, String body) throws Exception {
+    public String postRequest(String urlStr, String body) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
         connection.setRequestMethod("POST");
+        int timeout = 15000; // 设置超时时间为15秒
+        connection.setConnectTimeout(timeout);
+        connection.setReadTimeout(timeout);
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);
-        OutputStream outputStream = connection.getOutputStream();
-        outputStream.write(body.getBytes());
-        outputStream.close();
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-        String line;
-        StringBuilder response = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            response.append(line);
+        try (OutputStream outputStream = connection.getOutputStream();
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
+            writer.write(body);
         }
-        reader.close();
-        return response.toString();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),
+                StandardCharsets.UTF_8))) {
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            return response.toString();
+        } finally {
+            connection.disconnect(); // 断开连接
+        }
     }
+
 }
