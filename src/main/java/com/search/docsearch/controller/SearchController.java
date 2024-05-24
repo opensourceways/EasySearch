@@ -169,12 +169,8 @@ public class SearchController {
 
     @LogAction(type = "Get", OperationResource = "word")
     @PostMapping("word")
-    public SysResult findWord(@RequestParam("query") String query, @RequestBody WordQuery wordQuery) {
+    public SysResult findWord(@RequestParam("query") String query) {
         try {
-            if (StringUtils.hasText(wordQuery.getQuery())) {
-                query = wordQuery.getQuery();
-            }
-
             Map<String, Object> result = searchService.findWord(query);
             if (result == null) {
                 return SysResult.fail("内容不存在", null);
