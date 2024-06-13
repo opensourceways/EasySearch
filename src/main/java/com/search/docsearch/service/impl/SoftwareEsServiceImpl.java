@@ -416,7 +416,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         String typeByfrontDeskType = SoftwareTypeEnum.getTypeByfrontDeskType(condition.getDataType());
-        if (!StringUtils.hasLength(typeByfrontDeskType)) {
+        if (StringUtils.hasLength(typeByfrontDeskType)) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("dataType.keyword", typeByfrontDeskType));
         }
 
