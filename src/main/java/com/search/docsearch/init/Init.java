@@ -1,5 +1,6 @@
-package com.search.docsearch.config;
+package com.search.docsearch.init;
 
+import com.search.docsearch.config.MySystem;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Component
 @Slf4j
-@RestController
 public class Init implements ApplicationRunner {
 
     @Autowired

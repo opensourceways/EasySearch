@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void controllerException(HttpServletRequest request, HttpServletResponse response, ControllerException e) {
-        log.error("Controller异常:", e);
+        log.error("Controller异常:", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void methodArgumentNotValidException(HttpServletRequest request, HttpServletResponse response, MethodArgumentNotValidException e) {
-        log.error("参数校验异常:", e);
+        log.error("参数校验异常:", e.getMessage());
         BindingResult bindingResult = e.getBindingResult();
         StringBuilder sb = new StringBuilder();
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void exception(HttpServletRequest request, HttpServletResponse response, Exception e) {
-        log.error("异常:", e);
+        log.error("异常:", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
@@ -114,7 +114,7 @@ public class GlobalExceptionHandler {
         try (PrintWriter out = response.getWriter()) {
             out.append(JacksonUtils.writeValueAsString(sysResult));
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            log.error(e.getMessage());
         }
     }
 }
