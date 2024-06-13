@@ -48,6 +48,11 @@ public class SoftwareSysResult {
         return new SoftwareSysResult(400, msg, null);
     }
 
+    //
+    public static SoftwareSysResult failWithTooManyRequests() {
+        return new SoftwareSysResult(429, "Too Many Requests", null);
+    }
+
     public static SoftwareSysResult fail() {
         return new SoftwareSysResult(201, null, null);
     }
