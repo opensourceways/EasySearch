@@ -1,6 +1,5 @@
 package com.search.docsearch.service.impl;
 
-
 import com.alibaba.fastjson.JSONObject;
 import com.search.docsearch.config.SoftwareSearchConfig;
 import com.search.docsearch.constant.Constants;
@@ -14,6 +13,9 @@ import com.search.docsearch.service.ISoftwareEsSearchService;
 import com.search.docsearch.utils.JacksonUtils;
 import com.search.docsearch.utils.SortUtil;
 import com.search.docsearch.utils.Trie;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -41,7 +43,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Service
 public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
@@ -50,6 +52,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
     @Autowired
     SoftwareSearchConfig searchConfig;
+
     @Autowired
     ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
@@ -61,14 +64,14 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-
         } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
         if (response == null)
             return null;
+
         SoftwareSearchResponce softwareSearchResponce = handEsResponce(response);
-        if (softwareSearchResponce.getTotal() == 10000) {
+        if (softwareSearchResponce.getTotal() == Constants.MAX_ES_RETURN_LENGHTH) {
             List<SoftwareSearchCountResponce> countByCondition = getCountByCondition(condition);
             long total = 0l;
             for (SoftwareSearchCountResponce softwareSearchCountResponce : countByCondition) {
@@ -79,7 +82,6 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         return softwareSearchResponce;
 
     }
-
 
     @Override
     public List<SearchTagsDto> getTags(SoftwareSearchTags searchTags) throws ServiceException {
@@ -98,7 +100,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         }
 
         BucketOrder bucketOrder = BucketOrder.key(false);
-        sourceBuilder.aggregation(AggregationBuilders.terms("data").field(searchTags.getWant() + ".keyword").size(10000).order(bucketOrder));
+        sourceBuilder.aggregation(AggregationBuilders.terms("data").field(searchTags.getWant() + ".keyword")
+                .size(Constants.MAX_ES_RETURN_LENGHTH)
+                .order(bucketOrder));
         sourceBuilder.query(boolQueryBuilder);
         request.source(sourceBuilder);
         SearchResponse response = null;
@@ -120,29 +124,13 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     }
 
     @Override
-    public SearchFindwordDto findWord(String prefix, String dataType) throws ServiceException {
-        List<Trie.KeyCountResult> keyCountResultList = new ArrayList<>();
-        if (!StringUtils.isEmpty(dataType)) {
-            SoftwareTypeEnum enumByfrontDeskType = SoftwareTypeEnum.getEnumByfrontDeskType(dataType);
-            Trie trie = enumByfrontDeskType.getTrie();
-            for (int i = 0; i < 3 && i < prefix.length(); i++) {
-                keyCountResultList.addAll(trie.searchTopKWithPrefix(prefix.substring(0, prefix.length() - i), 10));
-                if (!CollectionUtils.isEmpty(keyCountResultList))
-                    break;
-            }
-        } else {
-            keyCountResultList.addAll(Constants.softwareTrie.searchTopKWithPrefix(prefix, 10));
-        }
-        SearchFindwordDto searchFindwordDto = new SearchFindwordDto(keyCountResultList);
-        return searchFindwordDto;
-    }
-
-    @Override
-    public List<SoftwareSearchCountResponce> getCountByCondition(SoftwareSearchCondition condition) throws ServiceException {
+    public List<SoftwareSearchCountResponce> getCountByCondition(SoftwareSearchCondition condition)
+            throws ServiceException {
         List<SoftwareSearchCountResponce> countList = new ArrayList<>();
         SearchRequest request = new SearchRequest(searchConfig.getIndex());
         SearchSourceBuilder searchSourceBuilder = buildSearchSourceBuilderByCondition(condition);
-        searchSourceBuilder.aggregation(AggregationBuilders.terms("data").field("dataType.keyword").subAggregation(AggregationBuilders.terms("category").field("category.keyword")));
+        searchSourceBuilder.aggregation(AggregationBuilders.terms("data").field("dataType.keyword")
+                .subAggregation(AggregationBuilders.terms("category").field("category.keyword")));
         request.source(searchSourceBuilder);
         SearchResponse response = null;
 
@@ -160,10 +148,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                 docCountMap.put(SoftwareTypeEnum.getFrontDeskTypeByType(bucket.getKeyAsString()), bucket.getDocCount());
             }
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
-           /* if (SoftwareTypeEnum.APPVERSION.equals(value)||SoftwareTypeEnum.EKPG.equals(value))
-                continue;*/
             SoftwareSearchCountResponce softwareSearchCountResponce = new SoftwareSearchCountResponce();
-            softwareSearchCountResponce.setDocCount(docCountMap.get(value.getFrontDeskType()) == null ? 0 : docCountMap.get(value.getFrontDeskType()));
+            softwareSearchCountResponce.setDocCount(
+                    docCountMap.get(value.getFrontDeskType()) == null ? 0 : docCountMap.get(value.getFrontDeskType()));
             softwareSearchCountResponce.setKey(value.getFrontDeskType());
             countList.add(softwareSearchCountResponce);
         }
@@ -172,7 +159,8 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     }
 
     @Override
-    public List<SoftwareDocsAllResponce> searchAllByCondition(SoftwareSearchCondition condition) throws ServiceException {
+    public List<SoftwareDocsAllResponce> searchAllByCondition(SoftwareSearchCondition condition)
+            throws ServiceException {
         List<SoftwareDocsAllResponce> responce = new ArrayList<>();
         CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 2);
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
@@ -192,31 +180,35 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                                 case APPLICATION:
                                     List<SoftwareAppChildrenDto> apppkg = softwareSearchResponce.getApppkg();
                                     apppkg.stream().forEach(a -> {
-                                        nameList.add(new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
+                                        nameList.add(
+                                                new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
                                     break;
 
                                 case RPMPKG:
                                     List<SoftwareRpmDto> rpmpkg = softwareSearchResponce.getRpmpkg();
                                     rpmpkg.stream().forEach(a -> {
-                                        nameList.add(new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
+                                        nameList.add(
+                                                new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
                                     break;
 
                                 case EKPG:
                                     List<SoftwareEpkgDto> epkgpkg = softwareSearchResponce.getEpkgpkg();
                                     epkgpkg.stream().forEach(a -> {
-                                        nameList.add(new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
+                                        nameList.add(
+                                                new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
                                     break;
 
                             }
-                            SoftwareDocsAllResponce softwareDocsAllResponce = new SoftwareDocsAllResponce(value.getFrontDeskType(), softwareSearchResponce.getTotal(), nameList);
+                            SoftwareDocsAllResponce softwareDocsAllResponce = new SoftwareDocsAllResponce(
+                                    value.getFrontDeskType(), softwareSearchResponce.getTotal(), nameList);
                             responce.add(softwareDocsAllResponce);
                         }
 
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("erorr happened in searchAllByCondition");
                     } finally {
                         countDownLatch.countDown();
                     }
@@ -227,7 +219,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("countDownLatch await failed");
         }
         if (responce.size() > 0) {
             SortUtil.sortResponce(responce);
@@ -236,17 +228,17 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         return responce;
     }
 
-
     private SoftwareSearchResponce handEsResponce(SearchResponse response) {
         List<Map<String, Object>> data = new ArrayList<>();
         for (SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> map = hit.getSourceAsMap();
             String description = (String) map.getOrDefault("description", "");
-            if (null != description && description.length() > 200) {
-                description = description.substring(0, 200) + "......";
+            if (null != description && description.length() > Constants.MAX_ES_DESC_LENGHTH) {
+                description = description.substring(0, Constants.MAX_ES_DESC_LENGHTH) + "......";
             }
             map.put("description", description);
             Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+
             if (highlightFields.containsKey("description")) {
                 StringBuilder descriptionHighlight = new StringBuilder();
                 for (Text textContent : highlightFields.get("description").getFragments()) {
@@ -267,7 +259,6 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         searchResponce.setTotal(response.getHits().getTotalHits().value);
         return searchResponce;
     }
-
 
     private SoftwareSearchResponce getSearchResponce(List<Map<String, Object>> data) {
         SoftwareSearchResponce searchResponce = new SoftwareSearchResponce();
@@ -302,13 +293,17 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         return searchResponce;
     }
 
-
     private List<SoftwareAppVersionDto> convertAppversionMapToSoftwareDto(List<Map<String, Object>> maps) {
         List<SoftwareAppVersionDto> softwareAppVersionDtoList = new ArrayList<>();
         maps.stream().forEach(m -> {
-                    SoftwareAppVersionDto softwareAppVersionDto = JacksonUtils.toObject(SoftwareAppVersionDto.class, JSONObject.toJSONString(m));
-                    softwareAppVersionDtoList.add(softwareAppVersionDto);
-                }
+            try {
+                SoftwareAppVersionDto softwareAppVersionDto = JacksonUtils.toObject(SoftwareAppVersionDto.class,
+                        JSONObject.toJSONString(m));
+                softwareAppVersionDtoList.add(softwareAppVersionDto);
+            } catch (Exception e) {
+                log.error("error happens in convertAppversionMapToSoftwareDto");
+            }
+        }
 
         );
         return softwareAppVersionDtoList;
@@ -317,38 +312,46 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     private List<SoftwareAllDto> convertAllMapToSoftwareDto(List<Map<String, Object>> maps) {
         List<SoftwareAllDto> softwareAllDtoList = new ArrayList<>();
         maps.stream().forEach(m -> {
-                    if (m.containsKey("pkgIds")) {
-                        m.put("pkgIds", JSONObject.parseObject(m.get("pkgIds") + ""));
+            try {
+                if (m.containsKey("pkgIds")) {
+                    m.put("pkgIds", JSONObject.parseObject(m.get("pkgIds") + ""));
 
-                    }
-                    if (m.containsKey("tags")) {
-                        m.put("tags", SortUtil.sortTags(JSONObject.parseArray(m.get("tags") + "")));
-
-                    }
-                    SoftwareAllDto softwareAllDto = JacksonUtils.toObject(SoftwareAllDto.class, JSONObject.toJSONString(m));
-                    softwareAllDtoList.add(softwareAllDto);
                 }
+                if (m.containsKey("tags")) {
+                    m.put("tags", SortUtil.sortTags(JSONObject.parseArray(m.get("tags") + "")));
+
+                }
+                SoftwareAllDto softwareAllDto = JacksonUtils.toObject(SoftwareAllDto.class, JSONObject.toJSONString(m));
+                softwareAllDtoList.add(softwareAllDto);
+            } catch (Exception e) {
+                log.error("error happens in convertAllMapToSoftwareDto");
+            }
+        }
 
         );
         return softwareAllDtoList;
     }
 
-
     private List<SoftwareAppChildrenDto> convertAppMapToSoftwareDto(List<Map<String, Object>> maps) {
         List<SoftwareAppChildrenDto> softwareAppDtoList = new ArrayList<>();
         maps.stream().forEach(m -> {
-                    SoftwareAppChildrenDto softwareAppChildrenDto = JacksonUtils.toObject(SoftwareAppChildrenDto.class, JSONObject.toJSONString(m));
-                    if (m.get("tagsText") != null) {
-                        String tagsText = String.valueOf(m.get("tagsText"));
-                        softwareAppChildrenDto.setTags(Arrays.asList(tagsText.split(",")));
-                    }
-                    SoftwarePkgIdsDto softwarePkgIdsDto = new SoftwarePkgIdsDto();
-                    softwarePkgIdsDto.setEPKG(m.get("EPKG") == null ? "" : String.valueOf(m.get("EPKG")));
-                    softwarePkgIdsDto.setIMAGE(m.get("IMAGE") == null ? "" : String.valueOf(m.get("IMAGE")));
-                    softwarePkgIdsDto.setRPM(m.get("RPM") == null ? "" : String.valueOf(m.get("RPM")));
-                    softwareAppChildrenDto.setPkgIds(softwarePkgIdsDto);
-                    softwareAppDtoList.add(softwareAppChildrenDto);
+            try {
+                SoftwareAppChildrenDto softwareAppChildrenDto = JacksonUtils.toObject(SoftwareAppChildrenDto.class,
+                        JSONObject.toJSONString(m));
+                if (m.get("tagsText") != null) {
+                    String tagsText = String.valueOf(m.get("tagsText"));
+                    softwareAppChildrenDto.setTags(Arrays.asList(tagsText.split(",")));
                 }
+                SoftwarePkgIdsDto softwarePkgIdsDto = new SoftwarePkgIdsDto();
+                softwarePkgIdsDto.setEPKG(m.get("EPKG") == null ? "" : String.valueOf(m.get("EPKG")));
+                softwarePkgIdsDto.setIMAGE(m.get("IMAGE") == null ? "" : String.valueOf(m.get("IMAGE")));
+                softwarePkgIdsDto.setRPM(m.get("RPM") == null ? "" : String.valueOf(m.get("RPM")));
+                softwareAppChildrenDto.setPkgIds(softwarePkgIdsDto);
+                softwareAppDtoList.add(softwareAppChildrenDto);
+            } catch (Exception e) {
+                log.error("error happens in convertAppMapToSoftwareDto");
+            }
+        }
 
         );
         return softwareAppDtoList;
@@ -358,10 +361,14 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         List<SoftwareEpkgDto> softwareEpkgDtoList = new ArrayList<>();
 
         maps.stream().forEach(m -> {
-            m.put("epkgUpdateAt", m.get("updatetime"));
-            m.put("epkgCategory", m.get("category"));
-            m.put("epkgSize", m.get("size"));
-            softwareEpkgDtoList.add(JacksonUtils.toObject(SoftwareEpkgDto.class, JSONObject.toJSONString(m)));
+            try {
+                m.put("epkgUpdateAt", m.get("updatetime"));
+                m.put("epkgCategory", m.get("category"));
+                m.put("epkgSize", m.get("size"));
+                softwareEpkgDtoList.add(JacksonUtils.toObject(SoftwareEpkgDto.class, JSONObject.toJSONString(m)));
+            } catch (Exception e) {
+                log.error("error happens in convertAppMapToSoftwareEpkgDto");
+            }
         });
         return softwareEpkgDtoList;
     }
@@ -370,14 +377,17 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         List<SoftwareRpmDto> softwareAppDtoList = new ArrayList<>();
 
         maps.stream().forEach(m -> {
-            m.put("rpmUpdateAt", m.get("updatetime"));
-            m.put("rpmCategory", m.get("category"));
-            m.put("rpmSize", m.get("size"));
-            softwareAppDtoList.add(JacksonUtils.toObject(SoftwareRpmDto.class, JSONObject.toJSONString(m)));
+            try {
+                m.put("rpmUpdateAt", m.get("updatetime"));
+                m.put("rpmCategory", m.get("category"));
+                m.put("rpmSize", m.get("size"));
+                softwareAppDtoList.add(JacksonUtils.toObject(SoftwareRpmDto.class, JSONObject.toJSONString(m)));
+            } catch (Exception e) {
+                log.error("error happens inconvertAppMapToSoftwareRpmDto");
+            }
         });
         return softwareAppDtoList;
     }
-
 
     private SearchRequest buildSearchRequest(SoftwareSearchCondition condition, String index) {
         int startIndex = (condition.getPageNum() - 1) * condition.getPageSize();
@@ -390,7 +400,6 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         return request;
     }
 
-
     private void buildHighlightBuilder(SearchSourceBuilder sourceBuilder) {
         HighlightBuilder highlightBuilder = new HighlightBuilder()
                 .field("description")
@@ -402,77 +411,80 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         sourceBuilder.highlighter(highlightBuilder);
     }
 
-
     private SearchSourceBuilder buildSearchSourceBuilderByCondition(SoftwareSearchCondition condition) {
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         String typeByfrontDeskType = SoftwareTypeEnum.getTypeByfrontDeskType(condition.getDataType());
-        if (!StringUtils.isEmpty(typeByfrontDeskType)) {
+        if (!StringUtils.hasLength(typeByfrontDeskType)) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("dataType.keyword", typeByfrontDeskType));
         }
 
-
         boolean isSupportKeywordType = SoftwarekeywordTypeEnum.isSupportKeywordType(condition.getKeywordType());
         boolean isSearchAll = "all".equals(condition.getKeywordType());
+
         if (isSearchAll || !isSupportKeywordType || "name".equals(condition.getKeywordType())) {
 
-            MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+            MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword())
+                    .analyzer("ik_max_word").slop(2);
             titleMP.boost(1000);
 
             WildcardQueryBuilder field = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword() + "*");
             boolQueryBuilder.should(field);
             boolQueryBuilder.should(titleMP);
         }
+
         if (isSearchAll || "file".equals(condition.getKeywordType())) {
-            WildcardQueryBuilder providesWildcard = QueryBuilders.wildcardQuery("providesText.keyword", "*" + condition.getKeyword() + "*");
+            WildcardQueryBuilder providesWildcard = QueryBuilders.wildcardQuery("providesText.keyword",
+                    "*" + condition.getKeyword() + "*");
             providesWildcard.boost(1);
             boolQueryBuilder.should(providesWildcard);
-            WildcardQueryBuilder requiresWildcard = QueryBuilders.wildcardQuery("requiresText.keyword", "*" + condition.getKeyword() + "*");
+            WildcardQueryBuilder requiresWildcard = QueryBuilders.wildcardQuery("requiresText.keyword",
+                    "*" + condition.getKeyword() + "*");
             requiresWildcard.boost(1);
             boolQueryBuilder.should(requiresWildcard);
         }
 
-
         if (isSearchAll || "description".equals(condition.getKeywordType())) {
-            MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders.matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
+            MatchPhraseQueryBuilder descriptionBuilder = QueryBuilders
+                    .matchPhraseQuery("description", condition.getKeyword()).analyzer("ik_max_word");
             descriptionBuilder.boost(10);
             boolQueryBuilder.should(descriptionBuilder);
         }
 
         if (isSearchAll || "summary".equals(condition.getKeywordType())) {
-            MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword()).analyzer("ik_max_word");
+            MatchPhraseQueryBuilder summaryBuilder = QueryBuilders.matchPhraseQuery("summary", condition.getKeyword())
+                    .analyzer("ik_max_word");
             summaryBuilder.boost(10);
             boolQueryBuilder.should(summaryBuilder);
         }
         boolQueryBuilder.minimumShouldMatch(1);
 
-        if (!StringUtils.isEmpty(condition.getArch())) {
+        if (!StringUtils.hasLength(condition.getArch())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("arch.keyword", condition.getArch().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
-        if (!StringUtils.isEmpty(condition.getEulerOsVersion())) {
+        if (!StringUtils.hasLength(condition.getEulerOsVersion())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("eulerOsVersion.keyword", condition.getEulerOsVersion()));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
-        if (!StringUtils.isEmpty(condition.getCategory())) {
+        if (!StringUtils.hasLength(condition.getCategory())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("category.keyword", condition.getCategory().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
-
-        if (!StringUtils.isEmpty(condition.getVersion())) {
+        if (!StringUtils.hasLength(condition.getVersion())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", condition.getVersion().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
-        if (!StringUtils.isEmpty(condition.getOs())) {
+        if (!StringUtils.hasLength(condition.getOs())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("os.keyword", condition.getOs().split(",")));
             boolQueryBuilder.mustNot(vBuilder);

@@ -7,12 +7,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
+
 import org.hibernate.validator.constraints.Range;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
+@Slf4j
 public class SoftwareSearchCondition implements Cloneable {
 
     @Range(min = 1, max = 1000, message = "page must be greater than 0 and less than 1000 ")
@@ -41,13 +44,14 @@ public class SoftwareSearchCondition implements Cloneable {
     private String nameOrder;
     @Size(max = 25)
     private String eulerOsVersion;
+
     @Override
     public SoftwareSearchCondition clone() {
         SoftwareSearchCondition condition = null;
         try {
             condition = (SoftwareSearchCondition) super.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            log.error("clone failed");
         }
         return condition;
     }
