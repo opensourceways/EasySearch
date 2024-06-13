@@ -63,6 +63,26 @@ public class LogUtil {
         String jsonLog = JSON.toJSONString(log);
         logger.info("operationLog:{}", jsonLog);
     }
+    /**
+     * format logging parameter.
+     *
+     * @param input The input pramater
+     * @return formatedOutput The safe output logging parmeter
+     */
+
+    public static String formatCodeString(String input) {
+        if (input == null) {
+            return input;
+        }
+
+        String formatedOutput = input.replace("\r", "\\r").replace("\n", "\\n").replace("\u0008", "\\u0008")
+                .replace("\u000B", "\\u000B")
+                .replace("\u000C", "\\u000C")
+                .replace("\u007F", "\\u007F")
+                .replace("\u0009", "\\u0009");
+
+        return formatedOutput;
+    }
 
     @Data
     public static class returnLog {

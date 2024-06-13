@@ -11,7 +11,6 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 /**
  * 加载所有的filter并指定filter顺序
- *
  */
 @Slf4j
 @Configuration
@@ -35,21 +34,6 @@ public class FilterConfig {
         return filterRegistrationBean;
     }
 
-    /**
-     * Content-Type过滤器
-     *
-     * @return
-     */
-    @Bean
-    public FilterRegistrationBean contentTypeFilter() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        ContentTypeFilter contentTypeFilter = new ContentTypeFilter();
-        log.info("ContentTypeFilter....");
-        filterRegistrationBean.setFilter(contentTypeFilter);
-        filterRegistrationBean.setOrder(2);
-        filterRegistrationBean.addUrlPatterns("/*");
-        return filterRegistrationBean;
-    }
 
     /**
      * 跨域过滤器
@@ -62,7 +46,7 @@ public class FilterConfig {
         CrossFilter crossFilter = new CrossFilter();
         log.info("crossFilter.....");
         filterRegistrationBean.setFilter(crossFilter);
-        filterRegistrationBean.setOrder(3);
+        filterRegistrationBean.setOrder(2);
         filterRegistrationBean.addUrlPatterns("/*");
         return filterRegistrationBean;
     }
