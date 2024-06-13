@@ -1,4 +1,4 @@
-package com.search.docsearch.controller;
+package com.search.docsearch.controller.community;
 
 
 import java.util.Map;
@@ -6,6 +6,7 @@ import java.util.Map;
 import com.search.docsearch.config.EsfunctionScoreConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequestMapping("/search")
+@ConditionalOnProperty(name = "controller.enabled.community", havingValue = "true")
 public class SearchController {
 
     @Autowired
@@ -42,6 +44,7 @@ public class SearchController {
 
     @Autowired
     EsfunctionScoreConfig esfunctionScoreConfig;
+
     /**
      * 查询文档，首页大搜索
      *
@@ -134,7 +137,7 @@ public class SearchController {
     @LimitRequest()
     public SysResult makeSort(@RequestBody Map<String, String> m) {
         try {
-            ParameterUtil.vailAndLimitRequestMap(m,esfunctionScoreConfig.getEsExistingKey());
+            ParameterUtil.vailAndLimitRequestMap(m, esfunctionScoreConfig.getEsExistingKey());
             Map<String, Object> result = searchService.advancedSearch(m);
             if (result == null) {
                 return SysResult.fail("内容不存在", null);

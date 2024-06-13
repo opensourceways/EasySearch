@@ -19,6 +19,8 @@ elasticsearch:
   esExistingKey:
   functionscore:
 
+software:
+  index:
 
 #openEuler    openGauss    openLookeng    mindSpore
 system: ${searchsystem:openEuler}
@@ -35,3 +37,31 @@ api:
   npsApi:
 server:
   port: 8080
+
+
+spring:
+  data:
+    redis:
+      host:
+      port:
+      password:
+      connect-timeout:
+      timeout:
+      poolmin-idel:
+      poolmax-idel:
+      poolmax:
+
+redis-global:
+  expiration:
+  caPath:
+
+dos-global:
+  rejectPeriod:
+  rejectCount:
+
+
+
+controller:
+  enabled:
+    easysoftware:
+    community:
