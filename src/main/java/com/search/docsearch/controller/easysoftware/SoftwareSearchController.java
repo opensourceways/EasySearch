@@ -42,7 +42,7 @@ public class SoftwareSearchController {
             }
             return SoftwareSysResult.ok("查询成功", result);
         } catch (Exception e) {
-            log.error("searchByCondition error is: " + e.getMessage());
+            log.error("searchByCondition failed");
         }
         return SoftwareSysResult.fail("查询失败", null);
     }
@@ -60,7 +60,7 @@ public class SoftwareSearchController {
             }
             return SoftwareSysResult.ok("查询成功", result);
         } catch (Exception e) {
-            log.error("getTags error is: " + e.getMessage());
+            log.error("getCount failed");
         }
 
         return SoftwareSysResult.fail("查询失败", null);
@@ -77,7 +77,7 @@ public class SoftwareSearchController {
             }
             return SoftwareSysResult.ok("查询成功", result);
         } catch (Exception e) {
-            log.error("searchAllByKeyword error is: " + e.getMessage());
+            log.error("searchAllByKeyword failed");
         }
         return SoftwareSysResult.fail("查询失败", null);
     }
