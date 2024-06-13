@@ -1,4 +1,4 @@
-package com.search.docsearch.controller;
+package com.search.docsearch.controller.easysoftware;
 
 import java.util.List;
 import com.search.docsearch.aop.LogAction;
@@ -9,6 +9,7 @@ import com.search.docsearch.enums.QueryTyepEnum;
 import com.search.docsearch.recognition.RecognitionService;
 import com.search.docsearch.service.ISoftwareEsSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequestMapping("/software")
+@ConditionalOnProperty(name = "easysoftware.controller.enabled", havingValue = "true")
 public class SoftwareSearchController {
 
     @Autowired

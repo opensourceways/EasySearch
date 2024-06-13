@@ -58,3 +58,15 @@ redis-global:
 dos-global:
   rejectPeriod:
   rejectCount:
+
+
+
+community:
+  controller:
+    enabled:
+
+
+
+easysoftware:
+  controller:
+    enabled:
