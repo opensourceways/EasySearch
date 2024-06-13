@@ -31,25 +31,25 @@ public class SoftwareSearchCondition implements Cloneable {
     @Size(max = 10)
 
     private String dataType;
-    @Size(max = 20)
+    @Size(max = 30)
     @Pattern(regexp = "^$|^[\\u4E00-\\u9FA5A-Za-z0-9.()$\\-_+, ]+$", message = "Null or string. String includes only letters, digits, and special ")
     private String version;
-    @Size(max = 20)
+    @Size(max = 30)
     @Pattern(regexp = "^$|^[\\u4E00-\\u9FA5A-Za-z0-9.()$\\-_+, ]+$", message = "Null or string. String includes only letters, digits, and special ")
     private String os;
-    @Size(max = 20)
+    @Size(max = 30)
     @Pattern(regexp = "^$|^[\\u4E00-\\u9FA5A-Za-z0-9.()$\\-_+, ]+$", message = "Null or string. String includes only letters, digits, and special ")
     private String arch;
-    @Size(max = 20)
+    @Size(max = 30)
     @Pattern(regexp = "^$|^[\\u4E00-\\u9FA5A-Za-z0-9.()$\\-_+, ]+$", message = "Null or string. String includes only letters, digits, and special ")
     private String category;
-    @Size(max = 20)
+    @Size(max = 30)
     @Pattern(regexp = "^$|^[\\u4E00-\\u9FA5A-Za-z0-9.()$\\-_+, ]+$", message = "Null or string. String includes only letters, digits, and special ")
     private String keywordType;
     @Size(max = 5)
 
     private String nameOrder;
-    @Size(max = 25)
+    @Size(max = 30)
     @Pattern(regexp = "^$|^[\\u4E00-\\u9FA5A-Za-z0-9.()$\\-_+, ]+$", message = "Null or string. String includes only letters, digits, and special ")
     private String eulerOsVersion;
 
