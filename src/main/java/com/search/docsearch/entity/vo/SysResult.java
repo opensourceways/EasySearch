@@ -10,11 +10,19 @@ public class SysResult {
     private Integer status;
     private String msg;
     private Object obj;
+    private Integer code;
 
     public SysResult(Integer status, String msg, Object obj) {
         this.status = status;
         this.msg = msg;
         this.obj = obj;
+    }
+
+    public SysResult(Integer status, Integer code, String msg, Object obj) {
+        this.status = status;
+        this.msg = msg;
+        this.obj = obj;
+        this.code = code;
     }
 
     public SysResult() {
@@ -49,6 +57,6 @@ public class SysResult {
     }
 
     public static SysResult fail() {
-        return new SysResult(201, null, null);
+        return new SysResult(201, 201,null, null);
     }
 }
