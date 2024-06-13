@@ -21,7 +21,7 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequestMapping("/search/sort")
-@ConditionalOnProperty(name = "community.controller.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "controller.enabled.community", havingValue = "true")
 public class DivideController {
     @Autowired
     private DivideService divideService;

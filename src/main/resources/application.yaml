@@ -61,12 +61,7 @@ dos-global:
 
 
 
-community:
-  controller:
-    enabled:
-
-
-
-easysoftware:
-  controller:
-    enabled:
+controller:
+  enabled:
+    easysoftware:
+    community:

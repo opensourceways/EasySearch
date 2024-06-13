@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequestMapping("/software")
-@ConditionalOnProperty(name = "easysoftware.controller.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "controller.enabled.easysoftware", havingValue = "true")
 public class SoftwareSearchController {
 
     @Autowired

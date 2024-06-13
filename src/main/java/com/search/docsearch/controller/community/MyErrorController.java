@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@ConditionalOnProperty(name = "community.controller.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "controller.enabled.community", havingValue = "true")
 public class MyErrorController implements ErrorController {
 
     private final String ERROR_PATH = "/error";
