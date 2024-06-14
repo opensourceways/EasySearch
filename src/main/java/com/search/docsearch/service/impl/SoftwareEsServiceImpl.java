@@ -416,7 +416,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         String typeByfrontDeskType = SoftwareTypeEnum.getTypeByfrontDeskType(condition.getDataType());
-        if (!StringUtils.hasLength(typeByfrontDeskType)) {
+        if (StringUtils.hasLength(typeByfrontDeskType)) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("dataType.keyword", typeByfrontDeskType));
         }
 
@@ -460,31 +460,31 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         }
         boolQueryBuilder.minimumShouldMatch(1);
 
-        if (!StringUtils.hasLength(condition.getArch())) {
+        if (StringUtils.hasLength(condition.getArch())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("arch.keyword", condition.getArch().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
-        if (!StringUtils.hasLength(condition.getEulerOsVersion())) {
+        if (StringUtils.hasLength(condition.getEulerOsVersion())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("eulerOsVersion.keyword", condition.getEulerOsVersion()));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
-        if (!StringUtils.hasLength(condition.getCategory())) {
+        if (StringUtils.hasLength(condition.getCategory())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("category.keyword", condition.getCategory().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
-        if (!StringUtils.hasLength(condition.getVersion())) {
+        if (StringUtils.hasLength(condition.getVersion())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("version.keyword", condition.getVersion().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
         }
 
-        if (!StringUtils.hasLength(condition.getOs())) {
+        if (StringUtils.hasLength(condition.getOs())) {
             BoolQueryBuilder vBuilder = QueryBuilders.boolQuery();
             vBuilder.mustNot(QueryBuilders.termsQuery("os.keyword", condition.getOs().split(",")));
             boolQueryBuilder.mustNot(vBuilder);
