@@ -107,7 +107,7 @@ public class RequestLimitRedisAspect {
             LOGGER.error("Resource uri: {}，the request frequency of uri exceeds the limited frequency: "
                             + "{} times/{}s ,Client IP：{},type: GET, Result: query failed.", LogUtil.formatCodeString(uri),
                     limitCount, period, ip);
-            return SoftwareSysResult.fail(HttpStatus.BAD_REQUEST.getReasonPhrase(), null);
+            return SoftwareSysResult.failWithTooManyRequests();
         }
 
         return joinPoint.proceed();

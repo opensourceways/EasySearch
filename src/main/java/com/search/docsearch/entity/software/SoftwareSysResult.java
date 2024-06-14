@@ -17,26 +17,10 @@ public class SoftwareSysResult {
         this.data = data;
     }
 
-    public SoftwareSysResult() {
-    }
-
-    public SoftwareSysResult(Throwable e) {
-        this.code = 201;
-        this.msg = e.getMessage();
-    }
 
     //定义成功的静态方法
     public static SoftwareSysResult ok(String msg, Object obj) {
         return new SoftwareSysResult(200, msg, obj);
-    }
-
-    //表示定义成功的静态方法
-    public static SoftwareSysResult ok() {
-        return new SoftwareSysResult(200, null, null);
-    }
-
-    public static SoftwareSysResult ok(Object data) {
-        return new SoftwareSysResult(200, null, data);
     }
 
     //定义一个失败的静态方法
@@ -44,8 +28,10 @@ public class SoftwareSysResult {
         return new SoftwareSysResult(201, msg, data);
     }
 
-    public static SoftwareSysResult parameterVerificationFailed(String msg) {
-        return new SoftwareSysResult(400, msg, null);
+
+    //dos攻击响应错误码
+    public static SoftwareSysResult failWithTooManyRequests() {
+        return new SoftwareSysResult(429, "Too Many Requests", null);
     }
 
     public static SoftwareSysResult fail() {
