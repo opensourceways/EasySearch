@@ -285,25 +285,43 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                 case ALL:
                     searchResponce.setAll(convertAllMapToSoftwareDto(maps));
 
-                case APPVERSION:
-                    searchResponce.setAppversion(convertAppversionMapToSoftwareDto(maps));
+                case OEPKG:
+                    searchResponce.setOepkg(convertOEpkgMapToSoftwareDto(maps));
+
                     break;
             }
         }
         return searchResponce;
     }
 
+
+    private List<SoftwareOepkgDto> convertOEpkgMapToSoftwareDto(List<Map<String, Object>> maps) {
+        List<SoftwareOepkgDto> softwareOEpkgDtoList = new ArrayList<>();
+        maps.stream().forEach(m -> {
+                    try {
+                        SoftwareOepkgDto oepkgDto = JacksonUtils.toObject(SoftwareOepkgDto.class,
+                                JSONObject.toJSONString(m));
+                        softwareOEpkgDtoList.add(oepkgDto);
+                    } catch (Exception e) {
+                        log.error("error happens in convertAppversionMapToSoftwareDto");
+                    }
+                }
+
+        );
+        return softwareOEpkgDtoList;
+    }
+
     private List<SoftwareAppVersionDto> convertAppversionMapToSoftwareDto(List<Map<String, Object>> maps) {
         List<SoftwareAppVersionDto> softwareAppVersionDtoList = new ArrayList<>();
         maps.stream().forEach(m -> {
-            try {
-                SoftwareAppVersionDto softwareAppVersionDto = JacksonUtils.toObject(SoftwareAppVersionDto.class,
-                        JSONObject.toJSONString(m));
-                softwareAppVersionDtoList.add(softwareAppVersionDto);
-            } catch (Exception e) {
-                log.error("error happens in convertAppversionMapToSoftwareDto");
-            }
-        }
+                    try {
+                        SoftwareAppVersionDto softwareAppVersionDto = JacksonUtils.toObject(SoftwareAppVersionDto.class,
+                                JSONObject.toJSONString(m));
+                        softwareAppVersionDtoList.add(softwareAppVersionDto);
+                    } catch (Exception e) {
+                        log.error("error happens in convertAppversionMapToSoftwareDto");
+                    }
+                }
 
         );
         return softwareAppVersionDtoList;
@@ -312,21 +330,21 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     private List<SoftwareAllDto> convertAllMapToSoftwareDto(List<Map<String, Object>> maps) {
         List<SoftwareAllDto> softwareAllDtoList = new ArrayList<>();
         maps.stream().forEach(m -> {
-            try {
-                if (m.containsKey("pkgIds")) {
-                    m.put("pkgIds", JSONObject.parseObject(m.get("pkgIds") + ""));
+                    try {
+                        if (m.containsKey("pkgIds")) {
+                            m.put("pkgIds", JSONObject.parseObject(m.get("pkgIds") + ""));
 
-                }
-                if (m.containsKey("tags")) {
-                    m.put("tags", SortUtil.sortTags(JSONObject.parseArray(m.get("tags") + "")));
+                        }
+                        if (m.containsKey("tags")) {
+                            m.put("tags", SortUtil.sortTags(JSONObject.parseArray(m.get("tags") + "")));
 
+                        }
+                        SoftwareAllDto softwareAllDto = JacksonUtils.toObject(SoftwareAllDto.class, JSONObject.toJSONString(m));
+                        softwareAllDtoList.add(softwareAllDto);
+                    } catch (Exception e) {
+                        log.error("error happens in convertAllMapToSoftwareDto");
+                    }
                 }
-                SoftwareAllDto softwareAllDto = JacksonUtils.toObject(SoftwareAllDto.class, JSONObject.toJSONString(m));
-                softwareAllDtoList.add(softwareAllDto);
-            } catch (Exception e) {
-                log.error("error happens in convertAllMapToSoftwareDto");
-            }
-        }
 
         );
         return softwareAllDtoList;
@@ -335,23 +353,23 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     private List<SoftwareAppChildrenDto> convertAppMapToSoftwareDto(List<Map<String, Object>> maps) {
         List<SoftwareAppChildrenDto> softwareAppDtoList = new ArrayList<>();
         maps.stream().forEach(m -> {
-            try {
-                SoftwareAppChildrenDto softwareAppChildrenDto = JacksonUtils.toObject(SoftwareAppChildrenDto.class,
-                        JSONObject.toJSONString(m));
-                if (m.get("tagsText") != null) {
-                    String tagsText = String.valueOf(m.get("tagsText"));
-                    softwareAppChildrenDto.setTags(Arrays.asList(tagsText.split(",")));
+                    try {
+                        SoftwareAppChildrenDto softwareAppChildrenDto = JacksonUtils.toObject(SoftwareAppChildrenDto.class,
+                                JSONObject.toJSONString(m));
+                        if (m.get("tagsText") != null) {
+                            String tagsText = String.valueOf(m.get("tagsText"));
+                            softwareAppChildrenDto.setTags(Arrays.asList(tagsText.split(",")));
+                        }
+                        SoftwarePkgIdsDto softwarePkgIdsDto = new SoftwarePkgIdsDto();
+                        softwarePkgIdsDto.setEPKG(m.get("EPKG") == null ? "" : String.valueOf(m.get("EPKG")));
+                        softwarePkgIdsDto.setIMAGE(m.get("IMAGE") == null ? "" : String.valueOf(m.get("IMAGE")));
+                        softwarePkgIdsDto.setRPM(m.get("RPM") == null ? "" : String.valueOf(m.get("RPM")));
+                        softwareAppChildrenDto.setPkgIds(softwarePkgIdsDto);
+                        softwareAppDtoList.add(softwareAppChildrenDto);
+                    } catch (Exception e) {
+                        log.error("error happens in convertAppMapToSoftwareDto");
+                    }
                 }
-                SoftwarePkgIdsDto softwarePkgIdsDto = new SoftwarePkgIdsDto();
-                softwarePkgIdsDto.setEPKG(m.get("EPKG") == null ? "" : String.valueOf(m.get("EPKG")));
-                softwarePkgIdsDto.setIMAGE(m.get("IMAGE") == null ? "" : String.valueOf(m.get("IMAGE")));
-                softwarePkgIdsDto.setRPM(m.get("RPM") == null ? "" : String.valueOf(m.get("RPM")));
-                softwareAppChildrenDto.setPkgIds(softwarePkgIdsDto);
-                softwareAppDtoList.add(softwareAppChildrenDto);
-            } catch (Exception e) {
-                log.error("error happens in convertAppMapToSoftwareDto");
-            }
-        }
 
         );
         return softwareAppDtoList;

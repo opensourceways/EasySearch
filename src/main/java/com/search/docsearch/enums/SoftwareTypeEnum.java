@@ -14,7 +14,8 @@ public enum SoftwareTypeEnum {
     RPMPKG("RPM", "rpmpkg", "rpmpkg", "rpm软件包", new Trie()),
     APPLICATION("IMAGE", "application", "apppkg", "容器镜像", new Trie()),
     EKPG("EPKG", "epkg", "epkgpkg", "openeuler软件包", new Trie()),
-    APPVERSION("","appversion", "appversion", "上游兼容应用全景", new Trie());
+    OEPKG("OEPKG", "oepkg", "oepkg", "oepkg软件包", new Trie()),
+    APPVERSION("", "appversion", "appversion", "上游兼容应用全景", new Trie());
     private final String tag;
     private final String type;
     private final String frontDeskType;
@@ -60,7 +61,7 @@ public enum SoftwareTypeEnum {
                 break;
             }
         }
-        return softwareTypeEnum==null? null:softwareTypeEnum.getTag();
+        return softwareTypeEnum == null ? null : softwareTypeEnum.getTag();
     }
 
     public static String getFrontDeskTypeByType(String type) {
