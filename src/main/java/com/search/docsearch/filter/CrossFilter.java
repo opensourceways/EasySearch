@@ -27,8 +27,8 @@ public class CrossFilter implements Filter {
         request.getSession(false);
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Cache-Control", "no-store");
-        response.setHeader("Pragma", "no-cache");
+        //  response.setHeader("Cache-Control", "no-store");
+        // response.setHeader("Pragma", "no-cache");
         filterChain.doFilter(request, response);
     }
 
