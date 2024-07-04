@@ -162,9 +162,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     public List<SoftwareDocsAllResponce> searchAllByCondition(SoftwareSearchCondition condition)
             throws ServiceException {
         List<SoftwareDocsAllResponce> responce = new ArrayList<>();
-        CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 2);
+        CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 3);
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
-            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value))
+            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value) || SoftwareTypeEnum.OEPKG.equals(value))
                 continue;
 
             threadPoolTaskExecutor.execute(new Runnable() {
