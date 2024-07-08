@@ -289,6 +289,8 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                 case OEPKG:
                     searchResponce.setOepkg(convertOEpkgMapToSoftwareDto(maps));
 
+                case APPVERSION:
+                    searchResponce.setAppversion(convertAppversionMapToSoftwareDto(maps));
                     break;
             }
         }
