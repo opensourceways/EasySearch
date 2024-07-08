@@ -161,6 +161,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     @Override
     public List<SoftwareDocsAllResponce> searchAllByCondition(SoftwareSearchCondition condition)
             throws ServiceException {
+        condition.setKeywordType("name");
         List<SoftwareDocsAllResponce> responce = new ArrayList<>();
         CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 3);
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
@@ -448,7 +449,12 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             titleMP.boost(1000);
 
             WildcardQueryBuilder field = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword() + "*");
+            WildcardQueryBuilder lowerNameMP = QueryBuilders.wildcardQuery("name.keyword", "*" + condition.getKeyword().toLowerCase(Locale.ROOT) + "*");
+            WildcardQueryBuilder upNameMP = QueryBuilders.wildcardQuery("name.keyword", "*" + condition.getKeyword().toUpperCase(Locale.ROOT) + "*");
             boolQueryBuilder.should(field);
+            boolQueryBuilder.should(lowerNameMP);
+            boolQueryBuilder.should(upNameMP);
+
             boolQueryBuilder.should(titleMP);
         }
 
