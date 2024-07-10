@@ -163,9 +163,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             throws ServiceException {
         condition.setKeywordType("name");
         List<SoftwareDocsAllResponce> responce = new ArrayList<>();
-        CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 3);
+        CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 2);
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
-            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value) || SoftwareTypeEnum.OEPKG.equals(value))
+            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value) )
                 continue;
 
             threadPoolTaskExecutor.execute(new Runnable() {
@@ -197,6 +197,14 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                                 case EKPG:
                                     List<SoftwareEpkgDto> epkgpkg = softwareSearchResponce.getEpkgpkg();
                                     epkgpkg.stream().forEach(a -> {
+                                        nameList.add(
+                                                new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
+                                    });
+
+
+                                case OEPKG:
+                                    List<SoftwareOepkgDto> oepkg = softwareSearchResponce.getOepkg();
+                                    oepkg.stream().forEach(a -> {
                                         nameList.add(
                                                 new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
