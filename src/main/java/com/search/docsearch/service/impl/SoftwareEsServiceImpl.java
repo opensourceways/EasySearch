@@ -458,10 +458,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                     .analyzer("ik_max_word").slop(2);
             titleMP.boost(1000);
 
-            WildcardQueryBuilder field = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword() + "*");
-            WildcardQueryBuilder lowerNameMP = QueryBuilders.wildcardQuery("name.keyword", "*" + condition.getKeyword().toLowerCase(Locale.ROOT) + "*");
-            WildcardQueryBuilder upNameMP = QueryBuilders.wildcardQuery("name.keyword", "*" + condition.getKeyword().toUpperCase(Locale.ROOT) + "*");
-            boolQueryBuilder.should(field);
+
+            WildcardQueryBuilder lowerNameMP = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword().toLowerCase(Locale.ROOT) + "*");
+            WildcardQueryBuilder upNameMP = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword().toUpperCase(Locale.ROOT) + "*");
             boolQueryBuilder.should(lowerNameMP);
             boolQueryBuilder.should(upNameMP);
 
