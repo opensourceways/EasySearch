@@ -16,7 +16,7 @@ public final class SortUtil {
      */
     private static final List<String> ORDERS = List.of("RPM", "IMAGE", "EPKG");
 
-    private static final List<String> RESPONCEORDERS = Arrays.asList("rpmpkg", "apppkg", "epkgpkg");
+    private static final List<String> RESPONCEORDERS = Arrays.asList("rpmpkg", "apppkg", "epkgpkg","oepkg");
 
     /**
      * sort the tags.
