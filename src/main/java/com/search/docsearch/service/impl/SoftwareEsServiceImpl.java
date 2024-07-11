@@ -161,10 +161,11 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     @Override
     public List<SoftwareDocsAllResponce> searchAllByCondition(SoftwareSearchCondition condition)
             throws ServiceException {
+        condition.setKeywordType("name");
         List<SoftwareDocsAllResponce> responce = new ArrayList<>();
         CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 2);
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
-            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value))
+            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value) )
                 continue;
 
             threadPoolTaskExecutor.execute(new Runnable() {
@@ -196,6 +197,14 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                                 case EKPG:
                                     List<SoftwareEpkgDto> epkgpkg = softwareSearchResponce.getEpkgpkg();
                                     epkgpkg.stream().forEach(a -> {
+                                        nameList.add(
+                                                new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
+                                    });
+
+
+                                case OEPKG:
+                                    List<SoftwareOepkgDto> oepkg = softwareSearchResponce.getOepkg();
+                                    oepkg.stream().forEach(a -> {
                                         nameList.add(
                                                 new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
@@ -288,6 +297,8 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                 case OEPKG:
                     searchResponce.setOepkg(convertOEpkgMapToSoftwareDto(maps));
 
+                case APPVERSION:
+                    searchResponce.setAppversion(convertAppversionMapToSoftwareDto(maps));
                     break;
             }
         }
@@ -447,8 +458,12 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                     .analyzer("ik_max_word").slop(2);
             titleMP.boost(1000);
 
-            WildcardQueryBuilder field = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword() + "*");
-            boolQueryBuilder.should(field);
+
+            WildcardQueryBuilder lowerNameMP = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword().toLowerCase(Locale.ROOT) + "*");
+            WildcardQueryBuilder upNameMP = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword().toUpperCase(Locale.ROOT) + "*");
+            boolQueryBuilder.should(lowerNameMP);
+            boolQueryBuilder.should(upNameMP);
+
             boolQueryBuilder.should(titleMP);
         }
 
