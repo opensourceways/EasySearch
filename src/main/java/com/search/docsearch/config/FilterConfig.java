@@ -41,12 +41,28 @@ public class FilterConfig {
      * @return
      */
     @Bean
+    public FilterRegistrationBean headerFilter() {
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+        ContentTypeFilter contentTypeFilter = new ContentTypeFilter();
+        log.info("headerFilter.....");
+        filterRegistrationBean.setFilter(contentTypeFilter);
+        filterRegistrationBean.setOrder(2);
+        filterRegistrationBean.addUrlPatterns("/*");
+        return filterRegistrationBean;
+    }
+
+    /**
+     * 跨域过滤器
+     *
+     * @return
+     */
+    @Bean
     public FilterRegistrationBean crossFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         CrossFilter crossFilter = new CrossFilter();
         log.info("crossFilter.....");
         filterRegistrationBean.setFilter(crossFilter);
-        filterRegistrationBean.setOrder(2);
+        filterRegistrationBean.setOrder(3);
         filterRegistrationBean.addUrlPatterns("/*");
         return filterRegistrationBean;
     }

@@ -71,7 +71,10 @@ public class SoftwareSearchController {
     public SoftwareSysResult searchAllByKeyword(@RequestBody @Validated SoftwareSearchCondition condition) {
 
         try {
-            List<SoftwareDocsAllResponce> result = searchService.searchAllByCondition(condition);
+            QueryTyepEnum queryType = recgService.ClassifyQuery(condition);
+            SoftwareSearchCondition clsCondition = recgService.ProcessQuery(condition, queryType);
+            List<SoftwareDocsAllResponce> result = searchService.searchAllByCondition(clsCondition);
+
             if (result == null) {
                 return SoftwareSysResult.fail("内容不存在", null);
             }

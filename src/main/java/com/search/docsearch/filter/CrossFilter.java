@@ -10,7 +10,6 @@ import java.io.IOException;
 
 /**
  * 跨域过滤器
- *
  */
 @Slf4j
 public class CrossFilter implements Filter {
@@ -24,12 +23,18 @@ public class CrossFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        request.getSession(false);
+       // request.getSession(false);
         HttpServletResponse response = (HttpServletResponse) servletResponse;
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT, PATCH");
         response.setHeader("Access-Control-Max-Age", "3600");
-        //  response.setHeader("Cache-Control", "no-store");
-        // response.setHeader("Pragma", "no-cache");
-        filterChain.doFilter(request, response);
+      //  response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            filterChain.doFilter(servletRequest, servletResponse);
+        }
     }
 
     @Override

@@ -24,5 +24,6 @@ public class SoftwareSearchResponce {
         this.apppkg = new ArrayList<>();
         this.epkgpkg = new ArrayList<>();
         this.appversion = new ArrayList<>();
+        this.oepkg=new ArrayList<>();
     }
 }

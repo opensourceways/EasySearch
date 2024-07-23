@@ -22,7 +22,7 @@ public class SearchCondition {
     @Pattern(regexp = "((^zh$|^en$|^ZH$|^EN$))")
     private String lang;
 
-    @Range(min = 1, max = 1000, message = "page must be greater than 0 and less than 1000 ")
+   // @Range(min = 1, max = 1000, message = "page must be greater than 0 and less than 1000 ")
     private int page = 1;
 
     @Range(min = 5, max = 50, message = "page must be greater than 5 and less than 50 ")

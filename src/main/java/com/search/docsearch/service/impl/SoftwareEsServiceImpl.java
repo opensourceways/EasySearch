@@ -10,6 +10,7 @@ import com.search.docsearch.enums.SoftwarekeywordTypeEnum;
 import com.search.docsearch.except.ServiceException;
 import com.search.docsearch.except.ServiceImplException;
 import com.search.docsearch.service.ISoftwareEsSearchService;
+import com.search.docsearch.thread.ThreadLocalCache;
 import com.search.docsearch.utils.JacksonUtils;
 import com.search.docsearch.utils.SortUtil;
 import com.search.docsearch.utils.Trie;
@@ -60,10 +61,10 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     public SoftwareSearchResponce searchByCondition(SoftwareSearchCondition condition) throws ServiceException {
 
         SearchRequest request = buildSearchRequest(condition, searchConfig.getIndex());
-
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+
         } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
@@ -71,13 +72,21 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             return null;
 
         SoftwareSearchResponce softwareSearchResponce = handEsResponce(response);
-        if (softwareSearchResponce.getTotal() == Constants.MAX_ES_RETURN_LENGHTH) {
-            List<SoftwareSearchCountResponce> countByCondition = getCountByCondition(condition);
+        if (condition.getNameOrder() != null) {
+            SortUtil.sortByName(softwareSearchResponce, condition.getNameOrder());
+        }
+
+        if (condition.getTimeOrder() != null) {
+            SortUtil.sortByTime(softwareSearchResponce, condition.getTimeOrder());
+        }
+
+        if (softwareSearchResponce.getTotal() > 10000) {
+           /* List<SoftwareSearchCountResponce> countByCondition = getCountByCondition(condition);
             long total = 0l;
             for (SoftwareSearchCountResponce softwareSearchCountResponce : countByCondition) {
                 total += softwareSearchCountResponce.getDocCount();
-            }
-            softwareSearchResponce.setTotal(total);
+            }*/
+            softwareSearchResponce.setTotal(10000);
         }
         return softwareSearchResponce;
 
@@ -147,10 +156,15 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             for (Terms.Bucket bucket : buckets) {
                 docCountMap.put(SoftwareTypeEnum.getFrontDeskTypeByType(bucket.getKeyAsString()), bucket.getDocCount());
             }
+        Boolean isTokenEmpty = StringUtils.isEmpty(ThreadLocalCache.get());
+
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
+            if (SoftwareTypeEnum.APPVERSION.equals(value) && isTokenEmpty) {
+                continue;
+            }
             SoftwareSearchCountResponce softwareSearchCountResponce = new SoftwareSearchCountResponce();
             softwareSearchCountResponce.setDocCount(
-                    docCountMap.get(value.getFrontDeskType()) == null ? 0 : docCountMap.get(value.getFrontDeskType()));
+                    docCountMap.get(value.getFrontDeskType()) == null ? 0 : docCountMap.get(value.getFrontDeskType()) > 10000 ? 10000 : docCountMap.get(value.getFrontDeskType()));
             softwareSearchCountResponce.setKey(value.getFrontDeskType());
             countList.add(softwareSearchCountResponce);
         }
@@ -161,11 +175,12 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     @Override
     public List<SoftwareDocsAllResponce> searchAllByCondition(SoftwareSearchCondition condition)
             throws ServiceException {
-        condition.setKeywordType("name");
+
+        condition.setKeywordType("all");
         List<SoftwareDocsAllResponce> responce = new ArrayList<>();
         CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 2);
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
-            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value) )
+            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value))
                 continue;
 
             threadPoolTaskExecutor.execute(new Runnable() {
@@ -200,7 +215,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                                         nameList.add(
                                                 new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
-
+                                    break;
 
                                 case OEPKG:
                                     List<SoftwareOepkgDto> oepkg = softwareSearchResponce.getOepkg();
@@ -212,7 +227,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
                             }
                             SoftwareDocsAllResponce softwareDocsAllResponce = new SoftwareDocsAllResponce(
-                                    value.getFrontDeskType(), softwareSearchResponce.getTotal(), nameList);
+                                    value.getFrontDeskType(), softwareSearchResponce.getTotal() > 10000 ? 10000 : softwareSearchResponce.getTotal(), nameList);
                             responce.add(softwareDocsAllResponce);
                         }
 
@@ -293,11 +308,15 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
                 case ALL:
                     searchResponce.setAll(convertAllMapToSoftwareDto(maps));
+                    break;
 
                 case OEPKG:
                     searchResponce.setOepkg(convertOEpkgMapToSoftwareDto(maps));
-
+                    break;
                 case APPVERSION:
+                    if (StringUtils.isEmpty(ThreadLocalCache.get())) {
+                        break;
+                    }
                     searchResponce.setAppversion(convertAppversionMapToSoftwareDto(maps));
                     break;
             }
@@ -344,6 +363,10 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                     try {
                         if (m.containsKey("pkgIds")) {
                             m.put("pkgIds", JSONObject.parseObject(m.get("pkgIds") + ""));
+
+                        }
+                        if (m.containsKey("maintainers")) {
+                            m.put("maintainers", JSONObject.parseObject(m.get("maintainers") + ""));
 
                         }
                         if (m.containsKey("tags")) {
@@ -422,8 +445,16 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         int startIndex = (condition.getPageNum() - 1) * condition.getPageSize();
         SearchRequest request = new SearchRequest(index);
         SearchSourceBuilder sourceBuilder = buildSearchSourceBuilderByCondition(condition);
+        sourceBuilder.from(startIndex);
         buildHighlightBuilder(sourceBuilder);
-        sourceBuilder.from(startIndex).size(condition.getPageSize());
+
+        if ("asc".equals(condition.getNameOrder()) || "desc".equals(condition.getNameOrder())) {
+            sourceBuilder.size(100);
+        } else if (startIndex + condition.getPageSize() > 10000) {
+            sourceBuilder.size(10000 - startIndex);
+        } else {
+            sourceBuilder.size(condition.getPageSize());
+        }
         sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
         request.source(sourceBuilder);
         return request;
@@ -452,29 +483,38 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         boolean isSupportKeywordType = SoftwarekeywordTypeEnum.isSupportKeywordType(condition.getKeywordType());
         boolean isSearchAll = "all".equals(condition.getKeywordType());
 
+        MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword())
+                .analyzer("ik_max_word").slop(2);
+        titleMP.boost(100);
+
+
+        WildcardQueryBuilder lowerNameMP = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword().toLowerCase(Locale.ROOT) + "*");
+        lowerNameMP.boost(10);
+
+        WildcardQueryBuilder upNameMP = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword().toUpperCase(Locale.ROOT) + "*");
+        upNameMP.boost(10);
         if (isSearchAll || !isSupportKeywordType || "name".equals(condition.getKeywordType())) {
-
-            MatchPhraseQueryBuilder titleMP = QueryBuilders.matchPhraseQuery("name", condition.getKeyword())
-                    .analyzer("ik_max_word").slop(2);
-            titleMP.boost(1000);
-
-
-            WildcardQueryBuilder lowerNameMP = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword().toLowerCase(Locale.ROOT) + "*");
-            WildcardQueryBuilder upNameMP = QueryBuilders.wildcardQuery("name", "*" + condition.getKeyword().toUpperCase(Locale.ROOT) + "*");
             boolQueryBuilder.should(lowerNameMP);
             boolQueryBuilder.should(upNameMP);
 
             boolQueryBuilder.should(titleMP);
         }
 
+        if (isSearchAll || "ubuntu".equals(condition.getKeywordType())) {
+            MatchPhraseQueryBuilder originPkg = QueryBuilders.matchPhraseQuery("originPkg", condition.getKeyword())
+                    .analyzer("ik_max_word").slop(2);
+            boolQueryBuilder.should(originPkg);
+
+        }
+
         if (isSearchAll || "file".equals(condition.getKeywordType())) {
             WildcardQueryBuilder providesWildcard = QueryBuilders.wildcardQuery("providesText.keyword",
                     "*" + condition.getKeyword() + "*");
-            providesWildcard.boost(1);
+            providesWildcard.boost(3);
             boolQueryBuilder.should(providesWildcard);
             WildcardQueryBuilder requiresWildcard = QueryBuilders.wildcardQuery("requiresText.keyword",
                     "*" + condition.getKeyword() + "*");
-            requiresWildcard.boost(1);
+            requiresWildcard.boost(3);
             boolQueryBuilder.should(requiresWildcard);
         }
 
@@ -523,12 +563,12 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             boolQueryBuilder.mustNot(vBuilder);
         }
         sourceBuilder.query(boolQueryBuilder);
-        if ("asc".equals(condition.getNameOrder())) {
+       /* if ("asc".equals(condition.getNameOrder())) {
             sourceBuilder.sort("name.keyword", SortOrder.ASC);
 
         } else if ("desc".equals(condition.getNameOrder())) {
             sourceBuilder.sort("name.keyword", SortOrder.DESC);
-        }
+        }*/
         return sourceBuilder;
 
     }
