@@ -9,6 +9,7 @@ public enum SoftwarekeywordTypeEnum {
     NAME("name", "名称"),
     DESCRIPTION("description", "描述"),
     FILE("file","文件"),
+    UBUNTU("ubuntu","ubuntu"),
     SUMMARY("summary", "概要");
     private final String keywordType;
     private final String message;

@@ -10,4 +10,5 @@ public class SoftwareAllDto extends SoftwareBaseDto {
     List tags;
     Map pkgIds;
     String iconUrl;
+    Map maintainers;
 }
