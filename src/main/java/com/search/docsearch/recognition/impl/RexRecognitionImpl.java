@@ -5,8 +5,10 @@ import com.search.docsearch.entity.software.SoftwareSearchCondition;
 import com.search.docsearch.enums.QueryTyepEnum;
 import com.search.docsearch.except.ServiceException;
 import com.search.docsearch.recognition.RecognitionService;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.springframework.stereotype.Service;
 import org.springframework.boot.SpringApplication;
 
@@ -16,10 +18,23 @@ public class RexRecognitionImpl implements RecognitionService {
     @Override
     public QueryTyepEnum ClassifyQuery(SoftwareSearchCondition condition) throws ServiceException {
         String query = condition.getKeyword();
-        if (query.toLowerCase().contains("command")) {
+        String lowerCaseQuery = query.toLowerCase();
+        if (lowerCaseQuery.contains("command")) {
             return QueryTyepEnum.ERROR_QUERY;
         }
 
+        if (lowerCaseQuery.contains(" ")) {
+            String[] split = lowerCaseQuery.split(" ");
+            if (split.length > 1) {
+                String version = split[1];
+                if (version.matches("^[\\d\\w.-]+$")) {
+                    condition.setVersion(version);
+                    condition.setKeyword(split[0]);
+                    return QueryTyepEnum.VERSION_QERTY;
+                }
+            }
+
+        }
         return QueryTyepEnum.KEYWORD_QUERY;
     }
 
@@ -28,7 +43,10 @@ public class RexRecognitionImpl implements RecognitionService {
             throws ServiceException {
 
         String query = condition.getKeyword();
-
+        if (query.contains("command") && query.contains(":")) {
+            condition.setKeyword(query.split(":")[0]);
+            return condition;
+        }
         if (queryType == QueryTyepEnum.ERROR_QUERY) {
             Pattern pattern = Pattern.compile("'([^']+)'");
             Matcher matcher = pattern.matcher(query);
