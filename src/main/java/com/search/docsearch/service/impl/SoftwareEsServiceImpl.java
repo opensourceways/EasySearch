@@ -217,13 +217,13 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                                     });
                                     break;
 
-                                case OEPKG:
+                               /* case OEPKG:
                                     List<SoftwareOepkgDto> oepkg = softwareSearchResponce.getOepkg();
                                     oepkg.stream().forEach(a -> {
                                         nameList.add(
                                                 new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
-                                    break;
+                                    break;*/
 
                             }
                             SoftwareDocsAllResponce softwareDocsAllResponce = new SoftwareDocsAllResponce(
@@ -310,9 +310,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                     searchResponce.setAll(convertAllMapToSoftwareDto(maps));
                     break;
 
-                case OEPKG:
+               /* case OEPKG:
                     searchResponce.setOepkg(convertOEpkgMapToSoftwareDto(maps));
-                    break;
+                    break;*/
                 case APPVERSION:
                     if (StringUtils.isEmpty(ThreadLocalCache.get())) {
                         break;
