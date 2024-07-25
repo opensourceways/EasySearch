@@ -209,13 +209,13 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                                     });
                                     break;
 
-                                case EKPG:
+                               /* case EKPG:
                                     List<SoftwareEpkgDto> epkgpkg = softwareSearchResponce.getEpkgpkg();
                                     epkgpkg.stream().forEach(a -> {
                                         nameList.add(
                                                 new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
-                                    break;
+                                    break;*/
 
                                 case OEPKG:
                                     List<SoftwareOepkgDto> oepkg = softwareSearchResponce.getOepkg();
@@ -302,9 +302,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                     searchResponce.setRpmpkg(convertAppMapToSoftwareRpmDto(maps));
                     break;
 
-                case EKPG:
+               /* case EKPG:
                     searchResponce.setEpkgpkg(convertAppMapToSoftwareEpkgDto(maps));
-                    break;
+                    break;*/
 
                 case ALL:
                     searchResponce.setAll(convertAllMapToSoftwareDto(maps));
