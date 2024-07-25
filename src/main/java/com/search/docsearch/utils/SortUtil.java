@@ -2,6 +2,7 @@ package com.search.docsearch.utils;
 
 import com.search.docsearch.dto.software.*;
 import com.search.docsearch.entity.software.SoftwareDocsAllResponce;
+import com.search.docsearch.entity.software.SoftwareSearchCondition;
 import com.search.docsearch.entity.software.SoftwareSearchResponce;
 import org.apache.http.client.utils.DateUtils;
 
@@ -45,14 +46,14 @@ public final class SortUtil {
         responce.sort(Comparator.comparingInt(a -> RESPONCEORDERS.indexOf(a.getKey())));
     }
 
-    public static void sortByName(SoftwareSearchResponce softwareSearchResponce, String nameOrder) {
+    public static void sortByName(SoftwareSearchResponce softwareSearchResponce, SoftwareSearchCondition condition) {
         List<SoftwareAllDto> all = softwareSearchResponce.getAll();
         List<SoftwareAppChildrenDto> apppkg = softwareSearchResponce.getApppkg();
         List<SoftwareAppVersionDto> appversion = softwareSearchResponce.getAppversion();
         List<SoftwareEpkgDto> epkgpkg = softwareSearchResponce.getEpkgpkg();
         List<SoftwareOepkgDto> oepkg = softwareSearchResponce.getOepkg();
         List<SoftwareRpmDto> rpmpkg = softwareSearchResponce.getRpmpkg();
-        if ("asc".equals(nameOrder)) {
+        if ("asc".equals(condition.getNameOrder())) {
             Collections.sort(all, Comparator.comparing((SoftwareBaseDto p) -> stripHtmlTags(p.getName())));
             Collections.sort(apppkg, Comparator.comparing((SoftwareBaseDto p) -> stripHtmlTags(p.getName())));
             Collections.sort(appversion, Comparator.comparing((SoftwareAppVersionDto p) -> stripHtmlTags(p.getName())));
@@ -61,8 +62,7 @@ public final class SortUtil {
             Collections.sort(rpmpkg, Comparator.comparing((SoftwareRpmDto p) -> stripHtmlTags(p.getName())));
         }
 
-        if ("desc".equals(nameOrder)) {
-
+        if ("desc".equals(condition.getNameOrder())) {
             Collections.sort(all, Comparator.comparing((SoftwareBaseDto p) -> stripHtmlTags(p.getName())).reversed());
             Collections.sort(apppkg, Comparator.comparing((SoftwareBaseDto p) -> stripHtmlTags(p.getName())).reversed());
             Collections.sort(appversion, Comparator.comparing((SoftwareAppVersionDto p) -> stripHtmlTags(p.getName())).reversed());
@@ -70,6 +70,41 @@ public final class SortUtil {
             Collections.sort(oepkg, Comparator.comparing((SoftwareOepkgDto p) -> stripHtmlTags(p.getName())).reversed());
             Collections.sort(rpmpkg, Comparator.comparing((SoftwareRpmDto p) -> stripHtmlTags(p.getName())).reversed());
 
+        }
+
+        int start = (condition.getPageNum() - 1) * condition.getPageSize();
+        int end = start + condition.getPageSize();
+
+        if (start < all.size() && all.size() <= end) {
+            softwareSearchResponce.setAll(all.subList(start, end));
+        } else {
+            softwareSearchResponce.getAll().clear();
+        }
+        if (start < apppkg.size() && apppkg.size() <= end) {
+            softwareSearchResponce.setApppkg(apppkg.subList(start, end));
+        } else {
+            softwareSearchResponce.getApppkg().clear();
+        }
+        if (start < appversion.size() && appversion.size() <= end) {
+            softwareSearchResponce.setAppversion(appversion.subList(start, end));
+        } else {
+            softwareSearchResponce.getAppversion().clear();
+        }
+        if (start < epkgpkg.size() && epkgpkg.size() <= end) {
+            softwareSearchResponce.setEpkgpkg(epkgpkg.subList(start, end));
+        } else {
+            softwareSearchResponce.getEpkgpkg().clear();
+        }
+        if (start < oepkg.size() && oepkg.size() <= end) {
+            softwareSearchResponce.setOepkg(oepkg.subList(start, end));
+        } else {
+            softwareSearchResponce.getOepkg().clear();
+        }
+
+        if (start < rpmpkg.size() && rpmpkg.size() <= end) {
+            softwareSearchResponce.setRpmpkg(rpmpkg.subList(start, end));
+        } else {
+            softwareSearchResponce.getRpmpkg().clear();
         }
 
         if (softwareSearchResponce.getTotal() > 100) {
