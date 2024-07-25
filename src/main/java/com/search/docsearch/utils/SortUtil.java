@@ -75,33 +75,33 @@ public final class SortUtil {
         int start = (condition.getPageNum() - 1) * condition.getPageSize();
         int end = start + condition.getPageSize();
 
-        if (start < all.size() && all.size() <= end) {
+        if (start < all.size() && end <= all.size()) {
             softwareSearchResponce.setAll(all.subList(start, end));
         } else {
             softwareSearchResponce.getAll().clear();
         }
-        if (start < apppkg.size() && apppkg.size() <= end) {
+        if (start < apppkg.size() && end <= apppkg.size()) {
             softwareSearchResponce.setApppkg(apppkg.subList(start, end));
         } else {
             softwareSearchResponce.getApppkg().clear();
         }
-        if (start < appversion.size() && appversion.size() <= end) {
+        if (start < appversion.size() && end <= appversion.size()) {
             softwareSearchResponce.setAppversion(appversion.subList(start, end));
         } else {
             softwareSearchResponce.getAppversion().clear();
         }
-        if (start < epkgpkg.size() && epkgpkg.size() <= end) {
+        if (start < epkgpkg.size() && end <= epkgpkg.size()) {
             softwareSearchResponce.setEpkgpkg(epkgpkg.subList(start, end));
         } else {
             softwareSearchResponce.getEpkgpkg().clear();
         }
-        if (start < oepkg.size() && oepkg.size() <= end) {
+        if (start < oepkg.size() && end <= oepkg.size()) {
             softwareSearchResponce.setOepkg(oepkg.subList(start, end));
         } else {
             softwareSearchResponce.getOepkg().clear();
         }
 
-        if (start < rpmpkg.size() && rpmpkg.size() <= end) {
+        if (start < rpmpkg.size() && end <= rpmpkg.size()) {
             softwareSearchResponce.setRpmpkg(rpmpkg.subList(start, end));
         } else {
             softwareSearchResponce.getRpmpkg().clear();
@@ -111,7 +111,6 @@ public final class SortUtil {
             softwareSearchResponce.setTotal(100);
         }
     }
-
 
     public static void sortByTime(SoftwareSearchResponce softwareSearchResponce, String timeOrder) {
 
