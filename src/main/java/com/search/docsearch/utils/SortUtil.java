@@ -75,41 +75,28 @@ public final class SortUtil {
         int start = (condition.getPageNum() - 1) * condition.getPageSize();
         int end = start + condition.getPageSize();
 
-        if (start < all.size() && end <= all.size()) {
-            softwareSearchResponce.setAll(all.subList(start, end));
-        } else {
-            softwareSearchResponce.getAll().clear();
-        }
-        if (start < apppkg.size() && end <= apppkg.size()) {
-            softwareSearchResponce.setApppkg(apppkg.subList(start, end));
-        } else {
-            softwareSearchResponce.getApppkg().clear();
-        }
-        if (start < appversion.size() && end <= appversion.size()) {
-            softwareSearchResponce.setAppversion(appversion.subList(start, end));
-        } else {
-            softwareSearchResponce.getAppversion().clear();
-        }
-        if (start < epkgpkg.size() && end <= epkgpkg.size()) {
-            softwareSearchResponce.setEpkgpkg(epkgpkg.subList(start, end));
-        } else {
-            softwareSearchResponce.getEpkgpkg().clear();
-        }
-        if (start < oepkg.size() && end <= oepkg.size()) {
-            softwareSearchResponce.setOepkg(oepkg.subList(start, end));
-        } else {
-            softwareSearchResponce.getOepkg().clear();
-        }
-
-        if (start < rpmpkg.size() && end <= rpmpkg.size()) {
-            softwareSearchResponce.setRpmpkg(rpmpkg.subList(start, end));
-        } else {
-            softwareSearchResponce.getRpmpkg().clear();
-        }
-
+        softwareSearchResponce.setAll(subList(start, end, all));
+        softwareSearchResponce.setApppkg(subList(start, end, apppkg));
+        softwareSearchResponce.setAppversion(subList(start, end, appversion));
+        softwareSearchResponce.setEpkgpkg(subList(start, end, epkgpkg));
+        softwareSearchResponce.setOepkg(subList(start, end, oepkg));
+        softwareSearchResponce.setRpmpkg(subList(start, end, rpmpkg));
         if (softwareSearchResponce.getTotal() > 100) {
             softwareSearchResponce.setTotal(100);
         }
+    }
+
+
+    public static List subList(Integer start, Integer end, List originList) {
+        List subList = null;
+        if (start < originList.size() && end <= originList.size()) {
+            subList = originList.subList(start, end);
+        } else if (start < originList.size() && end > originList.size()) {
+            subList = originList.subList(start, originList.size());
+        } else {
+            subList = new ArrayList();
+        }
+        return subList;
     }
 
     public static void sortByTime(SoftwareSearchResponce softwareSearchResponce, String timeOrder) {
