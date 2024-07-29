@@ -73,7 +73,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         SoftwareSearchResponce softwareSearchResponce = handEsResponce(response);
         if (condition.getNameOrder() != null) {
-            SortUtil.sortByName(softwareSearchResponce, condition);
+            SortUtil.sortByName(softwareSearchResponce,condition);
         }
 
         if (condition.getTimeOrder() != null) {
@@ -178,9 +178,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         condition.setKeywordType("all");
         List<SoftwareDocsAllResponce> responce = new ArrayList<>();
-        CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 1);
+        CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 2);
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
-            if (SoftwareTypeEnum.APPVERSION.equals(value))
+            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value))
                 continue;
 
             threadPoolTaskExecutor.execute(new Runnable() {
@@ -220,14 +220,6 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                                 case OEPKG:
                                     List<SoftwareOepkgDto> oepkg = softwareSearchResponce.getOepkg();
                                     oepkg.stream().forEach(a -> {
-                                        nameList.add(
-                                                new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
-                                    });
-                                    break;
-
-                                case ALL:
-                                    List<SoftwareAllDto> all = softwareSearchResponce.getAll();
-                                    all.stream().forEach(a -> {
                                         nameList.add(
                                                 new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
