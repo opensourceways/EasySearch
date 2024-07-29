@@ -2,6 +2,7 @@ package com.search.docsearch.utils;
 
 import com.search.docsearch.dto.software.*;
 import com.search.docsearch.entity.software.SoftwareDocsAllResponce;
+import com.search.docsearch.entity.software.SoftwareSearchCondition;
 import com.search.docsearch.entity.software.SoftwareSearchResponce;
 import org.apache.http.client.utils.DateUtils;
 
@@ -45,14 +46,14 @@ public final class SortUtil {
         responce.sort(Comparator.comparingInt(a -> RESPONCEORDERS.indexOf(a.getKey())));
     }
 
-    public static void sortByName(SoftwareSearchResponce softwareSearchResponce, String nameOrder) {
+    public static void sortByName(SoftwareSearchResponce softwareSearchResponce, SoftwareSearchCondition condition) {
         List<SoftwareAllDto> all = softwareSearchResponce.getAll();
         List<SoftwareAppChildrenDto> apppkg = softwareSearchResponce.getApppkg();
         List<SoftwareAppVersionDto> appversion = softwareSearchResponce.getAppversion();
         List<SoftwareEpkgDto> epkgpkg = softwareSearchResponce.getEpkgpkg();
         List<SoftwareOepkgDto> oepkg = softwareSearchResponce.getOepkg();
         List<SoftwareRpmDto> rpmpkg = softwareSearchResponce.getRpmpkg();
-        if ("asc".equals(nameOrder)) {
+        if ("asc".equals(condition.getNameOrder())) {
             Collections.sort(all, Comparator.comparing((SoftwareBaseDto p) -> stripHtmlTags(p.getName())));
             Collections.sort(apppkg, Comparator.comparing((SoftwareBaseDto p) -> stripHtmlTags(p.getName())));
             Collections.sort(appversion, Comparator.comparing((SoftwareAppVersionDto p) -> stripHtmlTags(p.getName())));
@@ -61,8 +62,7 @@ public final class SortUtil {
             Collections.sort(rpmpkg, Comparator.comparing((SoftwareRpmDto p) -> stripHtmlTags(p.getName())));
         }
 
-        if ("desc".equals(nameOrder)) {
-
+        if ("desc".equals(condition.getNameOrder())) {
             Collections.sort(all, Comparator.comparing((SoftwareBaseDto p) -> stripHtmlTags(p.getName())).reversed());
             Collections.sort(apppkg, Comparator.comparing((SoftwareBaseDto p) -> stripHtmlTags(p.getName())).reversed());
             Collections.sort(appversion, Comparator.comparing((SoftwareAppVersionDto p) -> stripHtmlTags(p.getName())).reversed());
@@ -72,11 +72,32 @@ public final class SortUtil {
 
         }
 
+        int start = (condition.getPageNum() - 1) * condition.getPageSize();
+        int end = start + condition.getPageSize();
+
+        softwareSearchResponce.setAll(subList(start, end, all));
+        softwareSearchResponce.setApppkg(subList(start, end, apppkg));
+        softwareSearchResponce.setAppversion(subList(start, end, appversion));
+        softwareSearchResponce.setEpkgpkg(subList(start, end, epkgpkg));
+        softwareSearchResponce.setOepkg(subList(start, end, oepkg));
+        softwareSearchResponce.setRpmpkg(subList(start, end, rpmpkg));
         if (softwareSearchResponce.getTotal() > 100) {
             softwareSearchResponce.setTotal(100);
         }
     }
 
+
+    public static List subList(Integer start, Integer end, List originList) {
+        List subList = null;
+        if (start < originList.size() && end <= originList.size()) {
+            subList = originList.subList(start, end);
+        } else if (start < originList.size() && end > originList.size()) {
+            subList = originList.subList(start, originList.size());
+        } else {
+            subList = new ArrayList();
+        }
+        return subList;
+    }
 
     public static void sortByTime(SoftwareSearchResponce softwareSearchResponce, String timeOrder) {
 

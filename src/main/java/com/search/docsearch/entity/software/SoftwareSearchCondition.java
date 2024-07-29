@@ -21,7 +21,7 @@ public class SoftwareSearchCondition implements Cloneable {
     @Range(min = 1, max = 1000, message = "page must be greater than 0 and less than 1000 ")
     private int pageNum = 1;
 
-    @Range(min = 2, max = 20, message = "page must be greater than 5 and less than 50 ")
+    @Range(min = 2, max = 100, message = "page must be greater than 5 and less than 50 ")
     private int pageSize = 10;
 
     @NotBlank(message = "keyword can not be null")

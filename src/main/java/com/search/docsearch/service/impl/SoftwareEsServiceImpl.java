@@ -73,7 +73,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
 
         SoftwareSearchResponce softwareSearchResponce = handEsResponce(response);
         if (condition.getNameOrder() != null) {
-            SortUtil.sortByName(softwareSearchResponce, condition.getNameOrder());
+            SortUtil.sortByName(softwareSearchResponce,condition);
         }
 
         if (condition.getTimeOrder() != null) {
