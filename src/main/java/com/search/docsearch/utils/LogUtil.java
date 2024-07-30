@@ -59,9 +59,7 @@ public class LogUtil {
         } else {
             log.setMessage("SUCCESS");
         }
-
-        String jsonLog = JSON.toJSONString(log);
-        logger.info("operationLog:{}", jsonLog);
+        logger.info("operationLog:{}", log.toString());
     }
     /**
      * format logging parameter.

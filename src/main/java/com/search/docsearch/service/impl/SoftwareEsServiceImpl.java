@@ -197,7 +197,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
                                     List<SoftwareAppChildrenDto> apppkg = softwareSearchResponce.getApppkg();
                                     apppkg.stream().forEach(a -> {
                                         nameList.add(
-                                                new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getVersion()));
+                                                new SoftwareNameDocsDto(a.getName(), a.getPkgId(), a.getAppVer()));
                                     });
                                     break;
 
