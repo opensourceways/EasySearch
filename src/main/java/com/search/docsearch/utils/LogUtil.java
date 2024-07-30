@@ -60,8 +60,8 @@ public class LogUtil {
             log.setMessage("SUCCESS");
         }
 
-        String jsonLog = JSON.toJSONString(log);
-        logger.info("operationLog:{}", jsonLog);
+       // String jsonLog = JSON.toJSONString(log);
+        logger.info("operationLog:{}", log.toString());
     }
 
     @Data
