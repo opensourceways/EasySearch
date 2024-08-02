@@ -1,6 +1,7 @@
 package com.search.docsearch.config;
 
 
+import com.search.docsearch.entity.software.SoftwareSysResult;
 import com.search.docsearch.entity.vo.SysResult;
 import com.search.docsearch.except.ControllerException;
 import com.search.docsearch.except.ServiceException;
@@ -20,9 +21,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.HashSet;
 
 /**
  * 全局异常处理
@@ -69,10 +72,14 @@ public class GlobalExceptionHandler {
         log.error("参数校验异常:", e.getMessage());
         BindingResult bindingResult = e.getBindingResult();
         StringBuilder sb = new StringBuilder();
-        for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            sb.append("[").append(fieldError.getField()).append("->").append(fieldError.getDefaultMessage()).append("]");
+        HashSet<String> errorFieldSet = new HashSet<>();
+        bindingResult.getFieldErrors().stream().forEach(fieldError -> errorFieldSet.add(fieldError.getField()));
+        errorFieldSet.stream().forEach(field -> sb.append(field).append("格式异常;"));
+        if (request.getRequestURI().contains("/software")) {
+            responseJson(request, response, SoftwareSysResult.fail(sb.toString(), null));
+        } else {
+            responseJson(request, response, SysResult.fail(sb.toString(), null));
         }
-        responseJson(request, response, SysResult.fail("查询失败", sb.toString()));
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)
@@ -108,7 +115,7 @@ public class GlobalExceptionHandler {
      * @param response  {HttpServletResponse}
      * @param sysResult {SysResult}
      */
-    private void responseJson(HttpServletRequest request, HttpServletResponse response, SysResult sysResult) {
+    private void responseJson(HttpServletRequest request, HttpServletResponse response, Object sysResult) {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
         try (PrintWriter out = response.getWriter()) {

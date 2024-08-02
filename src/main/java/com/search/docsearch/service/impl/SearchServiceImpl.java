@@ -225,10 +225,6 @@ public class SearchServiceImpl implements SearchService {
             if ("service".equals(map.getOrDefault("type", ""))) {
                 map.put("secondaryTitle", map.get("textContent"));
             }
-            if (condition.getPage() == 1) {
-                Float score = hit.getScore();
-                map.put("score", score*trie.getWordSimilarityWithTopSearch(String.valueOf(map.get("title")), 10));
-            }
             if (highlightFields.containsKey("title")) {
                 map.put("title", highlightFields.get("title").getFragments()[0].toString());
             }
@@ -237,10 +233,6 @@ public class SearchServiceImpl implements SearchService {
         }
         if (data.isEmpty()) {
             return null;
-        }
-
-        if (condition.getPage() == 1) {
-            data = data.stream().sorted((a, b) -> Double.compare((Double) b.get("score"), (Double) a.get("score"))).collect(Collectors.toList());
         }
         result.put("page", condition.getPage());
         result.put("pageSize", condition.getPageSize());
