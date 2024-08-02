@@ -73,9 +73,10 @@ public class ElasticSearchConfig {
         SSLContext sc = null;
         try {
             TrustManager[] tm = {new MyX509TrustManager(cerFilePath, cerPassword)};
-            sc = SSLContext.getInstance("SSL", "SunJSSE");
-            //也可以使用SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-            sc.init(null, tm, SecureRandom.getInstanceStrong());
+            //sc = SSLContext.getInstance("SSL", "SunJSSE");
+            //也可以使用
+            SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+            sslContext.init(null, tm, SecureRandom.getInstanceStrong());
 
             SSLIOSessionStrategy sessionStrategy = new SSLIOSessionStrategy(sc, new NoopHostnameVerifier());
             SecuredHttpClientConfigCallback httpClientConfigCallback = new SecuredHttpClientConfigCallback(sessionStrategy,
@@ -87,7 +88,7 @@ public class ElasticSearchConfig {
                             .setSocketTimeout(30 * 1000))
                     .setHttpClientConfigCallback(httpClientConfigCallback);
             final RestHighLevelClient client = new RestHighLevelClient(builder);
-            logger.info("es rest client build success {} ", client);
+            //  logger.info("es rest client build success {} ", client);
 
             ClusterHealthRequest request = new ClusterHealthRequest();
             ClusterHealthResponse response = client.cluster().health(request, RequestOptions.DEFAULT);

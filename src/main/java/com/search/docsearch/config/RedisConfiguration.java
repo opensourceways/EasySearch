@@ -3,6 +3,8 @@
 
 package com.search.docsearch.config;
 
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.SocketOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +14,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import redis.clients.jedis.JedisPoolConfig;
 
 import javax.net.ssl.SSLContext;
@@ -24,6 +27,7 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.time.Duration;
+
 
 @Configuration
 public class RedisConfiguration {
@@ -173,7 +177,23 @@ public class RedisConfiguration {
         poolConfig.setMaxIdle(maxIdel);
         //连接池的最大连接数
         poolConfig.setMaxTotal(maxPool);
-
         return poolConfig;
+    }
+
+    @Bean
+    public LettuceClientConfiguration lettuceClientConfiguration() {
+        SocketOptions socketOptions = SocketOptions.builder()
+                .connectTimeout(Duration.ofMillis(redisConnectTimeout))
+                .keepAlive(true)
+                .build();
+
+        ClientOptions clientOptions = ClientOptions.builder()
+                .socketOptions(socketOptions)
+                .build();
+
+        return LettuceClientConfiguration.builder()
+                .commandTimeout(Duration.ofMillis(redisReadTimeout))
+                .clientOptions(clientOptions)
+                .build();
     }
 }

@@ -59,7 +59,7 @@ public class LogUtil {
         } else {
             log.setMessage("SUCCESS");
         }
-        logger.info("operationLog:{}", log.toString());
+        logger.info("operationLog:{}");
     }
     /**
      * format logging parameter.
