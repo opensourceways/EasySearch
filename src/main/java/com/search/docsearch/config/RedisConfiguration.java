@@ -118,7 +118,7 @@ public class RedisConfiguration {
     public JedisClientConfiguration clientConfiguration() throws Exception {
         JedisClientConfiguration.JedisClientConfigurationBuilder configurationBuilder
                 = JedisClientConfiguration.builder()
-                .connectTimeout(Duration.ofMillis(redisConnectTimeout))
+                .connectTimeout(Duration.ZERO)
                 .readTimeout(Duration.ofMillis(redisReadTimeout));
 
 
