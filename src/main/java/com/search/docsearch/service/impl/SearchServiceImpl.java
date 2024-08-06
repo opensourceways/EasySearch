@@ -112,17 +112,17 @@ public class SearchServiceImpl implements SearchService {
         Map<String, Object> result = new HashMap<>();
         result.put("suggestList", suggestList);
         for (int i = 0; i < 3 && i < keyword.length(); i++) {
-            suggestList.addAll(trie.searchTopKWithPrefix(keyword.substring(0, keyword.length() - i), 5).stream().map(k -> "<em>" + k.getKey() + "</em>").collect(Collectors.toList()));
+            suggestList.addAll(trie.searchTopKWithPrefix(keyword.substring(0, keyword.length() - i), 5).stream().map(k-> "<em>"+k.getKey()+"</em>").collect(Collectors.toList()));
             if (!CollectionUtils.isEmpty(suggestList))
                 break;
 
         }
         if (CollectionUtils.isEmpty(suggestList)) {
             String suggestCorrection = trie.suggestCorrection(keyword);
-            suggestList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 5).stream().map(k -> "<em>" + k.getKey() + "</em>").collect(Collectors.toList()));
+            suggestList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 5).stream().map(k-> "<em>"+k.getKey()+"</em>").collect(Collectors.toList()));
         }
 
-        if (suggestList.size() > 0)
+        if (suggestList.size()>0)
             return result;
 
         String saveIndex = mySystem.index + "_" + lang;
@@ -227,7 +227,7 @@ public class SearchServiceImpl implements SearchService {
             }
             if (condition.getPage() == 1) {
                 Float score = hit.getScore();
-                map.put("score", score * trie.getWordSimilarityWithTopSearch(String.valueOf(map.get("title")), 10));
+                map.put("score", score*trie.getWordSimilarityWithTopSearch(String.valueOf(map.get("title")), 10));
             }
             if (highlightFields.containsKey("title")) {
                 map.put("title", highlightFields.get("title").getFragments()[0].toString());
@@ -609,9 +609,9 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public Map<String, Object> findWord(String prefix) throws ServiceException {
         List<Trie.KeyCountResult> keyCountResultList = new ArrayList<>();
-        for (int i = 0; i < 3 && i < prefix.length(); i++) {
-            keyCountResultList.addAll(trie.searchTopKWithPrefix(prefix.substring(0, prefix.length() - i), 10));
-            if (!CollectionUtils.isEmpty(keyCountResultList))
+        for (int i = 0; i < 3 && i<prefix.length() ; i++) {
+            keyCountResultList.addAll(trie.searchTopKWithPrefix(prefix.substring(0,prefix.length()-i), 10));
+            if(!CollectionUtils.isEmpty(keyCountResultList))
                 break;
         }
         //没查到根据相似度匹配
@@ -716,7 +716,7 @@ public class SearchServiceImpl implements SearchService {
 
 
     public String httpRequest(String urlStr, Boolean flag) throws IOException {
-        /*URL url = new URL(urlStr);
+        URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         int timeout = 15000; // 设置超时时间为15秒
@@ -732,12 +732,11 @@ public class SearchServiceImpl implements SearchService {
             return response.toString();
         } finally {
             connection.disconnect(); // 断开连接
-        }*/
-        return null;
+        }
     }
 
     public String postRequest(String urlStr, String body) throws IOException {
-        /*URL url = new URL(urlStr);
+        URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         int timeout = 15000; // 设置超时时间为15秒
@@ -759,8 +758,7 @@ public class SearchServiceImpl implements SearchService {
             return response.toString();
         } finally {
             connection.disconnect(); // 断开连接
-        }*/
-        return null;
+        }
     }
 
 }
