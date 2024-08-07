@@ -85,7 +85,7 @@ public class RequestLimitRedisAspect {
         }
 
         // 获取url
-        String ip = ClientIPUtil.getClientIpAdd(request);
+        String ip = ClientIPUtil.getClientIp(request);
         String uri = request.getRequestURI();
         String key = "req_limit:".concat(uri).concat(ip);
 
@@ -106,7 +106,7 @@ public class RequestLimitRedisAspect {
             // 审计日志
             LOGGER.error("Resource uri: {}，the request frequency of uri exceeds the limited frequency: "
                             + "{} times/{}s ,Client IP：{},type: GET, Result: query failed.", LogUtil.formatCodeString(uri),
-                    limitCount, period, ip);
+                    limitCount, period,ip);
             return SoftwareSysResult.failWithTooManyRequests();
         }
 

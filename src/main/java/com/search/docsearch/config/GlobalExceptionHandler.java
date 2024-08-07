@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -67,12 +68,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public void methodArgumentNotValidException(HttpServletRequest request, HttpServletResponse response, MethodArgumentNotValidException e) {
         log.error("参数校验异常:", e.getMessage());
-        BindingResult bindingResult = e.getBindingResult();
-        StringBuilder sb = new StringBuilder();
-        for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            sb.append("[").append(fieldError.getField()).append("->").append(fieldError.getDefaultMessage()).append("]");
-        }
-        responseJson(request, response, SysResult.fail("查询失败", sb.toString()));
+        responseJson(request, response, SysResult.fail("查询失败", "参数格式错误"));
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)
