@@ -33,7 +33,7 @@ public class LogUtil {
         log.setStartTime(str);
         log.setUserId(System.getenv("NO_ID_USER"));
 
-        log.setAccessIp(ClientIPUtil.getClientIpAddress(request));
+        log.setAccessIp(ClientIPUtil.getClientIp(request));
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
@@ -59,7 +59,7 @@ public class LogUtil {
         } else {
             log.setMessage("SUCCESS");
         }
-        logger.info("operationLog:{}");
+        logger.info("operationLog:{}",log.toString());
     }
     /**
      * format logging parameter.
