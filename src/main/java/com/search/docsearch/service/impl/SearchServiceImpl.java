@@ -237,6 +237,7 @@ public class SearchServiceImpl implements SearchService {
         result.put("page", condition.getPage());
         result.put("pageSize", condition.getPageSize());
         result.put("records", data);
+        result.put("count", response.getHits().getTotalHits().value);
         return result;
     }
 
