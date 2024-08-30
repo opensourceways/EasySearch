@@ -175,8 +175,9 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
     @Override
     public List<SoftwareDocsAllResponce> searchAllByCondition(SoftwareSearchCondition condition)
             throws ServiceException {
-
-        condition.setKeywordType("all");
+        if (condition.getKeywordType() == null) {
+            condition.setKeywordType("all");
+        }
         List<SoftwareDocsAllResponce> responce = new ArrayList<>();
         CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 2);
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
@@ -449,6 +450,7 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
         buildHighlightBuilder(sourceBuilder);
 
         if ("asc".equals(condition.getNameOrder()) || "desc".equals(condition.getNameOrder())) {
+            sourceBuilder.from(0);
             sourceBuilder.size(100);
         } else if (startIndex + condition.getPageSize() > 10000) {
             sourceBuilder.size(10000 - startIndex);
