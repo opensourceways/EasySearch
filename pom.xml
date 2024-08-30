@@ -21,12 +21,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <!--spring boot 2.0之后默认lettuce客户端, 使用jedis时需要排包-->
-            <exclusions>
+          <!--  <exclusions>
                 <exclusion>
                     <groupId>io.lettuce</groupId>
                     <artifactId>lettuce-core</artifactId>
                 </exclusion>
-            </exclusions>
+            </exclusions>-->
         </dependency>
         <!-- 引入jedis依赖包 -->
         <dependency>
