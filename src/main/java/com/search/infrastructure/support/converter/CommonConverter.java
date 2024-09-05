@@ -16,7 +16,8 @@ public class CommonConverter {
         List<CountVo> countVos = new ArrayList<>();
         for (Map<String, Object> map : numberList) {
             CountVo countVo = new CountVo();
-            BeanUtils.copyProperties(map, countVo);
+            countVo.setDoc_count(Long.parseLong(map.get("doc_count")+""));
+            countVo.setKey(String.valueOf(map.get("key")));
             countVos.add(countVo);
         }
         return countVos;

@@ -27,7 +27,7 @@ public class DocsOpeneulerCondition extends SearchDocsBaseCondition {
 
     public void setOpeneulerLimit(DocsCondition condition) {
         ArrayList<OpeneulerLimit> openeulerLimits = new ArrayList<>();
-        if (Objects.nonNull(condition.getFilter()))
+        if (!Objects.isNull(condition.getLimit()))
             condition.getLimit().stream().forEach(a -> {
                 OpeneulerLimit openeulerLimit = new OpeneulerLimit();
                 openeulerLimit.setType(a.getType());
@@ -40,7 +40,7 @@ public class DocsOpeneulerCondition extends SearchDocsBaseCondition {
 
     public void setOpeneulerFilter(DocsCondition condition) {
         ArrayList<OpeneulerFilter> openeulerFilters = new ArrayList<>();
-        if (Objects.nonNull(condition.getFilter()))
+        if (!Objects.isNull(condition.getFilter()))
             condition.getLimit().stream().forEach(a -> {
                 OpeneulerFilter openeulerFilter = new OpeneulerFilter();
                 openeulerFilter.setType(a.getType());

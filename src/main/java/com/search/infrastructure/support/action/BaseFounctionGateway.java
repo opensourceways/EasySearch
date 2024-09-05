@@ -1,7 +1,9 @@
 package com.search.infrastructure.support.action;
 
 import com.search.adapter.vo.CountResponceVo;
+import com.search.adapter.vo.SuggResponceVo;
 import com.search.adapter.vo.TagsResponceVo;
+import com.search.common.util.General;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.base.dto.SearchDocsBaseCondition;
 import com.search.domain.base.dto.SearchSortBaseCondition;
@@ -13,11 +15,18 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.suggest.Suggest;
+import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilders;
+import org.elasticsearch.search.suggest.SuggestionBuilder;
+import org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -27,9 +36,9 @@ public class BaseFounctionGateway {
     @Autowired
     protected RestHighLevelClient restHighLevelClient;
     @Autowired
-    protected BaseFounctionBuilder requestBuilder;
+    protected BaseFounctionRequestBuilder requestBuilder;
     @Autowired
-    protected BaseFounctionHandler responceHandler;
+    protected BaseFounctionResponceHandler responceHandler;
 
 
     public SearchResponse getSearchDocByType(DivideDocsBaseCondition condition) {
@@ -59,6 +68,57 @@ public class BaseFounctionGateway {
         return dateMapList;
     }
 
+
+    public SuggResponceVo getDefaultSuggByCondition(SearchDocsBaseCondition docsBaseCondition) {
+        String saveIndex = docsBaseCondition.getIndex();
+        SuggResponceVo suggResponceVo = new SuggResponceVo();
+        HashSet<String> suggestSet = new HashSet<>();
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        SuggestionBuilder<TermSuggestionBuilder> termSuggestionBuilder =
+                SuggestBuilders.termSuggestion("textContent")
+                        .text(docsBaseCondition.getKeyword())
+                        .minWordLength(2)
+                        .prefixLength(0)
+                        .analyzer("ik_smart")
+                        .size(3)
+                        .suggestMode(TermSuggestionBuilder.SuggestMode.ALWAYS);
+
+        SuggestBuilder suggestBuilder = new SuggestBuilder();
+        String suggFiled = "my_sugg";
+        suggestBuilder.addSuggestion(suggFiled, termSuggestionBuilder);
+
+        SearchRequest suggRequest = new SearchRequest(saveIndex);
+        suggRequest.source(searchSourceBuilder.suggest(suggestBuilder));
+
+        SearchResponse suggResponse = executeDefaultEsSearch(suggRequest);
+        if (suggResponse == null) {
+            return suggResponceVo;
+        }
+        for (int i = 0; i <= 3; i++) {
+            StringBuilder sb = new StringBuilder();
+            for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option> my_sugg : suggResponse.getSuggest().getSuggestion(suggFiled)) {
+
+                String op = my_sugg.getText().string();
+
+                boolean hc = General.haveChinese(op);
+
+                if (!hc) {
+                    if (my_sugg.getOptions().size() > i) {
+                        op = my_sugg.getOptions().get(i).getText().string();
+                        sb.append("<em>").append(op).append("</em>").append(" ");
+                    } else {
+                        sb.append(op).append(" ");
+                    }
+                } else {
+                    sb.append(op);
+                }
+            }
+            suggestSet.add(sb.toString().trim());
+
+        }
+        suggResponceVo.setSuggestList(suggestSet.stream().toList());
+        return suggResponceVo;
+    }
 
     public TagsResponceVo getDefaultSearchTagsByCondition(SearchTagsBaseCondition tagsCondition) {
         TagsResponceVo tagsResponceVo = new TagsResponceVo();

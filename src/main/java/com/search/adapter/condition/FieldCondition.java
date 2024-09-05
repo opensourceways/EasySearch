@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 
-
 @Data
 public class FieldCondition {
     @Size(max = 30)
@@ -45,4 +44,7 @@ public class FieldCondition {
     @Size(max = 30)
     @Pattern(regexp = SearchConstant.VALID_STR_REG, message = SearchConstant.VALID_MESSAGE)
     private String eulerOsVersion;
+
+
+    private String tags;
 }

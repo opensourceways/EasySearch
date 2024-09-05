@@ -1,9 +1,8 @@
 package com.search.infrastructure.search.openeuler;
 
-import com.search.adapter.vo.CountResponceVo;
-import com.search.adapter.vo.DocsResponceVo;
-import com.search.adapter.vo.SortResponceVo;
-import com.search.adapter.vo.TagsResponceVo;
+
+import com.search.adapter.vo.*;
+import com.search.common.util.General;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.openeuler.dto.DocsOpeneulerCondition;
 import com.search.domain.openeuler.dto.SortOpeneulerCondition;
@@ -15,7 +14,6 @@ import com.search.infrastructure.support.action.BaseFounctionGateway;
 import com.search.infrastructure.support.converter.CommonConverter;
 import com.search.infrastructure.search.openeuler.dataobject.OpenEulerDo;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -24,15 +22,17 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class OpeneulerGatewayImpl extends BaseFounctionGateway implements OpeneulerGateway {
+    @Override
+    public SuggResponceVo getSuggByCondition(DocsOpeneulerCondition docsOpeneulerCondition) {
+        return super.getDefaultSuggByCondition(docsOpeneulerCondition);
+    }
+
     @Override
     public DocsResponceVo<OpenEulerVo> searchByCondition(DocsOpeneulerCondition searchBaseCondition) {
         SearchRequest defaultSearchRequest = requestBuilder.getDefaultDocsSearchRequest(searchBaseCondition);

@@ -2,6 +2,8 @@ package com.search.infrastructure.search.openeuler.dataobject;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class OpenEulerDo {
     /**
@@ -60,7 +62,7 @@ public class OpenEulerDo {
     /**
      * 作者
      */
-    private String author;
+    private List author;
     /**
      * 横幅
      */
@@ -98,4 +100,12 @@ public class OpenEulerDo {
      */
     private String titletemplate;
 
+    /**
+     * 定制会话
+     */
+    private Boolean customlayout;
+    /**
+     * tags
+     */
+    private List tags;
 }

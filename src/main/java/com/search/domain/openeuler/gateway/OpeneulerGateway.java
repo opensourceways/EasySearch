@@ -1,9 +1,6 @@
 package com.search.domain.openeuler.gateway;
 
-import com.search.adapter.vo.CountResponceVo;
-import com.search.adapter.vo.DocsResponceVo;
-import com.search.adapter.vo.SortResponceVo;
-import com.search.adapter.vo.TagsResponceVo;
+import com.search.adapter.vo.*;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.openeuler.dto.DocsOpeneulerCondition;
 import com.search.domain.openeuler.dto.SortOpeneulerCondition;
@@ -12,6 +9,8 @@ import com.search.domain.openeuler.vo.OpenEulerVo;
 
 
 public interface OpeneulerGateway {
+
+    SuggResponceVo  getSuggByCondition(DocsOpeneulerCondition docsOpeneulerCondition);
 
     DocsResponceVo<OpenEulerVo> searchByCondition(DocsOpeneulerCondition docsOpeneulerCondition);
 

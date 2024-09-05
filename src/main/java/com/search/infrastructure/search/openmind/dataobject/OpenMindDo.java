@@ -2,6 +2,8 @@ package com.search.infrastructure.search.openmind.dataobject;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class OpenMindDo {
 
@@ -24,7 +26,7 @@ public class OpenMindDo {
     /**
      * 日期
      */
-    private String date;
+    private Date date;
 
     /**
      * 文档类型

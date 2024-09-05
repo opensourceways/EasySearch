@@ -3,6 +3,8 @@ package com.search.domain.openeuler.vo;
 import com.search.domain.base.vo.CommunityBaseVo;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class OpenEulerVo extends CommunityBaseVo {
     /**
@@ -16,7 +18,7 @@ public class OpenEulerVo extends CommunityBaseVo {
     /**
      * 作者
      */
-    private String author;
+    private List author;
     /**
      * 横幅
      */

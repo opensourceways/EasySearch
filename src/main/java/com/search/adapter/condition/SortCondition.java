@@ -7,8 +7,10 @@ import lombok.Data;
 public class SortCondition {
     Integer page;
     Integer pageSize;
-    Integer keyword;
-    String type;
-    Boolean isNeedHighlight;
+    String category;
+    String tags;
+    String archives;
     String lang;
+    String type;
+    String keyword;
 }

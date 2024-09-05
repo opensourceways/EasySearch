@@ -20,7 +20,6 @@ public class SearchController {
 
     @PostMapping("docs")
     public ResponceResult searchDataByCondition(@RequestBody @Validated DocsCondition condition) {
-        System.out.println("开始请求");
         return searchAdapter.searchDataByCondition(condition);
     }
 
@@ -47,5 +46,10 @@ public class SearchController {
     public ResponceResult searchAllByKeyword(@RequestBody @Validated DocsCondition condition) {
         return searchAdapter.getDocAllByCondition(condition);
 
+    }
+
+    @PostMapping("/sugg")
+    public ResponceResult getSugg(@RequestBody @Validated DocsCondition condition) {
+        return searchAdapter.getSuggByCondition(condition);
     }
 }

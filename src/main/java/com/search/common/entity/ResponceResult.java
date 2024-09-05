@@ -36,7 +36,7 @@ public class ResponceResult {
     }
 
     public static ResponceResult ok(Object data) {
-        return new ResponceResult(200, null, data);
+        return new ResponceResult(200, "查询成功", data);
     }
 
     //定义一个失败的静态方法

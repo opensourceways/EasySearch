@@ -6,88 +6,181 @@ import java.util.Date;
 
 @Data
 public class SoftCenterDo {
-    String type;
+    /**
+     * 类型
+     */
+    private String type;
+    /**
+     * EPKG
+     */
+    private String EPKG;
+    /**
+     * IMAGE
+     */
+    private String IMAGE;
+    /**
+     * RPM
+     */
+    private String RPM;
+    /**
+     * appVer
+     */
+    private String appVer;
+    /**
+     * arch
+     */
+    private String arch;
+    /**
+     * binDownloadUrl
+     */
+    private String binDownloadUrl;
 
-    String EPKG;
+    /**
+     * category
+     */
+    private String category;
+    /**
+     * dataType
+     */
+    private String dataType;
+    /**
+     * date
+     */
+    private Date date;
+    /**
+     * description
+     */
+    private String description;
+    /**
+     * downloadCount
+     */
+    private String downloadCount;
+    /**
+     * epkgUpdate
+     */
+    private Date epkgUpdate;
+    /**
+     * epkg_name
+     */
+    private String epkg_name;
+    /**
+     * eulerHomepage
+     */
+    private String eulerHomepage;
 
-    String IMAGE;
+    /**
+     * eulerOsVersion
+     */
+    private String eulerOsVersion;
+    /**
+     * iconUrl
+     */
+    private String iconUrl;
+    /**
+     * id
+     */
+    private String id;
+    /**
+     * maintainers
+     */
+    private String maintainers;
+    /**
+     * installation
+     */
+    private String installation;
+    /**
+     * name
+     */
+    private String name;
+    /**
+     * openeulerVersion;
+     */
+    private String openeulerVersion;
+    /**
+     * originPkg
+     */
+    private String originPkg;
+    /**
+     * os
+     */
+    private String os;
+    /**
+     * pkgId
+     */
+    private String pkgId;
+    /**
+     * pkgIds
+     */
+    private String pkgIds;
+    /**
+     * provideName
+     */
+    private String provideName;
+    /**
+     * providesText
+     */
+    private String providesText;
+    /**
+     * requiresText
+     */
+    private String requiresText;
+    /**
+     * rpmSize
+     */
+    private String rpmSize;
+    /**
+     * rpmUpdate
+     */
+    private Long rpmUpdate;
+    /**
+     * rpmUpdateAt
+     */
+    private String rpmUpdateAt;
+    /**
+     * rpm_name
+     */
+    private String rpm_name;
+    /**
+     * size
+     */
+    private String size;
 
-    String RPM;
+    /**
+     * srcRepo
+     */
+    private String srcRepo;
+    /**
+     * status
+     */
+    private String status;
+    /**
+     * summary
+     */
+    private String summary;
+    /**
+     * tags
+     */
+    private String tags;
+    /**
+     * tagsText
+     */
+    private String tagsText;
+    /**
+     * upHomepage
+     */
+    private String upHomepage;
 
-    String appVer;
+    /**
+     * updatetime
+     */
+    private String updatetime;
 
-    String arch;
-
-    String binDownloadUrl;
-
-
-    String category;
-
-    String dataType;
-
-    Date date;
-
-    String description;
-
-    String downloadCount;
-
-    Date epkgUpdate;
-
-    String epkg_name;
-
-    String eulerHomepage;
-
-
-    String eulerOsVersion;
-
-    String iconUrl;
-
-    String id;
-
-    String installation;
-
-    String name;
-
-    String openeulerVersion;
-
-    String originPkg;
-
-    String os;
-
-    String pkgId;
-
-    String pkgIds;
-
-    String provideName;
-
-    String providesText;
-
-    String requiresText;
-
-    Date rpmUpdate;
-
-    String rpm_name;
-
-    String size;
-
-
-    String srcRepo;
-
-    String status;
-
-    String summary;
-
-    String tags;
-
-    String tagsText;
-
-    String upHomepage;
-
-
-    String updatetime;
-
-
-    String upstreamVersion;
-
-    String version;
+    /**
+     * upstreamVersion
+     */
+    private String upstreamVersion;
+    /**
+     * upstreamVersion
+     */
+    private String version;
 }

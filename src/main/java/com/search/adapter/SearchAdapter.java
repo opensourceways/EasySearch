@@ -1,5 +1,6 @@
 package com.search.adapter;
 
+import com.search.adapter.condition.DevideCondition;
 import com.search.adapter.condition.DocsCondition;
 import com.search.adapter.condition.TagsCondition;
 import com.search.adapter.condition.SortCondition;
@@ -22,7 +23,6 @@ import com.search.domain.opengauss.dto.TagsOpengaussCondition;
 import com.search.domain.opengauss.gateway.OpengaussGateway;
 import com.search.domain.openmind.dto.DocsOpenmindCondition;
 import com.search.domain.openmind.dto.SortOpenmindCondition;
-import com.search.domain.openmind.dto.TagsOpenmindCondition;
 import com.search.domain.openmind.gateway.OpenmindGateway;
 import com.search.domain.softcenter.dto.DocsSoftcenterCondition;
 import com.search.domain.softcenter.gateway.SoftcenterGateway;
@@ -106,7 +106,7 @@ public class SearchAdapter {
         String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
         switch (dataSource) {
             case SourceConstant.SOURCE_OPENEULER:
-                SortOpeneulerCondition sortOpeneulerCondition = new SortOpeneulerCondition();
+                SortOpeneulerCondition sortOpeneulerCondition = new SortOpeneulerCondition(index, condition);
                 return ResponceResult.ok(openeulerGateway.getSearchSortByCondition(sortOpeneulerCondition));
 
             case SourceConstant.SOURCE_MINDSPORE:
@@ -117,9 +117,6 @@ public class SearchAdapter {
                 SortOpengaussCondition sortOpengaussCondition = new SortOpengaussCondition();
                 return ResponceResult.ok(opengaussGateway.getSearchSortByCondition(sortOpengaussCondition));
 
-            case SourceConstant.SOURCE_OPENMIND:
-                SortOpenmindCondition sortOpenmindCondition = new SortOpenmindCondition();
-                return ResponceResult.ok(openmindGateway.getSearchSortByCondition(sortOpenmindCondition));
 
             default:
                 return ResponceResult.fail("not supported currently source", null);
@@ -132,20 +129,17 @@ public class SearchAdapter {
         String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
         switch (dataSource) {
             case SourceConstant.SOURCE_OPENEULER:
-                TagsOpeneulerCondition tagsOpeneulerCondition = new TagsOpeneulerCondition();
+                TagsOpeneulerCondition tagsOpeneulerCondition = new TagsOpeneulerCondition(condition, index);
                 return ResponceResult.ok(openeulerGateway.getSearchTagsByCondition(tagsOpeneulerCondition));
 
             case SourceConstant.SOURCE_MINDSPORE:
-                TagsMindsporeCondition tagsMindsporeCondition = new TagsMindsporeCondition();
+                TagsMindsporeCondition tagsMindsporeCondition = new TagsMindsporeCondition(condition, index);
                 return ResponceResult.ok(mindSporeGateway.getSearchTagsByCondition(tagsMindsporeCondition));
 
             case SourceConstant.SOURCE_OPENGAUSS:
-                TagsOpengaussCondition tagsOpengaussCondition = new TagsOpengaussCondition();
+                TagsOpengaussCondition tagsOpengaussCondition = new TagsOpengaussCondition(condition, index);
                 return ResponceResult.ok(opengaussGateway.getSearchTagsByCondition(tagsOpengaussCondition));
 
-            case SourceConstant.SOURCE_OPENMIND:
-                TagsOpenmindCondition tagsOpenmindCondition = new TagsOpenmindCondition();
-                return ResponceResult.ok(openmindGateway.getSearchTagsByCondition(tagsOpenmindCondition));
 
             default:
                 return ResponceResult.fail("not supported currently source", null);
@@ -160,7 +154,7 @@ public class SearchAdapter {
         String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
         switch (dataSource) {
             case SourceConstant.SOURCE_OPENEULER:
-                SortOpeneulerCondition sortOpeneulerCondition = new SortOpeneulerCondition();
+                SortOpeneulerCondition sortOpeneulerCondition = new SortOpeneulerCondition(index, condition);
                 return ResponceResult.ok(openeulerGateway.getDvideSearchSortByCondition(sortOpeneulerCondition));
 
             case SourceConstant.SOURCE_MINDSPORE:
@@ -181,11 +175,11 @@ public class SearchAdapter {
     }
 
 
-    public ResponceResult getDocSearch(DocsCondition condition) {
+    public ResponceResult getDocSearch(DevideCondition condition) {
 
         String dataSource = ThreadLocalCache.getDataSource();
         String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
-        DivideDocsBaseCondition divideDocsBaseCondition = new DivideDocsBaseCondition();
+        DivideDocsBaseCondition divideDocsBaseCondition = new DivideDocsBaseCondition(index, "docs", condition);
         switch (dataSource) {
             case SourceConstant.SOURCE_OPENEULER:
                 return ResponceResult.ok(openeulerGateway.searchDocByType(divideDocsBaseCondition));
@@ -221,4 +215,16 @@ public class SearchAdapter {
     }
 
 
+    public ResponceResult getSuggByCondition(DocsCondition condition) {
+
+        String dataSource = ThreadLocalCache.getDataSource();
+        String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
+        switch (dataSource) {
+            case SourceConstant.SOURCE_OPENEULER:
+                DocsOpeneulerCondition docsOpeneulerCondition = new DocsOpeneulerCondition(index, condition);
+                return ResponceResult.ok(openeulerGateway.getSuggByCondition(docsOpeneulerCondition));
+            default:
+                return ResponceResult.fail("not supported currently source", null);
+        }
+    }
 }

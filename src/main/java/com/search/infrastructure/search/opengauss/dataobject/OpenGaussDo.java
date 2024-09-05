@@ -2,6 +2,8 @@ package com.search.infrastructure.search.opengauss.dataobject;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class OpenGaussDo {
     /**
@@ -44,7 +46,7 @@ public class OpenGaussDo {
     /**
      * 日期
      */
-    Data data;
+    Date date;
 
     /**
      * 细节
@@ -182,4 +184,8 @@ public class OpenGaussDo {
      * 版本
      */
     private String version;
+    /**
+     * sumary
+     */
+    private String sumary;
 }

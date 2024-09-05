@@ -1,6 +1,7 @@
 package com.search.controller;
 
 import com.search.adapter.SearchAdapter;
+import com.search.adapter.condition.DevideCondition;
 import com.search.adapter.condition.DocsCondition;
 import com.search.adapter.condition.SortCondition;
 import com.search.common.entity.ResponceResult;
@@ -28,7 +29,7 @@ DivideController {
 
 
     @PostMapping("docs")
-    public ResponceResult searchDivideDocsByCondition(@RequestBody @Validated DocsCondition condition) {
+    public ResponceResult searchDivideDocsByCondition(@RequestBody @Validated DevideCondition condition) {
 
         return searchAdapter.getDocSearch(condition);
     }
