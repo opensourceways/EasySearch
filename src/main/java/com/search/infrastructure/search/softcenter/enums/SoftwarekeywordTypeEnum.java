@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.infrastructure.search.softcenter.enums;
 
 import lombok.AllArgsConstructor;
@@ -6,14 +16,39 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum SoftwarekeywordTypeEnum {
+    /**
+     * name keyword type.
+     */
     NAME("name", "名称"),
+    /**
+     * description  keyword type.
+     */
     DESCRIPTION("description", "描述"),
-    FILE("file","文件"),
+    /**
+     * file keyword type.
+     */
+    FILE("file", "文件"),
+    /**
+     * summary keyword type.
+     */
     SUMMARY("summary", "概要");
+
+    /**
+     * 关键字类型.
+     */
     private final String keywordType;
+    /**
+     * 信息.
+     */
     private final String message;
 
-    public static  boolean isSupportKeywordType(String keywordType) {
+    /**
+     * check is support  Keyword Type.
+     *
+     * @param keywordType Keyword Type.
+     * @return boolean.
+     */
+    public static boolean isSupportKeywordType(String keywordType) {
         for (SoftwarekeywordTypeEnum value : SoftwarekeywordTypeEnum.values()) {
             if (value.getKeywordType().equals(keywordType))
                 return Boolean.TRUE;

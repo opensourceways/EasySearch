@@ -11,14 +11,23 @@
 
 package com.search.common.exception;
 
+import com.search.common.entity.ResponceResult;
+import com.search.common.util.ObjectMapperUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -27,93 +36,80 @@ public class GlobalExceptionHandler {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-  /*  *//**
+    /**
+     * Handles exceptions of type TrustManagerException.
+     *
+     * @param e The TrustManagerException to handle
+     * @return ResponceResult containing details about the exception
+     */
+    @ExceptionHandler(value = TrustManagerException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public ResponceResult trustManagerException(TrustManagerException e) {
+        LOGGER.error("TrustManager异常:{}", e.getMessage());
+        return ResponceResult.fail("查询失败", null);
+    }
+
+    /**
      * Handles exceptions of type MethodArgumentNotValidException.
      *
      * @param e The MethodArgumentNotValidException to handle
-     * @return ResponseEntity containing details about the exception
-     *//*
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> exception(final MethodArgumentNotValidException e) {
-        LOGGER.error(MessageCode.EC0002.getMsgEn());
-        return ResultUtil.fail(HttpStatus.BAD_REQUEST, MessageCode.EC0002);
+     * @return ResponceResult containing details about the exception
+     */
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ResponceResult methodArgumentNotValidException(MethodArgumentNotValidException e) {
+        LOGGER.error("参数校验异常:", e.getMessage());
+        BindingResult bindingResult = e.getBindingResult();
+        StringBuilder sb = new StringBuilder();
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            sb.append("[").append(fieldError.getField()).append("->").append(fieldError.getDefaultMessage()).append("]");
+        }
+        return ResponceResult.fail("查询失败", null);
     }
 
-    *//**
-     * Handles exceptions of type ParamErrorException.
+    /**
+     * Handles exceptions of type IllegalArgumentException.
      *
-     * @param e The ParamErrorException to handle
-     * @return ResponseEntity containing details about the exception
-     *//*
-    @ExceptionHandler(ParamErrorException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> exception(final ParamErrorException e) {
-        LOGGER.error(e.getMessage());
-        return ResultUtil.fail(HttpStatus.BAD_REQUEST, MessageCode.EC0002);
+     * @param e The IllegalArgumentException to handle
+     * @return ResponceResult containing details about the exception
+     */
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ResponceResult illegalArgumentException(IllegalArgumentException e) {
+        LOGGER.error("参数异常:{}", e.getMessage());
+        return ResponceResult.fail(e.getMessage(), null);
     }
 
-    *//**
-     * Handles exceptions of type EnumValidException.
-     *
-     * @param e The EnumValidException to handle
-     * @return ResponseEntity containing details about the exception
-     *//*
-    @ExceptionHandler(EnumValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> exception(final EnumValidException e) {
-        LOGGER.error(MessageCode.EC0002.getMsgEn());
-        return ResultUtil.fail(HttpStatus.BAD_REQUEST, MessageCode.EC0002);
-    }
-
-    *//**
-     * Handles exceptions of type EnumValidException.
-     *
-     * @param e The EnumValidException to handle
-     * @return ResponseEntity containing details about the exception
-     *//*
-    @ExceptionHandler(NoneResException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> exception(final NoneResException e) {
-        LOGGER.error(MessageCode.EC0002.getMsgEn());
-        return ResultUtil.fail(HttpStatus.NOT_FOUND, MessageCode.EC0009.getMsgEn());
-    }
-
-    *//**
-     * Handles exceptions of type AppPkgIconException.
-     *
-     * @param e The AppPkgIconException to handle
-     * @return ResponseEntity containing details about the exception
-     *//*
-    @ExceptionHandler(AppPkgIconException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> exception(final AppPkgIconException e) {
-        LOGGER.error(MessageCode.EC0009.getMsgEn());
-        return ResultUtil.fail(HttpStatus.BAD_REQUEST, MessageCode.EC0009);
-    }
-
-    *//**
-     * Handles general exceptions.
+    /**
+     * Handles exceptions of type Exception.
      *
      * @param e The Exception to handle
-     * @return ResponseEntity containing details about the exception
-     *//*
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<Object> exception(final Exception e) {
-        LOGGER.error(e.getMessage());
-        return ResultUtil.fail(HttpStatus.INTERNAL_SERVER_ERROR, MessageCode.ES0001);
+     * @return ResponceResult containing details about the exception
+     */
+    @ExceptionHandler(value = Exception.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ResponceResult exception(Exception e) {
+        LOGGER.error("异常:", e.getMessage());
+        return ResponceResult.fail("查询失败", null);
     }
 
-    *//**
-     * Handles runtime exceptions.
+    /**
+     * 响应json格式字符串
      *
-     * @param e The RuntimeException to handle
-     * @return ResponseEntity containing details about the exception
-     *//*
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<Object> exception(final RuntimeException e) {
-        return ResultUtil.fail(HttpStatus.INTERNAL_SERVER_ERROR, MessageCode.ES0001);
-    }*/
+     * @param request   {HttpServletRequest}
+     * @param response  {HttpServletResponse}
+     * @param sysResult {SysResult}
+     */
+    private void responseJson(HttpServletRequest request, HttpServletResponse response, ResponceResult sysResult) {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json; charset=utf-8");
+        try (PrintWriter out = response.getWriter()) {
+            out.append(ObjectMapperUtil.writeValueAsString(sysResult));
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+        }
+    }
 }

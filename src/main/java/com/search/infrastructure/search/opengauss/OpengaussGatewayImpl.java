@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.infrastructure.search.opengauss;
 
 import com.search.adapter.vo.CountResponceVo;
@@ -29,7 +39,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OpengaussGatewayImpl extends BaseFounctionGateway implements OpengaussGateway {
 
-
+    /**
+     * Search for different types of data.
+     *
+     * @param searchDocsCondition The search condition for querying different types of data.
+     * @return DocsResponceVo<OpenGaussVo>.
+     */
     @Override
     public DocsResponceVo<OpenGaussVo> searchByCondition(DocsOpengaussCondition searchDocsCondition) {
         List<Map<String, Object>> dateMapList = super.getDefaultSearchByCondition(searchDocsCondition);
@@ -39,11 +54,23 @@ public class OpengaussGatewayImpl extends BaseFounctionGateway implements Openga
         return docsResponceVo;
     }
 
+    /**
+     * Search the number of data.
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return CountResponceVo.
+     */
     @Override
     public CountResponceVo getSearchCountByCondition(DocsOpengaussCondition condition) {
         return super.getDefaultSearchCountByCondition(condition);
     }
 
+    /**
+     * Search for sort  of  Opengauss data.
+     *
+     * @param sortCondition The search condition for Openeuler.
+     * @return SortResponceVo<OpenEulerVo>.
+     */
     @Override
     public SortResponceVo<OpenGaussVo> getSearchSortByCondition(SortOpengaussCondition sortCondition) {
         SearchResponse response = super.getSearchSortListByCondition(sortCondition);
@@ -57,13 +84,25 @@ public class OpengaussGatewayImpl extends BaseFounctionGateway implements Openga
         return null;
     }
 
+    /**
+     * Search the tags of   Opengauss data.
+     *
+     * @param tagsCondition The search condition for querying tags.
+     * @return TagsResponceVo.
+     */
     @Override
     public TagsResponceVo getSearchTagsByCondition(TagsOpengaussCondition tagsCondition) {
         return super.getDefaultSearchTagsByCondition(tagsCondition);
     }
 
+    /**
+     * get Dvide Search Sort  of   Opengauss data.
+     *
+     * @param sortCondition The search condition for querying .
+     * @return SortResponceVo<OpenEulerVo>.
+     */
     @Override
-    public SortResponceVo<OpenEulerVo> getDvideSearchSortByCondition(SortOpengaussCondition sortCondition) {
+    public SortResponceVo<OpenGaussVo> getDvideSearchSortByCondition(SortOpengaussCondition sortCondition) {
         SearchResponse response = super.getDvideSearchSortByCondition(sortCondition);
         if (response != null) {
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
@@ -75,8 +114,14 @@ public class OpengaussGatewayImpl extends BaseFounctionGateway implements Openga
         return null;
     }
 
+    /**
+     * Search for  Opengauss document data
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return SortResponceVo<OpenEulerVo>.
+     */
     @Override
-    public SortResponceVo<OpenEulerVo> searchDocByType(DivideDocsBaseCondition condition) {
+    public SortResponceVo<OpenGaussVo> searchDocByType(DivideDocsBaseCondition condition) {
         SearchRequest divideDocsSearch = requestBuilder.getDivideDocsSearch(condition);
         SearchResponse searchResponse = super.executeDefaultEsSearch(divideDocsSearch);
         if (searchResponse != null) {

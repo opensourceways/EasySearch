@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.controller;
 
 import com.search.adapter.SearchAdapter;
@@ -12,8 +22,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
-
-
 @RestController
 @RequestMapping("/search/sort")
 @RequiredArgsConstructor
@@ -21,13 +29,25 @@ public class
 DivideController {
     private final SearchAdapter searchAdapter;
 
+    /**
+     * 根据数据源适配gateway以实现搜索特定type数据.
+     *
+     * @param condition condition obj.
+     * @param type      类型 .
+     * @return ResponceResult.
+     */
     @PostMapping("/{type}")
     public ResponceResult getDivideSortSearch(@PathVariable @NotBlank(message = "must have a type") String type, @RequestBody @NotEmpty(message = "Requires at least one condition") SortCondition condition) {
 
         return searchAdapter.getDivideSearch(condition, type);
     }
 
-
+    /**
+     * 根据数据源适配gateway以实现搜索文档数据
+     *
+     * @param condition condition obj.
+     * @return ResponceResult.
+     */
     @PostMapping("docs")
     public ResponceResult searchDivideDocsByCondition(@RequestBody @Validated DevideCondition condition) {
 

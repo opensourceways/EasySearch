@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.adapter;
 
 import com.search.adapter.condition.DevideCondition;
@@ -32,13 +42,33 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SearchAdapter {
+    /**
+     * Provide openeuler search capability.
+     */
     private final OpeneulerGateway openeulerGateway;
+    /**
+     * Provide  mindSpore search capability.
+     */
     private final MindSporeGateway mindSporeGateway;
+    /**
+     * Provide pengauss search capability.
+     */
     private final OpengaussGateway opengaussGateway;
+    /**
+     * Provide openmind search capability.
+     */
     private final OpenmindGateway openmindGateway;
+    /**
+     * Provide softcenter search capability.
+     */
     private final SoftcenterGateway softcenterGateway;
 
-
+    /**
+     * 根据数据源适配gateway以实现搜索符合条件的各种类型数据
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return ResponceResult.
+     */
     public ResponceResult searchDataByCondition(DocsCondition condition) {
         String dataSource = ThreadLocalCache.getDataSource();
         String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
@@ -67,7 +97,12 @@ public class SearchAdapter {
 
     }
 
-
+    /**
+     * 根据数据源适配gateway以实现搜索符合条件的各种类型数据的数量.
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return ResponceResult.
+     */
     public ResponceResult getDocsCountByCondition(DocsCondition condition) {
         String dataSource = ThreadLocalCache.getDataSource();
         String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
@@ -99,7 +134,12 @@ public class SearchAdapter {
 
     }
 
-
+    /**
+     * 根据数据源适配gateway以实现搜索符合特定类型的数据.
+     *
+     * @param condition The search condition for querying Sort.
+     * @return ResponceResult.
+     */
     public ResponceResult geSortByCondition(SortCondition condition) {
 
         String dataSource = ThreadLocalCache.getDataSource();
@@ -123,7 +163,12 @@ public class SearchAdapter {
         }
     }
 
-
+    /**
+     * 根据数据源适配gateway以实现搜索数据的标签.
+     *
+     * @param condition The search condition for querying tags.
+     * @return ResponceResult.
+     */
     public ResponceResult getTagsByCondition(TagsCondition condition) {
         String dataSource = ThreadLocalCache.getDataSource();
         String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
@@ -146,7 +191,12 @@ public class SearchAdapter {
         }
     }
 
-
+    /**
+     * 根据数据源适配gateway以实现搜索特定type数据.
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return ResponceResult.
+     */
     public ResponceResult getDivideSearch(SortCondition condition, String type) {
 
         String dataSource = ThreadLocalCache.getDataSource();
@@ -165,16 +215,17 @@ public class SearchAdapter {
                 SortOpengaussCondition sortOpengaussCondition = new SortOpengaussCondition();
                 return ResponceResult.ok(opengaussGateway.getDvideSearchSortByCondition(sortOpengaussCondition));
 
-            case SourceConstant.SOURCE_OPENMIND:
-                SortOpenmindCondition sortOpenmindCondition = new SortOpenmindCondition();
-                return ResponceResult.ok(openmindGateway.getDvideSearchSortByCondition(sortOpenmindCondition));
-
             default:
                 return ResponceResult.fail("not supported currently source", null);
         }
     }
 
-
+    /**
+     * 根据数据源适配gateway以实现搜索文档数据
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return ResponceResult.
+     */
     public ResponceResult getDocSearch(DevideCondition condition) {
 
         String dataSource = ThreadLocalCache.getDataSource();
@@ -199,7 +250,12 @@ public class SearchAdapter {
 
     }
 
-
+    /**
+     * 根据数据源适配gateway以实现搜索符合条件数据的特定字段以及数量.
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return ResponceResult.
+     */
     public ResponceResult getDocAllByCondition(DocsCondition condition) {
 
         String dataSource = ThreadLocalCache.getDataSource();
@@ -214,7 +270,12 @@ public class SearchAdapter {
         }
     }
 
-
+    /**
+     * 根据数据源适配gateway以实现搜索建议.
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return ResponceResult.
+     */
     public ResponceResult getSuggByCondition(DocsCondition condition) {
 
         String dataSource = ThreadLocalCache.getDataSource();

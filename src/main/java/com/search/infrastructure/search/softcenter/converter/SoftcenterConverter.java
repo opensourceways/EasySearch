@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.infrastructure.search.softcenter.converter;
 
 
@@ -13,8 +23,18 @@ import java.util.List;
 
 
 @Slf4j
-public class SoftcenterConverter {
+public final class SoftcenterConverter {
 
+    private SoftcenterConverter() {
+
+    }
+
+    /**
+     * convert SoftCenterDo  To ApplicationVersion.
+     *
+     * @param applicationVersionDoList The list of SoftCenterDo.
+     * @return A list of ApplicationVersionVo.
+     */
     public static List<ApplicationVersionVo> convertToApplicationVersion(List<SoftCenterDo> applicationVersionDoList) {
         List<ApplicationVersionVo> softwareAppVersionDtoList = new ArrayList<>();
         applicationVersionDoList.stream().forEach(m -> {
@@ -31,6 +51,12 @@ public class SoftcenterConverter {
         return softwareAppVersionDtoList;
     }
 
+    /**
+     * convert SoftCenterDo  To FieldApplicationVo.
+     *
+     * @param fieldApplicationDoList The list of SoftCenterDo.
+     * @return A list of FieldApplicationVo.
+     */
     public static List<FieldApplicationVo> convertToFieldApplication(List<SoftCenterDo> fieldApplicationDoList) {
         List<FieldApplicationVo> fieldApplicationVoList = new ArrayList<>();
         fieldApplicationDoList.stream().forEach(m -> {
@@ -53,6 +79,12 @@ public class SoftcenterConverter {
         return fieldApplicationVoList;
     }
 
+    /**
+     * convert SoftCenterDo  To ApplicationPackageVo.
+     *
+     * @param applicationPackageDoList The list of SoftCenterDo.
+     * @return A list of ApplicationPackageVo.
+     */
     public static List<ApplicationPackageVo> convertToApplicationPackage(List<SoftCenterDo> applicationPackageDoList) {
         List<ApplicationPackageVo> applicationPackageVoList = new ArrayList<>();
         applicationPackageDoList.stream().forEach(m -> {
@@ -79,6 +111,12 @@ public class SoftcenterConverter {
         return applicationPackageVoList;
     }
 
+    /**
+     * convert SoftCenterDo  To EPKGPackageVo.
+     *
+     * @param epkgPackageDoList The list of SoftCenterDo.
+     * @return A list of EPKGPackageVo.
+     */
     public static List<EPKGPackageVo> convertToEPKGPackage(List<SoftCenterDo> epkgPackageDoList) {
         List<EPKGPackageVo> softwareEpkgVoList = new ArrayList<>();
 
@@ -97,6 +135,12 @@ public class SoftcenterConverter {
         return softwareEpkgVoList;
     }
 
+    /**
+     * convert SoftCenterDo  To RPMPackageVo.
+     *
+     * @param rpmPackageDoList The list of SoftCenterDo.
+     * @return A list of RPMPackageVo.
+     */
     public static List<RPMPackageVo> convertAppMapToSoftwareRpmDto(List<SoftCenterDo> rpmPackageDoList) {
         List<RPMPackageVo> rpmPackageVoList = new ArrayList<>();
         rpmPackageDoList.stream().forEach(m -> {
