@@ -48,6 +48,11 @@ public final class SortUtil {
         return list;
     }
 
+    /**
+     * sort the responce.
+     *
+     * @param responce responce
+     */
     public static void sortResponce(List<DocsAllVo> responce) {
         responce.sort(Comparator.comparingInt(a -> RESPONCEORDERS.indexOf(a.getKey())));
     }

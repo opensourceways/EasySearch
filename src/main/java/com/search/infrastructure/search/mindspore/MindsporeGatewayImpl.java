@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.infrastructure.search.mindspore;
 
 import com.search.adapter.vo.CountResponceVo;
@@ -19,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +38,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSporeGateway {
+    /**
+     * Search for different types of data.
+     *
+     * @param searchBaseCondition The search condition for querying MindSpore.
+     * @return ResponceResult.
+     */
     @Override
     public DocsResponceVo<MindSporeVo> searchByCondition(DocsMindsporeCondition searchBaseCondition) {
         List<Map<String, Object>> dateMapList = super.getDefaultSearchByCondition(searchBaseCondition);
@@ -36,11 +53,23 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         return docsResponceVo;
     }
 
+    /**
+     * Search the number of   MindSpore data.
+     *
+     * @param condition The search condition for querying MindSpore.
+     * @return CountResponceVo.
+     */
     @Override
     public CountResponceVo getSearchCountByCondition(DocsMindsporeCondition condition) {
         return super.getDefaultSearchCountByCondition(condition);
     }
 
+    /**
+     * Search for sort  of  MindSpore data.
+     *
+     * @param sortCondition The search condition for MindSpore.
+     * @return SortResponceVo<MindSporeVo>.
+     */
     @Override
     public SortResponceVo getSearchSortByCondition(SortMindsporeCondition sortCondition) {
         SearchResponse response = super.getSearchSortListByCondition(sortCondition);
@@ -54,11 +83,23 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         return null;
     }
 
+    /**
+     * Search the tags of   MindSpore data..
+     *
+     * @param tagsCondition The search condition for querying tags.
+     * @return TagsResponceVo.
+     */
     @Override
     public TagsResponceVo getSearchTagsByCondition(TagsMindsporeCondition tagsCondition) {
         return super.getDefaultSearchTagsByCondition(tagsCondition);
     }
 
+    /**
+     * get Dvide Search Sort  of   MindSpore data.
+     *
+     * @param sortCondition The search condition for querying .
+     * @return SortResponceVo<OpenEulerVo>.
+     */
     @Override
     public SortResponceVo getDvideSearchSortByCondition(SortMindsporeCondition sortCondition) {
         SearchResponse response = super.getDvideSearchSortByCondition(sortCondition);
@@ -72,6 +113,12 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         return null;
     }
 
+    /**
+     * Search for  MindSpore document data
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return SortResponceVo<OpenEulerVo>.
+     */
     @Override
     public SortResponceVo<MindSporeVo> searchDocByType(DivideDocsBaseCondition condition) {
         SearchResponse searchResponse = super.getSearchDocByType(condition);

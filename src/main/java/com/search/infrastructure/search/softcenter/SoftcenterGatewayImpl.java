@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.infrastructure.search.softcenter;
 
 import com.search.adapter.vo.CountResponceVo;
@@ -43,9 +53,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class SoftcenterGatewayImpl extends BaseFounctionGateway implements SoftcenterGateway {
+    /**
+     * Autowired ThreadPoolTaskExecutor bean.
+     */
     @Autowired
     ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
+    /**
+     * Search for different types of data.
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return ResponceResult.
+     */
     @Override
     public SoftWareVo searchByCondition(DocsSoftcenterCondition condition) {
         SearchRequest searchRequest = requestBuilder.getDefaultSearchRequest(condition.getIndex());
@@ -63,7 +82,12 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
         return null;
     }
 
-
+    /**
+     * Search the number of data.
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return ResponceResult.
+     */
     @Override
     public CountResponceVo getSearchCountByCondition(DocsSoftcenterCondition condition) {
         List<CountVo> countList = new ArrayList<>();
@@ -93,6 +117,12 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
         return countResponceVo;
     }
 
+    /**
+     * Search for the number of specific fields that meet the criteria.
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return List<DocsAllVo>.
+     */
     @Override
     public List<DocsAllVo> getSearchAllByCondition(DocsSoftcenterCondition condition) {
         List<DocsAllVo> responce = new ArrayList<>();
@@ -163,7 +193,12 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
         return responce;
     }
 
-
+    /**
+     * Search for the number of specific fields that meet the criteria.
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return List<DocsAllVo>.
+     */
     private SearchSourceBuilder buildSearchSourceBuilderByCondition(DocsSoftcenterCondition condition) {
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -253,7 +288,12 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
 
     }
 
-
+    /**
+     * 将搜索的List<Map> 数据按照不同类型的数据和业务数据转换成对应的vo.
+     *
+     * @param data 搜索的原始数据.
+     * @return SoftWareVo.
+     */
     private SoftWareVo getSearchResponce(List<Map<String, Object>> data) {
         SoftWareVo searchResponce = new SoftWareVo();
         Map<String, List<Map<String, Object>>> dataTypeMap = data.stream().collect(Collectors.groupingBy(m -> {
