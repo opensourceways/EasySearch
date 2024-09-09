@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.infrastructure.support.action;
 
 import org.elasticsearch.action.search.SearchResponse;
@@ -15,7 +25,12 @@ import java.util.Map;
 
 @Component
 public class BaseFounctionResponceHandler {
-
+    /**
+     * Convert an SearchResponse object to an list.
+     *
+     * @param response SearchResponse.
+     * @return An list of map.
+     */
     public List<Map<String, Object>> handResponceHitsToMapList(SearchResponse response) {
         List<Map<String, Object>> dateMapList = new ArrayList<>();
         for (SearchHit hit : response.getHits().getHits()) {
@@ -25,7 +40,13 @@ public class BaseFounctionResponceHandler {
         return dateMapList;
     }
 
-
+    /**
+     * Convert an SearchResponse object to an list.
+     *
+     * @param response SearchResponse.
+     * @param term     term.
+     * @return An list of map.
+     */
     public List<Map<String, Object>> handAggregationToCountList(SearchResponse response, String term) {
         List<Map<String, Object>> numberList = new ArrayList<>();
         ParsedTerms aggregation = response.getAggregations().get(term);
@@ -39,7 +60,14 @@ public class BaseFounctionResponceHandler {
         return numberList;
     }
 
-
+    /**
+     * Convert an SearchResponse object to an list.
+     *
+     * @param response           SearchResponse.
+     * @param highlightFieldList highlightFieldList.
+     * @param subStringField     subStringField.
+     * @return An list of map.
+     */
     public List<Map<String, Object>> getDefaultsHightResponceToMapList(SearchResponse response, List<String> highlightFieldList, String subStringField) {
         List<Map<String, Object>> data = new ArrayList<>();
         for (SearchHit hit : response.getHits().getHits()) {

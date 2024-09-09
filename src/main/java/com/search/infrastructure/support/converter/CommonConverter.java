@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.infrastructure.support.converter;
 
 import com.alibaba.fastjson.JSONObject;
@@ -12,18 +22,30 @@ import java.util.Map;
 
 public class CommonConverter {
 
+
+    /**
+     * Convert an list of map object to an CountVo list.
+     *
+     * @param numberList The list of map  to convert
+     * @return An list of CountVo
+     */
     public static List<CountVo> toCountVoList(List<Map<String, Object>> numberList) {
         List<CountVo> countVos = new ArrayList<>();
         for (Map<String, Object> map : numberList) {
             CountVo countVo = new CountVo();
-            countVo.setDoc_count(Long.parseLong(map.get("doc_count")+""));
+            countVo.setDoc_count(Long.parseLong(map.get("doc_count") + ""));
             countVo.setKey(String.valueOf(map.get("key")));
             countVos.add(countVo);
         }
         return countVos;
     }
 
-
+    /**
+     * Convert an list of map object to an TagsVo list.
+     *
+     * @param numberList The list of map  to convert
+     * @return An list of TagsVo
+     */
     public static List<TagsVo> toTagsVoList(List<Map<String, Object>> numberList) {
         List<TagsVo> tagsVos = new ArrayList<>();
         for (Map<String, Object> map : numberList) {
@@ -37,7 +59,13 @@ public class CommonConverter {
         return tagsVos;
     }
 
-
+    /**
+     * Convert an list of map object to an Do list.
+     *
+     * @param dateMapList The list of map  to convert
+     * @param clazz       to Convert type
+     * @return An list of clazz
+     */
     public static <T> List<T> toDoList(final List<Map<String, Object>> dateMapList, Class<T> clazz) {
         List<T> doList = new ArrayList<>(dateMapList.size());
         for (Map<String, Object> map : dateMapList) {
@@ -47,7 +75,13 @@ public class CommonConverter {
         return doList;
     }
 
-
+    /**
+     * Convert an list of map object to an vo list.
+     *
+     * @param doList The list of map  to convert
+     * @param clazz  to Convert type
+     * @return An list of clazz
+     */
     public static <T> List<T> toBaseVoList(final List doList, Class<T> clazz) {
         List<T> voList = new ArrayList<>(doList.size());
         for (Object dataObject : doList) {

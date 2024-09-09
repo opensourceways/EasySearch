@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.infrastructure.support.action;
 
 import com.alibaba.fastjson.JSONObject;
@@ -31,24 +41,37 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-
 public class BaseFounctionRequestBuilder {
+    /**
+     * Autowired EsQueryBuildConfig bean.
+     */
     @Autowired
     EsQueryBuildConfig esQueryBuildConfig;
 
-
+    /**
+     * 创建SearchRequest.
+     *
+     * @param index 索引.
+     * @return SearchResponse.
+     */
     public SearchRequest getDefaultSearchRequest(String index) {
         SearchRequest request = new SearchRequest(index);
         return request;
     }
 
-
+    /**
+     * buildBoolQuery.
+     *
+     * @return BoolQueryBuilder.
+     */
     public BoolQueryBuilder buildBoolQuery() {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         return boolQueryBuilder;
     }
 
-
+    /**
+     * buildShouldQuery.
+     */
     public void buildShouldQuery(BoolQueryBuilder boolQueryBuilder, String keyWord) {
         List<EsQueryBuildConfig.BuildQuery> queries = esQueryBuildConfig.getQueries();
         if (queries == null)
@@ -82,7 +105,9 @@ public class BaseFounctionRequestBuilder {
         boolQueryBuilder.minimumShouldMatch(1);
     }
 
-
+    /**
+     * buildMustNotQuery.
+     */
     public void buildMustNotQuery(BoolQueryBuilder boolQueryBuilder, Object limit, Object filter) {
         if (limit instanceof List) {
             List limitList = (List) limit;
@@ -132,7 +157,11 @@ public class BaseFounctionRequestBuilder {
         }
     }
 
-
+    /**
+     * buildHighlightBuilder.
+     *
+     * @return HighlightBuilder.
+     */
     public HighlightBuilder buildHighlightBuilder() {
         List<EsQueryBuildConfig.BuildQuery> queries = esQueryBuildConfig.getQueries();
         if (queries == null)
@@ -156,7 +185,12 @@ public class BaseFounctionRequestBuilder {
         return highlightBuilder;
     }
 
-
+    /**
+     * buildFunctionScoreQuery.
+     *
+     * @param boolQueryBuilder boolQueryBuilder.
+     * @return FunctionScoreQueryBuilder.
+     */
     public FunctionScoreQueryBuilder buildFunctionScoreQuery(BoolQueryBuilder boolQueryBuilder) {
         List<EsQueryBuildConfig.BuildQuery> collect = esQueryBuildConfig.getQueries().stream().filter(buildQuery -> ThreadLocalCache.getDataSource().equals(buildQuery.getSource())).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(collect) && collect.get(0).getFunctions() != null) {
@@ -176,7 +210,12 @@ public class BaseFounctionRequestBuilder {
         return null;
     }
 
-
+    /**
+     * 根据SearchDocsBaseCondition 组建SearchRequest.
+     *
+     * @param condition SearchDocsBaseCondition.
+     * @return SearchRequest.
+     */
     public SearchRequest getDefaultDocsSearchRequest(SearchDocsBaseCondition condition) {
         SearchRequest defaultSearchRequest = getDefaultSearchRequest(condition.getIndex());
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -193,7 +232,14 @@ public class BaseFounctionRequestBuilder {
         return defaultSearchRequest;
     }
 
-
+    /**
+     * 根据SearchDocsBaseCondition 组建SearchRequest.
+     *
+     * @param condition SearchDocsBaseCondition.
+     * @param field     AggregationBuilders.field
+     * @param terms     AggregationBuilders.terms.
+     * @return SearchRequest.
+     */
     public SearchRequest getDefaultCountSearchRequest(SearchDocsBaseCondition condition, String field, String terms) {
         SearchRequest defaultSearchRequest = getDefaultSearchRequest(condition.getIndex());
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -206,7 +252,13 @@ public class BaseFounctionRequestBuilder {
         return defaultSearchRequest;
     }
 
-
+    /**
+     * getDefaultSortSearchRequest.
+     *
+     * @param condition       SearchSortBaseCondition.
+     * @param isNeedHighlight 响应结果是否需要高亮.
+     * @return SearchRequest.
+     */
     public SearchRequest getDefaultSortSearchRequest(SearchSortBaseCondition condition, Boolean isNeedHighlight) {
 
         SearchRequest request = new SearchRequest(condition.getIndex());
@@ -244,7 +296,12 @@ public class BaseFounctionRequestBuilder {
         return request;
     }
 
-
+    /**
+     * getDefaultTagsSearchRequest.
+     *
+     * @param condition SearchTagsBaseCondition.
+     * @return SearchRequest.
+     */
     public SearchRequest getDefaultTagsSearchRequest(SearchTagsBaseCondition condition) {
 
         SearchRequest request = new SearchRequest(condition.getIndex());
@@ -270,13 +327,23 @@ public class BaseFounctionRequestBuilder {
         return request;
     }
 
-
+    /**
+     * getDivideSortSearch.
+     *
+     * @param condition SearchSortBaseCondition.
+     * @return SearchRequest.
+     */
     public SearchRequest getDivideSortSearch(SearchSortBaseCondition condition) {
 
         return getDefaultSortSearchRequest(condition, Boolean.FALSE);
     }
 
-
+    /**
+     * getDivideDocsSearch.
+     *
+     * @param condition DivideDocsBaseCondition.
+     * @return SearchRequest.
+     */
     public SearchRequest getDivideDocsSearch(DivideDocsBaseCondition condition) {
         SearchRequest request = getDefaultSearchRequest(condition.getIndex());
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -319,7 +386,13 @@ public class BaseFounctionRequestBuilder {
         return request;
     }
 
-
+    /**
+     * buildMatchQueriesByConfig.
+     *
+     * @param boolQueryBuilder   boolQueryBuilder.
+     * @param matchQueriesConfig matchQueriesConfig.
+     * @param keyWord            keyWord.
+     */
     private void buildMatchQueriesByConfig(List<EsQueryBuildConfig.MatchQuery> matchQueriesConfig, BoolQueryBuilder boolQueryBuilder, String keyWord) {
         for (EsQueryBuildConfig.MatchQuery matchQueryConfig : matchQueriesConfig) {
             MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(matchQueryConfig.getName(), keyWord).analyzer(matchQueryConfig.getAnalyzer());
@@ -330,6 +403,13 @@ public class BaseFounctionRequestBuilder {
         }
     }
 
+    /**
+     * buildMatchPhraseQueriesrByConfig.
+     *
+     * @param boolQueryBuilder   boolQueryBuilder.
+     * @param matchQueriesConfig matchQueriesConfig.
+     * @param keyWord            keyWord.
+     */
     private void buildMatchPhraseQueriesrByConfig(List<EsQueryBuildConfig.MatchQuery> matchQueriesConfig, BoolQueryBuilder boolQueryBuilder, String keyWord) {
         for (EsQueryBuildConfig.MatchQuery matchQueryConfig : matchQueriesConfig) {
             MatchPhraseQueryBuilder matchPhraseQueryBuilder = QueryBuilders.matchPhraseQuery(matchQueryConfig.getName(), keyWord).analyzer(matchQueryConfig.getAnalyzer()).boost(matchQueryConfig.getBoost() == null ? 1 : matchQueryConfig.getBoost());
