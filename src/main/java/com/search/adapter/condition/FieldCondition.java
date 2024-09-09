@@ -25,27 +25,27 @@ public class FieldCondition {
      */
     @Size(max = 30)
     @Pattern(regexp = SearchConstant.VALID_STR_REGEXP, message = SearchConstant.VALID_MESSAGE)
-    String type;
+    private String type;
     /**
      * condition field of components.
      */
     @Size(max = 30)
     @Pattern(regexp = SearchConstant.VALID_STR_REGEXP, message = SearchConstant.VALID_MESSAGE)
-    String components;
+    private String components;
 
     /**
      * condition field of name.
      */
     @Size(max = 30)
     @Pattern(regexp = SearchConstant.VALID_STR_REGEXP, message = SearchConstant.VALID_MESSAGE)
-    String name;
+    private String name;
 
     /**
      * condition field of docsType.
      */
     @Size(max = 30)
     @Pattern(regexp = SearchConstant.VALID_STR_REGEXP, message = SearchConstant.VALID_MESSAGE)
-    String docsType;
+    private String docsType;
 
     /**
      * condition field of dataType.

@@ -15,7 +15,6 @@ import com.search.adapter.vo.DocsResponceVo;
 import com.search.adapter.vo.SortResponceVo;
 import com.search.adapter.vo.TagsResponceVo;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
-import com.search.domain.openeuler.vo.OpenEulerVo;
 import com.search.domain.opengauss.dto.DocsOpengaussCondition;
 import com.search.domain.opengauss.dto.SortOpengaussCondition;
 import com.search.domain.opengauss.dto.TagsOpengaussCondition;
@@ -64,7 +63,7 @@ public interface OpengaussGateway {
     SortResponceVo<OpenGaussVo> getDvideSearchSortByCondition(SortOpengaussCondition sortCondition);
 
     /**
-     * Search for  Opengauss document data
+     * Search for  Opengauss document data.
      *
      * @param DivideDocsBaseCondition The search condition for querying different types of data.
      * @return SortResponceVo<OpenEulerVo>.

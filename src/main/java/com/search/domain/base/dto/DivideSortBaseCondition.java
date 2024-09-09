@@ -10,9 +10,11 @@
 */
 package com.search.domain.base.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class DivideSortBaseCondition {
     /**
      * 输入框关键字.

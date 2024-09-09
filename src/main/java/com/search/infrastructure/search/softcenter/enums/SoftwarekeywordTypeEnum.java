@@ -50,8 +50,9 @@ public enum SoftwarekeywordTypeEnum {
      */
     public static boolean isSupportKeywordType(String keywordType) {
         for (SoftwarekeywordTypeEnum value : SoftwarekeywordTypeEnum.values()) {
-            if (value.getKeywordType().equals(keywordType))
+            if (value.getKeywordType().equals(keywordType)) {
                 return Boolean.TRUE;
+            }
         }
         return Boolean.FALSE;
     }

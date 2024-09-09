@@ -10,124 +10,127 @@
 */
 package com.search.infrastructure.search.openmind.dataobject;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
+
 public class OpenMindDo {
 
 
     /**
-     * 档案
+     * 档案.
      */
     private String archives;
     /**
-     * 文章名
+     * 文章名.
      */
     private String articleName;
 
     /**
-     * 类别
+     * 类别.
      */
     private String category;
 
 
     /**
-     * 日期
+     * 日期.
      */
     private Date date;
 
     /**
-     * 文档类型
+     * 文档类型.
      */
     private String docsType;
 
     /**
-     * from
+     * from.
      */
-    String from;
+    private String from;
 
 
     /**
-     * css h1 标签
+     * css h1 标签.
      */
     private String h1;
 
     /**
-     * css h2 标签
+     * css h2 标签.
      */
     private String h2;
 
     /**
-     * css h3 标签
+     * css h3 标签.
      */
     private String h3;
 
     /**
-     * css h4 标签
+     * css h4 标签.
      */
     private String h4;
 
     /**
-     * css h5 标签
+     * css h5 标签.
      */
     private String h5;
 
     /**
-     * 标题
+     * 标题.
      */
     private String title;
 
 
     /**
-     * es数据id,唯一
+     * es数据id,唯一.
      */
     private String id;
     /**
-     * 语言
+     * 语言.
      */
     private String lang;
 
     /**
-     * 路径,用于前台跳转
+     * 路径,用于前台跳转.
      */
     private String path;
 
     /**
-     * 指定
+     * 指定.
      */
     private String specify;
 
 
     /**
-     * css 加粗 标签
+     * css 加粗 标签.
      */
     private String strong;
 
     /**
-     * time
+     * time.
      */
     private String time;
 
 
     /**
-     * 文本内容
+     * 文本内容.
      */
     private String textContent;
 
     /**
-     * 类型
+     * 类型.
      */
     private String type;
 
     /**
-     * 版本
+     * 版本.
      */
     private String version;
 
     /**
-     * 设置
+     * 设置.
      */
     private String settings;
 

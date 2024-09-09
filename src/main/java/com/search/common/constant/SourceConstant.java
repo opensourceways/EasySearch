@@ -10,7 +10,14 @@
 */
 package com.search.common.constant;
 
-public class SourceConstant {
+public final class SourceConstant {
+
+    // Private constructor to prevent instantiation of the SourceConstant class
+    private SourceConstant() {
+        // private constructor to hide the implicit public one
+        throw new AssertionError("SourceConstant class cannot be instantiated.");
+    }
+
     /**
      * Constant of REQUETS_HEADER_SOURCE.
      */

@@ -22,8 +22,7 @@ public class TagsMindsporeCondition extends SearchTagsBaseCondition {
      * 有参构造，初始化TagsMindsporeCondition.
      *
      * @param index     数据索引 .
-     * @param condition 前台请求封装条件
-     * @return TagsMindsporeCondition.
+     * @param condition 前台请求封装条件.
      */
     public TagsMindsporeCondition(TagsCondition condition, String index) {
         super.category = condition.getCategory();

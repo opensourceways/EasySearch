@@ -11,79 +11,81 @@
 package com.search.domain.opengauss.vo;
 
 import com.search.domain.base.vo.CommunityCssVo;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class OpenGaussVo extends CommunityCssVo {
     /**
-     * 作者
+     * 作者.
      */
     private String author;
 
     /**
-     * banner
+     * banner.
      */
     private String banner;
     /**
-     * company
+     * company.
      */
     private String company;
     /**
-     * detail
+     * detail.
      */
     private String detail;
 
     /**
-     * 图片
+     * 图片.
      */
     private String img;
     /**
-     * img_mobile
+     * img_mobile.
      */
     private String img_mobile;
     /**
-     * 行业
+     * 行业.
      */
     private String industry;
     /**
-     * 标签
+     * 标签.
      */
     private String label;
     /**
-     * 标签2
+     * 标签2.
      */
     private String label2;
     /**
-     * link url
+     * link url.
      */
     private String link;
     /**
-     * 位置
+     * 位置.
      */
     private String location;
     /**
-     * 官方路径
+     * 官方路径.
      */
     private String officialpath;
     /**
-     * 概括
+     * 概括.
      */
     private String summary;
     /**
-     * tag
+     * tag.
      */
     private String tag;
 
     /**
-     * tags
+     * tags.
      */
     private String tags;
     /**
-     * times
+     * times.
      */
     private String times;
     /**
-     * 文章时间
+     * 文章时间.
      */
     private String time;
 }

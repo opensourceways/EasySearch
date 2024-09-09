@@ -11,7 +11,6 @@
 package com.search.adapter.vo;
 
 import com.search.domain.base.vo.CommunityBaseVo;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,21 +22,29 @@ public class SortResponceVo<T extends CommunityBaseVo> {
     /**
      * list of object.
      */
-    List<T> records;
+    private List<T> records;
     /**
      * current request pageSize.
      */
-    Integer pageSize;
+    private Integer pageSize;
 
     /**
      * current request page.
      */
-    Integer page;
+    private Integer page;
     /**
      * result count.
      */
-    Long count;
+    private Long count;
 
+    /**
+     * 有参构造.
+     *
+     * @param records  数据主题 .
+     * @param pageSize 每页数量.
+     * @param page     页码.
+     * @param count    命中数据总量.
+     */
     public SortResponceVo(List<T> records, Integer pageSize, Integer page, Long count) {
         this.records = records;
         this.pageSize = pageSize;

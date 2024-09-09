@@ -13,8 +13,6 @@ package com.search.infrastructure.search.softcenter.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.HashSet;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor

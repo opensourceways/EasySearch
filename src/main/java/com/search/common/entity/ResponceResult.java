@@ -11,10 +11,8 @@
 package com.search.common.entity;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 @Data
-@Accessors(chain = true)
 public class ResponceResult {
     /**
      * 状态码.
@@ -30,12 +28,11 @@ public class ResponceResult {
     private Object obj;
 
     /**
-     * 有参构造，初始ResponceResult
+     * 有参构造，初始ResponceResult.
      *
      * @param status 状态码 .
      * @param msg    响应消息.
      * @param obj    响应数据.
-     * @return ResponceResult.
      */
     public ResponceResult(Integer status, String msg, Object obj) {
         this.status = status;
@@ -44,7 +41,7 @@ public class ResponceResult {
     }
 
     /**
-     * 定义成功的静态方法
+     * 定义成功的静态方法.
      *
      * @param msg 响应消息.
      * @param obj 响应数据.

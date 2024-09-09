@@ -68,7 +68,8 @@ public class BaseFounctionResponceHandler {
      * @param subStringField     subStringField.
      * @return An list of map.
      */
-    public List<Map<String, Object>> getDefaultsHightResponceToMapList(SearchResponse response, List<String> highlightFieldList, String subStringField) {
+    public List<Map<String, Object>> getDefaultsHightResponceToMapList(SearchResponse response,
+                                                                       List<String> highlightFieldList, String subStringField) {
         List<Map<String, Object>> data = new ArrayList<>();
         for (SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> map = hit.getSourceAsMap();

@@ -26,10 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/search")
 @RequiredArgsConstructor
 public class SearchController {
+    /**
+     * search adapter.
+     */
     private final SearchAdapter searchAdapter;
 
     /**
-     * 搜索符合条件的各种类型数据
+     * 搜索符合条件的各种类型数据.
      *
      * @param condition controller conditon.
      * @return ResponceResult.

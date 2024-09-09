@@ -38,19 +38,29 @@ public enum SearchSourceEnum {
      * Enum datesource of softcenter .
      */
     SOFTCENTER(SourceConstant.SOURCE_SOFTCENTER, "软件中心");
+
+
+    /**
+     * 数据源字段 .
+     */
     private final String source;
+
+    /**
+     * 数据源信息字段 .
+     */
     private final String info;
 
     /**
-     * 根据传入的dataSource获取project的SearchSourceEnum
+     * 根据传入的dataSource获取project的SearchSourceEnum.
      *
      * @param dataSource 数据源 .
      * @return SearchSourceEnum.
      */
     public static SearchSourceEnum getRequestTypeByDatasource(String dataSource) {
         for (SearchSourceEnum value : SearchSourceEnum.values()) {
-            if (value.getSource().equals(dataSource))
+            if (value.getSource().equals(dataSource)) {
                 return value;
+            }
         }
         return null;
     }

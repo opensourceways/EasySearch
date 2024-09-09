@@ -197,18 +197,30 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.2.4</version>
             </plugin>
-            <!--<plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <release>17</release>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.3.1</version>
                 <configuration>
-                    &lt;!&ndash; XXXX &ndash;&gt;
-                    &lt;!&ndash; 可以自定义的规则文件 &ndash;&gt;
+                    <!-- XXXX -->
+                    <!-- 可以自定义的规则文件 -->
                     <configLocation>checkstyle.xml</configLocation>
-                    &lt;!&ndash; 是否有输出文件 &ndash;&gt;
+                    <!-- 是否有输出文件 -->
                     <consoleOutput>true</consoleOutput>
-                    &lt;!&ndash; 是否因为不符合的规范中断mvn进程 &ndash;&gt;
+                    <!-- 是否因为不符合的规范中断mvn进程 -->
                     <failsOnError>false</failsOnError>
                     <linkXRef>false</linkXRef>
                     <skip>false</skip>
@@ -223,7 +235,15 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.2.3</version>
+                <configuration>
+                    <effort>Max</effort>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

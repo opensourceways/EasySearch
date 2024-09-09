@@ -49,7 +49,10 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         List<Map<String, Object>> dateMapList = super.getDefaultSearchByCondition(searchBaseCondition);
         List<MindsporeDo> mindsporeDos = CommonConverter.toDoList(dateMapList, MindsporeDo.class);
         List<MindSporeVo> mindSporeVos = CommonConverter.toBaseVoList(mindsporeDos, MindSporeVo.class);
-        DocsResponceVo<MindSporeVo> docsResponceVo = new DocsResponceVo(mindSporeVos, searchBaseCondition.getPageSize(), searchBaseCondition.getPage(), searchBaseCondition.getKeyword());
+        DocsResponceVo<MindSporeVo> docsResponceVo = new DocsResponceVo(mindSporeVos,
+                searchBaseCondition.getPageSize(),
+                searchBaseCondition.getPage(),
+                searchBaseCondition.getKeyword());
         return docsResponceVo;
     }
 
@@ -77,7 +80,14 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
             List<MindsporeDo> mindsporeDos = CommonConverter.toDoList(dateMapList, MindsporeDo.class);
             List<MindSporeVo> mindSporeVos = CommonConverter.toBaseVoList(mindsporeDos, MindSporeVo.class);
-            SortResponceVo<MindSporeVo> sortResponceVo = new SortResponceVo(mindSporeVos, sortCondition.getPageSize(), sortCondition.getPage(), response.getHits().getTotalHits().value);
+            long total = 0L;
+            if (response.getHits() != null && response.getHits().getTotalHits() != null) {
+                total = response.getHits().getTotalHits().value;
+            }
+            SortResponceVo<MindSporeVo> sortResponceVo = new SortResponceVo(mindSporeVos,
+                    sortCondition.getPageSize(),
+                    sortCondition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;
@@ -107,14 +117,21 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
             List<OpenMindDo> openMindDos = CommonConverter.toDoList(dateMapList, OpenMindDo.class);
             List<OpenMindVo> openMindVos = CommonConverter.toBaseVoList(openMindDos, OpenMindVo.class);
-            SortResponceVo<OpenMindVo> sortResponceVo = new SortResponceVo(openMindVos, sortCondition.getPageSize(), sortCondition.getPage(), response.getHits().getTotalHits().value);
+            long total = 0L;
+            if (response.getHits() != null && response.getHits().getTotalHits() != null) {
+                total = response.getHits().getTotalHits().value;
+            }
+            SortResponceVo<OpenMindVo> sortResponceVo = new SortResponceVo(openMindVos,
+                    sortCondition.getPageSize(),
+                    sortCondition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;
     }
 
     /**
-     * Search for  MindSpore document data
+     * Search for  MindSpore document data.
      *
      * @param condition The search condition for querying different types of data.
      * @return SortResponceVo<OpenEulerVo>.
@@ -126,7 +143,13 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(searchResponse);
             List<OpenMindDo> openMindDos = CommonConverter.toDoList(dateMapList, OpenMindDo.class);
             List<OpenMindVo> openMindVos = CommonConverter.toBaseVoList(openMindDos, OpenMindVo.class);
-            SortResponceVo<MindSporeVo> sortResponceVo = new SortResponceVo(openMindVos, condition.getPageSize(), condition.getPage(), searchResponse.getHits().getTotalHits().value);
+            long total = 0L;
+            if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits() != null) {
+                total = searchResponse.getHits().getTotalHits().value;
+            }
+            SortResponceVo<MindSporeVo> sortResponceVo = new SortResponceVo(openMindVos, condition.getPageSize(),
+                    condition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;

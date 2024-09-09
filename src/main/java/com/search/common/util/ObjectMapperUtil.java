@@ -11,11 +11,19 @@
 
 package com.search.common.util;
 
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.*;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -29,8 +37,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * Jackson工具类.
@@ -170,7 +185,7 @@ public final class ObjectMapperUtil {
     /**
      * Convert a JSON string to an object of the specified class.
      *
-     * @param <T> Type parameter for the method.
+     * @param <T>   Type parameter for the method.
      * @param clazz The class of the object to convert to
      * @param json  The JSON string to convert
      * @return An object of the specified class
@@ -193,7 +208,7 @@ public final class ObjectMapperUtil {
     /**
      * Convert a byte array representing JSON to an object of the specified class.
      *
-     * @param <T> Type parameter for the method.
+     * @param <T>   Type parameter for the method.
      * @param clazz The class of the object to convert to
      * @param bytes The byte array representing JSON data
      * @return An object of the specified class
@@ -216,7 +231,7 @@ public final class ObjectMapperUtil {
     /**
      * Convert a JSON string to a list of objects of the specified class.
      *
-     * @param <T> Type parameter for the method.
+     * @param <T>   Type parameter for the method.
      * @param clazz The class of the objects in the list
      * @param json  The JSON string to convert
      * @return A list of objects of the specified class

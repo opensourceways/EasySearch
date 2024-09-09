@@ -62,7 +62,7 @@ public interface MindSporeGateway {
     SortResponceVo<MindSporeVo> getDvideSearchSortByCondition(SortMindsporeCondition sortCondition);
 
     /**
-     * Search for  MindSpore document data
+     * Search for  MindSpore document data.
      *
      * @param DivideDocsBaseCondition The search condition for querying different types of data.
      * @return SortResponceVo<OpenEulerVo>.

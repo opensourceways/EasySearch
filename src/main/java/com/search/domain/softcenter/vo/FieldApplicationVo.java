@@ -10,8 +10,6 @@
 */
 package com.search.domain.softcenter.vo;
 
-
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,18 +18,17 @@ import java.util.Map;
 
 @Getter
 @Setter
-@Data
 public class FieldApplicationVo extends FieldBaseVo {
     /**
      * 标签.
      */
-    List tags;
+    private List tags;
     /**
      * pkgid.
      */
-    Map pkgIds;
+    private Map pkgIds;
     /**
      * icon Url.
      */
-    String iconUrl;
+    private String iconUrl;
 }
