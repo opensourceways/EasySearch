@@ -11,7 +11,6 @@
 package com.search.adapter.vo;
 
 import com.search.domain.base.vo.CommunityBaseVo;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,26 +22,35 @@ public class DocsResponceVo<T extends CommunityBaseVo> {
     /**
      * list of object.
      */
-    List<T> records;
+    private List<T> records;
     /**
      * current request pageSize.
      */
-    Integer pageSize;
+    private Integer pageSize;
 
     /**
      * current request page.
      */
-    Integer page;
+    private Integer page;
 
     /**
      * current request keyword.
      */
-    String keyword;
+    private String keyword;
     /**
      * result count.
      */
-    long total;
+    private long total;
 
+
+    /**
+     * 有参构造.
+     *
+     * @param records  数据主题 .
+     * @param pageSize 每页数量.
+     * @param page     页码.
+     * @param keyword  输入框关键字.
+     */
     public DocsResponceVo(List<T> records, Integer pageSize, Integer page, String keyword) {
         this.records = records;
         this.pageSize = pageSize;

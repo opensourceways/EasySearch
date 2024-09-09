@@ -22,30 +22,30 @@ public class EPKGPackageVo extends FieldBaseVo {
     /**
      * epkg 更新时间.
      */
-    String epkgUpdateAt;
+    private String epkgUpdateAt;
     /**
      * epkg Size.
      */
-    String epkgSize;
+    private String epkgSize;
     /**
      * 概要.
      */
-    String summary;
+    private String summary;
 
     /**
      * epkg 大类.
      */
-    String epkgCategory;
+    private String epkgCategory;
     /**
      * requires.
      */
-    String requires;
+    private String requires;
     /**
      * provides.
      */
-    String provides;
+    private String provides;
     /**
      * 原始包名.
      */
-    String originPkg;
+    private String originPkg;
 }

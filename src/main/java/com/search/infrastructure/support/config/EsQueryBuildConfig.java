@@ -10,7 +10,6 @@
 */
 package com.search.infrastructure.support.config;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,65 +21,107 @@ import java.util.List;
 @Component
 @Getter
 @Setter
-@Data
 @ConfigurationProperties(prefix = "elasticsearch.querybuild")
 public class EsQueryBuildConfig {
     /**
-     * queries
+     * queries.
      */
-    List<BuildQuery> queries = new ArrayList<>();
+    private List<BuildQuery> queries = new ArrayList<>();
 
     /**
-     * BuildQuery
+     * BuildQuery.
      */
     @Getter
     @Setter
-    @Data
-    public class BuildQuery {
-        String source;
-        List<MatchQuery> matchPhraseQueries;
-        List<MatchQuery> matchQueries;
-
-        List<FounctionScore> functions;
-        Highlight highlight;
+    public static class BuildQuery {
+        /**
+         * 数据源.
+         */
+        private String source;
+        /**
+         * match Phrase query list.
+         */
+        private List<MatchQuery> matchPhraseQueries;
+        /**
+         * match  query list.
+         */
+        private List<MatchQuery> matchQueries;
+        /**
+         * founction score list.
+         */
+        private List<FounctionScore> functions;
+        /**
+         * highlight.
+         */
+        private Highlight highlight;
     }
 
     /**
-     * MatchQuery
+     * MatchQuery.
      */
     @Getter
     @Setter
-    @Data
-    public class MatchQuery {
-        String name;
-        String analyzer;
-        Integer slop;
-        Float boost;
+    public static class MatchQuery {
+        /**
+         * match 字段名称.
+         */
+        private String name;
+        /**
+         * 分词器.
+         */
+        private String analyzer;
+        /**
+         * slop.
+         */
+        private Integer slop;
+        /**
+         * boost.
+         */
+        private Float boost;
     }
 
     /**
-     * FounctionScore
+     * FounctionScore.
      */
     @Getter
     @Setter
-    @Data
-    public class FounctionScore {
-        String termkey;
-        String keyValue;
-        Float weight;
+    public static class FounctionScore {
+        /**
+         * term key.
+         */
+        private String termkey;
+        /**
+         * key value.
+         */
+        private String keyValue;
+        /**
+         * 权重.
+         */
+        private Float weight;
     }
 
     /**
-     * Highlight
+     * Highlight.
      */
     @Getter
     @Setter
-    @Data
-    public class Highlight {
-        List<String> fields;
-        Integer fragmentSize;
-        String preTags;
-        String postTags;
+    public static class Highlight {
+        /**
+         * 需要高亮的字段名称.
+         */
+        private List<String> fields;
+        /**
+         * 高亮fragment Size.
+         */
+        private Integer fragmentSize;
+        /**
+         * 高亮部分标签前缀.
+         */
+        private String preTags;
+        /**
+         * 高亮部分标签后缀.
+         */
+        private String postTags;
     }
 
 

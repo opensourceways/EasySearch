@@ -14,7 +14,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.search.common.thread.ThreadLocalCache;
 import com.search.common.util.General;
 import com.search.common.util.ObjectMapperUtil;
-import com.search.domain.base.dto.*;
+import com.search.domain.base.dto.DivideDocsBaseCondition;
+import com.search.domain.base.dto.SearchDocsBaseCondition;
+import com.search.domain.base.dto.SearchSortBaseCondition;
+import com.search.domain.base.dto.SearchTagsBaseCondition;
 import com.search.infrastructure.support.config.EsQueryBuildConfig;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.common.lucene.search.function.CombineFunction;
@@ -37,7 +40,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -46,7 +52,7 @@ public class BaseFounctionRequestBuilder {
      * Autowired EsQueryBuildConfig bean.
      */
     @Autowired
-    EsQueryBuildConfig esQueryBuildConfig;
+    private EsQueryBuildConfig esQueryBuildConfig;
 
     /**
      * 创建SearchRequest.
@@ -71,13 +77,18 @@ public class BaseFounctionRequestBuilder {
 
     /**
      * buildShouldQuery.
+     *
+     * @param boolQueryBuilder boolQueryBuilder.
+     * @param keyWord          keyWord.
      */
     public void buildShouldQuery(BoolQueryBuilder boolQueryBuilder, String keyWord) {
         List<EsQueryBuildConfig.BuildQuery> queries = esQueryBuildConfig.getQueries();
-        if (queries == null)
+        if (queries == null) {
             queries = new ArrayList<>();
+        }
         String dataSource = ThreadLocalCache.getDataSource();
-        List<EsQueryBuildConfig.BuildQuery> collect = queries.stream().filter(buildQuery -> dataSource.equals(buildQuery.getSource())).collect(Collectors.toList());
+        List<EsQueryBuildConfig.BuildQuery> collect = queries.stream().filter(buildQuery ->
+                dataSource.equals(buildQuery.getSource())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(collect)) {
             MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", keyWord).analyzer("ik_max_word").slop(2);
             ptitleMP.boost(200);
@@ -107,6 +118,10 @@ public class BaseFounctionRequestBuilder {
 
     /**
      * buildMustNotQuery.
+     *
+     * @param boolQueryBuilder boolQueryBuilder.
+     * @param limit            limit condition.
+     * @param filter           filter condition.
      */
     public void buildMustNotQuery(BoolQueryBuilder boolQueryBuilder, Object limit, Object filter) {
         if (limit instanceof List) {
@@ -164,9 +179,11 @@ public class BaseFounctionRequestBuilder {
      */
     public HighlightBuilder buildHighlightBuilder() {
         List<EsQueryBuildConfig.BuildQuery> queries = esQueryBuildConfig.getQueries();
-        if (queries == null)
+        if (queries == null) {
             queries = new ArrayList<>();
-        List<EsQueryBuildConfig.BuildQuery> collect = queries.stream().filter(buildQuery -> ThreadLocalCache.getDataSource().equals(buildQuery.getSource())).collect(Collectors.toList());
+        }
+        List<EsQueryBuildConfig.BuildQuery> collect = queries.stream().filter(buildQuery ->
+                ThreadLocalCache.getDataSource().equals(buildQuery.getSource())).collect(Collectors.toList());
         HighlightBuilder highlightBuilder = new HighlightBuilder();
         if (!CollectionUtils.isEmpty(collect) && collect.get(0).getHighlight() != null) {
             EsQueryBuildConfig.Highlight highlight = collect.get(0).getHighlight();
@@ -192,14 +209,18 @@ public class BaseFounctionRequestBuilder {
      * @return FunctionScoreQueryBuilder.
      */
     public FunctionScoreQueryBuilder buildFunctionScoreQuery(BoolQueryBuilder boolQueryBuilder) {
-        List<EsQueryBuildConfig.BuildQuery> collect = esQueryBuildConfig.getQueries().stream().filter(buildQuery -> ThreadLocalCache.getDataSource().equals(buildQuery.getSource())).collect(Collectors.toList());
+        List<EsQueryBuildConfig.BuildQuery> collect = esQueryBuildConfig.getQueries().stream().filter(
+                buildQuery -> ThreadLocalCache.getDataSource().equals(buildQuery.getSource())).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(collect) && collect.get(0).getFunctions() != null) {
             List<EsQueryBuildConfig.FounctionScore> functions = collect.get(0).getFunctions();
 
-            FunctionScoreQueryBuilder.FilterFunctionBuilder[] functionBuilder = new FunctionScoreQueryBuilder.FilterFunctionBuilder[functions.size()];
+            FunctionScoreQueryBuilder.FilterFunctionBuilder[] functionBuilder = new FunctionScoreQueryBuilder.
+                    FilterFunctionBuilder[functions.size()];
             for (int i = 0; i < functions.size(); i++) {
                 EsQueryBuildConfig.FounctionScore founctionScore = functions.get(i);
-                functionBuilder[i] = new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.termQuery(founctionScore.getTermkey(), founctionScore.getKeyValue()), ScoreFunctionBuilders.weightFactorFunction(founctionScore.getWeight()));
+                functionBuilder[i] = new FunctionScoreQueryBuilder.FilterFunctionBuilder(
+                        QueryBuilders.termQuery(founctionScore.getTermkey(), founctionScore.getKeyValue()),
+                        ScoreFunctionBuilders.weightFactorFunction(founctionScore.getWeight()));
             }
             FunctionScoreQueryBuilder functionScoreQuery = QueryBuilders.functionScoreQuery(boolQueryBuilder, functionBuilder)
                     .scoreMode(FunctionScoreQuery.ScoreMode.SUM)
@@ -393,9 +414,12 @@ public class BaseFounctionRequestBuilder {
      * @param matchQueriesConfig matchQueriesConfig.
      * @param keyWord            keyWord.
      */
-    private void buildMatchQueriesByConfig(List<EsQueryBuildConfig.MatchQuery> matchQueriesConfig, BoolQueryBuilder boolQueryBuilder, String keyWord) {
+    private void buildMatchQueriesByConfig(List<EsQueryBuildConfig.MatchQuery> matchQueriesConfig,
+                                           BoolQueryBuilder boolQueryBuilder,
+                                           String keyWord) {
         for (EsQueryBuildConfig.MatchQuery matchQueryConfig : matchQueriesConfig) {
-            MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(matchQueryConfig.getName(), keyWord).analyzer(matchQueryConfig.getAnalyzer());
+            MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(matchQueryConfig.getName(), keyWord).
+                    analyzer(matchQueryConfig.getAnalyzer());
             if (matchQueryConfig.getBoost() != null && matchQueryConfig.getBoost() > 0) {
                 matchQueryBuilder.boost(matchQueryConfig.getBoost());
             }
@@ -410,9 +434,13 @@ public class BaseFounctionRequestBuilder {
      * @param matchQueriesConfig matchQueriesConfig.
      * @param keyWord            keyWord.
      */
-    private void buildMatchPhraseQueriesrByConfig(List<EsQueryBuildConfig.MatchQuery> matchQueriesConfig, BoolQueryBuilder boolQueryBuilder, String keyWord) {
+    private void buildMatchPhraseQueriesrByConfig(List<EsQueryBuildConfig.MatchQuery> matchQueriesConfig,
+                                                  BoolQueryBuilder boolQueryBuilder,
+                                                  String keyWord) {
         for (EsQueryBuildConfig.MatchQuery matchQueryConfig : matchQueriesConfig) {
-            MatchPhraseQueryBuilder matchPhraseQueryBuilder = QueryBuilders.matchPhraseQuery(matchQueryConfig.getName(), keyWord).analyzer(matchQueryConfig.getAnalyzer()).boost(matchQueryConfig.getBoost() == null ? 1 : matchQueryConfig.getBoost());
+            MatchPhraseQueryBuilder matchPhraseQueryBuilder = QueryBuilders.matchPhraseQuery(
+                    matchQueryConfig.getName(), keyWord).analyzer(matchQueryConfig.getAnalyzer()).
+                    boost(matchQueryConfig.getBoost() == null ? 1 : matchQueryConfig.getBoost());
             if (matchQueryConfig.getSlop() != null) {
                 matchPhraseQueryBuilder.slop(matchQueryConfig.getSlop());
             }

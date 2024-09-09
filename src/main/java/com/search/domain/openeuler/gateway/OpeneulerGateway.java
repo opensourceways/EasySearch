@@ -10,7 +10,12 @@
 */
 package com.search.domain.openeuler.gateway;
 
-import com.search.adapter.vo.*;
+
+import com.search.adapter.vo.CountResponceVo;
+import com.search.adapter.vo.DocsResponceVo;
+import com.search.adapter.vo.SortResponceVo;
+import com.search.adapter.vo.SuggResponceVo;
+import com.search.adapter.vo.TagsResponceVo;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.openeuler.dto.DocsOpeneulerCondition;
 import com.search.domain.openeuler.dto.SortOpeneulerCondition;
@@ -62,13 +67,13 @@ public interface OpeneulerGateway {
     /**
      * get Dvide Search Sort  of   Openeuler data.
      *
-     * @param sortCondition The search condition for querying .
+     * @param sortCondition The search condition for querying.
      * @return SortResponceVo<OpenEulerVo>.
      */
     SortResponceVo<OpenEulerVo> getDvideSearchSortByCondition(SortOpeneulerCondition sortCondition);
 
     /**
-     * Search for Euler document data
+     * Search for Euler document data.
      *
      * @param DivideDocsBaseCondition The search condition for querying different types of data.
      * @return SortResponceVo<OpenEulerVo>.

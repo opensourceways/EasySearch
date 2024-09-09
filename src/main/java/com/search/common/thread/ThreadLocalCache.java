@@ -16,7 +16,7 @@ import com.search.common.util.ObjectMapperUtil;
 import java.util.Optional;
 
 /**
- * 当前线程请求头信息
+ * 当前线程请求头信息.
  */
 public final class ThreadLocalCache {
     /**
@@ -33,6 +33,8 @@ public final class ThreadLocalCache {
 
     /**
      * ThreadLocal set.
+     *
+     * @param str threadlocal info.
      */
     public static void put(String str) {
         THREAD_LOCAL.set(str);
@@ -40,6 +42,8 @@ public final class ThreadLocalCache {
 
     /**
      * ThreadLocal get.
+     *
+     * @return current thread local info.
      */
     public static String get() {
         return THREAD_LOCAL.get();
@@ -54,14 +58,19 @@ public final class ThreadLocalCache {
 
     /**
      * getHeaderInfo.
+     *
+     * @return HeaderInfo object.
      */
     public static HeaderInfo getHeaderInfo() {
-        return Optional.ofNullable(THREAD_LOCAL.get()).map(json -> ObjectMapperUtil.toObject(HeaderInfo.class, json)).orElse(
+        return Optional.ofNullable(THREAD_LOCAL.get()).
+                map(json -> ObjectMapperUtil.toObject(HeaderInfo.class, json)).orElse(
                 new HeaderInfo());
     }
 
     /**
      * getDataSource.
+     *
+     * @return ThreadLocal's headerinfo dataSource value.
      */
     public static String getDataSource() {
         return getHeaderInfo().getDataSource();
@@ -69,6 +78,8 @@ public final class ThreadLocalCache {
 
     /**
      * put Source on ThreadLocalCache .
+     *
+     * @param source request headerinfo.
      */
     public static void putSource(String source) {
         HeaderInfo headerInfo = getHeaderInfo();

@@ -10,35 +10,31 @@
 */
 package com.search.domain.softcenter.vo;
 
-
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Data
 public class NameDocsVo {
     /**
      * 包名.
      */
-    String name;
+    private String name;
     /**
      * pkgId.
      */
-    String pkgId;
+    private String pkgId;
     /**
      * 版本.
      */
-    String version;
+    private String version;
 
     /**
-     * 有参构造，初始化
+     * 有参构造，初始化.
      *
      * @param name    包名 .
      * @param pkgId   pkgId.
      * @param version 版本.
-     * @return NameDocsVo.
      */
     public NameDocsVo(String name, String pkgId, String version) {
         this.name = name;

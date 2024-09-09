@@ -22,8 +22,7 @@ public class TagsOpengaussCondition extends SearchTagsBaseCondition {
      * 有参构造，初始化TagsOpengaussCondition.
      *
      * @param index     数据索引 .
-     * @param condition 前台请求封装条件
-     * @return DocsOpengaussCondition.
+     * @param condition 前台请求封装条件.
      */
     public TagsOpengaussCondition(TagsCondition condition, String index) {
         super.category = condition.getCategory();
@@ -35,7 +34,6 @@ public class TagsOpengaussCondition extends SearchTagsBaseCondition {
     /**
      * 无参构造.
      *
-     * @return DocsOpengaussCondition.
      */
     public TagsOpengaussCondition() {
 

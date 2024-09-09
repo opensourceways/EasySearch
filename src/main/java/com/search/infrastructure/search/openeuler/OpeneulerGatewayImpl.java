@@ -11,8 +11,11 @@
 package com.search.infrastructure.search.openeuler;
 
 
-import com.search.adapter.vo.*;
-import com.search.common.util.General;
+import com.search.adapter.vo.CountResponceVo;
+import com.search.adapter.vo.DocsResponceVo;
+import com.search.adapter.vo.SortResponceVo;
+import com.search.adapter.vo.SuggResponceVo;
+import com.search.adapter.vo.TagsResponceVo;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.openeuler.dto.DocsOpeneulerCondition;
 import com.search.domain.openeuler.dto.SortOpeneulerCondition;
@@ -32,8 +35,9 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -62,7 +66,10 @@ public class OpeneulerGatewayImpl extends BaseFounctionGateway implements Openeu
         List<Map<String, Object>> dateMapList = handDocsEsResponce(searchResponse);
         List<OpenEulerDo> openEulerDos = CommonConverter.toDoList(dateMapList, OpenEulerDo.class);
         List<OpenEulerVo> openEulerVos = CommonConverter.toBaseVoList(openEulerDos, OpenEulerVo.class);
-        DocsResponceVo docsResponceVo = new DocsResponceVo(openEulerVos, searchBaseCondition.getPageSize(), searchBaseCondition.getPage(), searchBaseCondition.getKeyword());
+        DocsResponceVo docsResponceVo = new DocsResponceVo(openEulerVos,
+                searchBaseCondition.getPageSize(),
+                searchBaseCondition.getPage(),
+                searchBaseCondition.getKeyword());
         return docsResponceVo;
     }
 
@@ -90,7 +97,15 @@ public class OpeneulerGatewayImpl extends BaseFounctionGateway implements Openeu
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
             List<OpenEulerDo> openEulerDos = CommonConverter.toDoList(dateMapList, OpenEulerDo.class);
             List<OpenEulerVo> openEulerVos = CommonConverter.toBaseVoList(openEulerDos, OpenEulerVo.class);
-            SortResponceVo sortResponceVo = new SortResponceVo(openEulerVos, sortCondition.getPageSize(), sortCondition.getPage(), response.getHits().getTotalHits().value);
+            long total = 0L;
+            if (response.getHits() != null && response.getHits().getTotalHits() != null) {
+                total = response.getHits().getTotalHits().value;
+            }
+            SortResponceVo sortResponceVo = new SortResponceVo(
+                    openEulerVos,
+                    sortCondition.getPageSize(),
+                    sortCondition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;
@@ -120,14 +135,22 @@ public class OpeneulerGatewayImpl extends BaseFounctionGateway implements Openeu
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
             List<OpenEulerDo> openEulerDos = CommonConverter.toDoList(dateMapList, OpenEulerDo.class);
             List<OpenEulerVo> openEulerVos = CommonConverter.toBaseVoList(openEulerDos, OpenEulerVo.class);
-            SortResponceVo sortResponceVo = new SortResponceVo(openEulerVos, sortCondition.getPageSize(), sortCondition.getPage(), response.getHits().getTotalHits().value);
+            long total = 0L;
+            if (response.getHits() != null && response.getHits().getTotalHits() != null) {
+                total = response.getHits().getTotalHits().value;
+            }
+            SortResponceVo sortResponceVo = new SortResponceVo(
+                    openEulerVos,
+                    sortCondition.getPageSize(),
+                    sortCondition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;
     }
 
     /**
-     * Search for Euler document data
+     * Search for Euler document data.
      *
      * @param condition The search condition for querying different types of data.
      * @return SortResponceVo<OpenEulerVo>.
@@ -139,7 +162,15 @@ public class OpeneulerGatewayImpl extends BaseFounctionGateway implements Openeu
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(searchResponse);
             List<OpenEulerDo> openEulerDos = CommonConverter.toDoList(dateMapList, OpenEulerDo.class);
             List<OpenEulerVo> openEulerVos = CommonConverter.toBaseVoList(openEulerDos, OpenEulerVo.class);
-            SortResponceVo sortResponceVo = new SortResponceVo(openEulerVos, condition.getPageSize(), condition.getPage(), searchResponse.getHits().getTotalHits().value);
+            long total = 0L;
+            if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits() != null) {
+                total = searchResponse.getHits().getTotalHits().value;
+            }
+
+            SortResponceVo sortResponceVo = new SortResponceVo(openEulerVos,
+                    condition.getPageSize(),
+                    condition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;

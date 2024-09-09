@@ -10,68 +10,65 @@
 */
 package com.search.domain.softcenter.vo;
 
-
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Data
 public class FieldBaseVo {
     /**
      * 包名.
      */
-    String name;
+    private String name;
     /**
      * 版本.
      */
-    String version;
+    private String version;
 
     /**
      * 操作系统.
      */
-    String os;
+    private String os;
     /**
      * arch.
      */
-    String arch;
+    private String arch;
 
     /**
      * 源码仓库.
      */
-    String srcRepo;
+    private String srcRepo;
     /**
      * 描述.
      */
-    String description;
+    private String description;
 
     /**
      * html页面.
      */
-    String htmlurl;
+    private String htmlurl;
     /**
      * 数据类型.
      */
-    String dataType;
+    private String dataType;
     /**
      * 数据id，源于数据库.
      */
-    String id;
+    private String id;
     /**
      * bin下载地址.
      */
-    String binDownloadUrl;
+    private String binDownloadUrl;
     /**
      * 下载.
      */
-    String installation;
+    private String installation;
     /**
      * pkgId.
      */
-    String pkgId;
+    private String pkgId;
     /**
      * 类别.
      */
-    String category;
+    private String category;
 }

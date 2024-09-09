@@ -47,7 +47,10 @@ public class OpenmindGatewayImpl extends BaseFounctionGateway implements Openmin
         List<Map<String, Object>> dateMapList = super.getDefaultSearchByCondition(searchBaseCondition);
         List<OpenMindDo> openMindDos = CommonConverter.toDoList(dateMapList, OpenMindDo.class);
         List<OpenMindVo> openMindVos = CommonConverter.toBaseVoList(openMindDos, OpenMindVo.class);
-        DocsResponceVo docsResponceVo = new DocsResponceVo(openMindVos, searchBaseCondition.getPageSize(), searchBaseCondition.getPage(), searchBaseCondition.getKeyword());
+        DocsResponceVo docsResponceVo = new DocsResponceVo(openMindVos,
+                searchBaseCondition.getPageSize(),
+                searchBaseCondition.getPage(),
+                searchBaseCondition.getKeyword());
         return docsResponceVo;
     }
 
@@ -75,7 +78,14 @@ public class OpenmindGatewayImpl extends BaseFounctionGateway implements Openmin
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
             List<OpenMindDo> openMindDos = CommonConverter.toDoList(dateMapList, OpenMindDo.class);
             List<OpenMindVo> openMindVos = CommonConverter.toBaseVoList(openMindDos, OpenMindVo.class);
-            SortResponceVo sortResponceVo = new SortResponceVo(openMindVos, sortCondition.getPageSize(), sortCondition.getPage(), response.getHits().getTotalHits().value);
+            long total = 0L;
+            if (response.getHits() != null && response.getHits().getTotalHits() != null) {
+                total = response.getHits().getTotalHits().value;
+            }
+            SortResponceVo sortResponceVo = new SortResponceVo(openMindVos,
+                    sortCondition.getPageSize(),
+                    sortCondition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;
@@ -105,14 +115,21 @@ public class OpenmindGatewayImpl extends BaseFounctionGateway implements Openmin
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
             List<OpenMindDo> openMindDos = CommonConverter.toDoList(dateMapList, OpenMindDo.class);
             List<OpenMindVo> openMindVos = CommonConverter.toBaseVoList(openMindDos, OpenMindVo.class);
-            SortResponceVo sortResponceVo = new SortResponceVo(openMindVos, sortCondition.getPageSize(), sortCondition.getPage(), response.getHits().getTotalHits().value);
+            long total = 0L;
+            if (response.getHits() != null && response.getHits().getTotalHits() != null) {
+                total = response.getHits().getTotalHits().value;
+            }
+            SortResponceVo sortResponceVo = new SortResponceVo(openMindVos,
+                    sortCondition.getPageSize(),
+                    sortCondition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;
     }
 
     /**
-     * Search for  Openmind document data
+     * Search for  Openmind document data.
      *
      * @param condition The search condition .
      * @return SortResponceVo<OpenMindVo>.
@@ -124,7 +141,14 @@ public class OpenmindGatewayImpl extends BaseFounctionGateway implements Openmin
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(searchResponse);
             List<OpenMindDo> openMindDos = CommonConverter.toDoList(dateMapList, OpenMindDo.class);
             List<OpenMindVo> openMindVos = CommonConverter.toBaseVoList(openMindDos, OpenMindVo.class);
-            SortResponceVo sortResponceVo = new SortResponceVo(openMindVos, condition.getPageSize(), condition.getPage(), searchResponse.getHits().getTotalHits().value);
+            long total = 0L;
+            if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits() != null) {
+                total = searchResponse.getHits().getTotalHits().value;
+            }
+            SortResponceVo sortResponceVo = new SortResponceVo(openMindVos,
+                    condition.getPageSize(),
+                    condition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;

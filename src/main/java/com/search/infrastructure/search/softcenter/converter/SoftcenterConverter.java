@@ -12,8 +12,14 @@ package com.search.infrastructure.search.softcenter.converter;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.search.domain.softcenter.vo.*;
-import com.search.infrastructure.search.softcenter.dataobject.*;
+
+import com.search.domain.softcenter.vo.RPMPackageVo;
+import com.search.domain.softcenter.vo.ApplicationPackageVo;
+import com.search.domain.softcenter.vo.ApplicationVersionVo;
+import com.search.domain.softcenter.vo.EPKGPackageVo;
+import com.search.domain.softcenter.vo.FieldApplicationVo;
+
+import com.search.infrastructure.search.softcenter.dataobject.SoftCenterDo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 

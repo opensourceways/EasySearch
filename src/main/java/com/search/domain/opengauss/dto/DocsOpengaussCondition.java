@@ -30,11 +30,10 @@ public class DocsOpengaussCondition extends SearchDocsBaseCondition {
     private List<OpengaussLimit> limit;
 
     /**
-     * 有参构造，初始化DocsOpengaussCondition
+     * 有参构造，初始化DocsOpengaussCondition.
      *
      * @param index     数据索引 .
-     * @param condition 前台请求封装条件
-     * @return DocsOpengaussCondition.
+     * @param condition 前台请求封装条件.
      */
     public DocsOpengaussCondition(String index, DocsCondition condition) {
         super.index = index;
@@ -47,19 +46,20 @@ public class DocsOpengaussCondition extends SearchDocsBaseCondition {
     }
 
     /**
-     * 根据DocsCondition封装社区limit obj
+     * 根据DocsCondition封装社区limit obj.
      *
      * @param condition 前台请求封装条件.
      */
     public void setOpengaussLimit(DocsCondition condition) {
         ArrayList<OpengaussLimit> opengaussLimits = new ArrayList<>();
-        if (Objects.nonNull(condition.getFilter()))
+        if (Objects.nonNull(condition.getFilter())) {
             condition.getLimit().stream().forEach(a -> {
                 OpengaussLimit opengaussLimit = new OpengaussLimit();
                 opengaussLimit.setType(a.getType());
                 opengaussLimit.setVersion(a.getVersion());
                 opengaussLimits.add(opengaussLimit);
             });
+        }
         this.limit = opengaussLimits;
     }
 
@@ -68,9 +68,15 @@ public class DocsOpengaussCondition extends SearchDocsBaseCondition {
      */
     @Getter
     @Setter
-    private class OpengaussLimit {
-        String type;
-        String version;
+    private static class OpengaussLimit {
+        /**
+         * 类型.
+         */
+        private String type;
+        /**
+         * 版本.
+         */
+        private String version;
     }
 
 

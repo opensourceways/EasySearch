@@ -19,9 +19,9 @@ public class TagsVo {
     /**
      * 数据大类.
      */
-    String key;
+    private String key;
     /**
      * 文档数量.
      */
-    Long count;
+    private Long count;
 }

@@ -12,14 +12,12 @@ package com.search.domain.softcenter.dto;
 
 
 import com.search.domain.base.dto.SearchDocsBaseCondition;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Data
-public class DocsSoftcenterCondition extends SearchDocsBaseCondition implements Cloneable {
+public class DocsSoftcenterCondition extends SearchDocsBaseCondition {
 
     /**
      * 数据类型.
@@ -53,16 +51,4 @@ public class DocsSoftcenterCondition extends SearchDocsBaseCondition implements 
      * 欧拉 os 版本.
      */
     private String eulerOsVersion;
-
-    @Override
-    public DocsSoftcenterCondition clone() {
-        DocsSoftcenterCondition condition = null;
-        try {
-            condition = (DocsSoftcenterCondition) super.clone();
-        } catch (CloneNotSupportedException e) {
-
-        }
-        return condition;
-    }
-
 }

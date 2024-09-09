@@ -10,7 +10,14 @@
 */
 package com.search.common.constant;
 
-public class SearchConstant {
+public final class SearchConstant {
+
+    // Private constructor to prevent instantiation of the SearchConstant class
+    private SearchConstant() {
+        // private constructor to hide the implicit public one
+        throw new AssertionError("SearchConstant class cannot be instantiated.");
+    }
+
     /**
      * language allowed.
      */
@@ -62,7 +69,8 @@ public class SearchConstant {
     /**
      * keyword regexp allowed.
      */
-    public static final String SEARCH_KEYWORD_MESSAGE = "Include only letters, digits, and special characters(_-()$.), Contain 1 to 100 characters.";
+    public static final String SEARCH_KEYWORD_MESSAGE =
+            "Include only letters, digits, and special characters(_-()$.), Contain 1 to 100 characters.";
 
     /**
      * VALID_MESSAGE, error message.

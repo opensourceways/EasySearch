@@ -10,79 +10,81 @@
 */
 package com.search.infrastructure.search.mindspore.dataobject;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class MindsporeDo {
     /**
-     * 档案
+     * 档案.
      */
-    String archives;
+    private String archives;
 
 
     /**
-     * 文章名
+     * 文章名.
      */
-    String articleName;
+    private String articleName;
 
     /**
-     * 成分
+     * 成分.
      */
-    String components;
-
-
-    /**
-     * 日期
-     */
-    String date;
+    private String components;
 
 
     /**
-     * 日期
+     * 日期.
      */
-    String id;
-
-    /**
-     * 语言
-     */
-    String lang;
-
-    /**
-     * 路径
-     */
-    String path;
-
-    /**
-     * 子类
-     */
-    String subclass;
+    private String date;
 
 
     /**
-     * 文本内容
+     * 日期.
      */
-    String textContent;
+    private String id;
+
+    /**
+     * 语言.
+     */
+    private String lang;
+
+    /**
+     * 路径.
+     */
+    private String path;
+
+    /**
+     * 子类.
+     */
+    private String subclass;
 
 
     /**
-     * time
+     * 文本内容.
      */
-    String time;
+    private String textContent;
 
 
     /**
-     * 标题
+     * time.
      */
-    String title;
-
-    /**
-     * 类型
-     */
-    String type;
+    private String time;
 
 
     /**
-     * 版本
+     * 标题.
      */
-    String version;
+    private String title;
+
+    /**
+     * 类型.
+     */
+    private String type;
+
+
+    /**
+     * 版本.
+     */
+    private String version;
 }

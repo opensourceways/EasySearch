@@ -19,11 +19,10 @@ import lombok.Setter;
 @Setter
 public class TagsOpeneulerCondition extends SearchTagsBaseCondition {
     /**
-     * 有参构造，TagsOpeneulerCondition
+     * 有参构造，TagsOpeneulerCondition.
      *
      * @param index     数据索引 .
-     * @param condition 前台请求封装条件
-     * @return TagsOpeneulerCondition.
+     * @param condition 前台请求封装条件.
      */
     public TagsOpeneulerCondition(TagsCondition condition, String index) {
         super.category = condition.getCategory();

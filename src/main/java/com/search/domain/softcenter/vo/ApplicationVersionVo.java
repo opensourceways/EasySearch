@@ -10,8 +10,11 @@
 */
 package com.search.domain.softcenter.vo;
 
-import lombok.Data;
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ApplicationVersionVo {
     /**
      * name.

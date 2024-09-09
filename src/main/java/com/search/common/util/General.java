@@ -17,25 +17,59 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class General {
-    static final String REGEX_CHINESE = "[\u4e00-\u9fa5]";// 中文正则
+public final class General {
+
+    // Private constructor to prevent instantiation of the General class
+    private General() {
+        // private constructor to hide the implicit public one
+        throw new AssertionError("General class cannot be instantiated.");
+    }
+
+    /**
+     * REGEX_CHINESE.
+     */
+    static final String REGEX_CHINESE = "[\u4e00-\u9fa5]";
+    /**
+     * CHINSEE_PATTERN.
+     */
     private static final Pattern CHINSEE_PATTERN = Pattern.compile(REGEX_CHINESE);
+    /**
+     * REPLACE_MAP.
+     */
     private static final HashMap<String, String> REPLACE_MAP = new HashMap<String, String>() {{
         put("_", " ");
         put("&", " ");
         put("+", " ");
     }};
 
+    /**
+     * remove Chinese.
+     *
+     * @param str include Chinese str.
+     * @return removed Chinese str.
+     */
     public static String removeChinese(String str) {
         Matcher mat = CHINSEE_PATTERN.matcher(str);
         return mat.replaceAll(" ");
     }
 
+    /**
+     * check include Chinese .
+     *
+     * @param str The original data to be check.
+     * @return boolean.
+     */
     public static boolean haveChinese(String str) {
         Matcher m = CHINSEE_PATTERN.matcher(str);
         return m.find();
     }
 
+    /**
+     * replacementCharacter.
+     *
+     * @param str The original data to be replaced.
+     * @return replacementCharacter.
+     */
     public static String replacementCharacter(String str) {
         for (Map.Entry<String, String> entry : REPLACE_MAP.entrySet()) {
             str = str.replace(entry.getKey(), entry.getValue());
@@ -61,7 +95,12 @@ public class General {
         return insertSpaceBetweenNumbersAndLetters(str);
     }
 
-
+    /**
+     * insertSpaceBetweenNumbersAndLetters.
+     *
+     * @param str The original data to be insert.
+     * @return A str.
+     */
     public static String insertSpaceBetweenNumbersAndLetters(String str) {
         String regex = "(\\d+\\.)+\\d*";
         Pattern pattern = Pattern.compile(regex);
