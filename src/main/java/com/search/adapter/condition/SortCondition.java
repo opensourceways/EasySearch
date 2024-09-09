@@ -63,13 +63,17 @@ public class SortCondition {
      * Page number within the range of PackageConstant.MIN_PAGE_NUM to PackageConstant.
      * MAX_PAGE_NUM, default value is 1.
      */
-    @Range(min = SearchConstant.MIN_PAGE_NUM, max = SearchConstant.MAX_PAGE_NUM, message = SearchConstant.PAGE_RANGE_MESSAGE)
+    @Range(min = SearchConstant.MIN_PAGE_NUM,
+            max = SearchConstant.MAX_PAGE_NUM,
+            message = SearchConstant.PAGE_RANGE_MESSAGE)
     private int page = 1;
     /**
      * Page size within the range of PackageConstant.MIN_PAGE_SIZE to PackageConstant.
      * MAX_PAGE_SIZE, default value is 10.
      */
-    @Range(min = SearchConstant.MIN_PAGE_SIZE, max = SearchConstant.MAX_PAGE_SIZE, message = SearchConstant.PAGESIZE_RANGE_MESSAGE)
+    @Range(min = SearchConstant.MIN_PAGE_SIZE,
+            max = SearchConstant.MAX_PAGE_SIZE,
+            message = SearchConstant.PAGESIZE_RANGE_MESSAGE)
     private int pageSize = 10;
 
 
@@ -78,7 +82,8 @@ public class SortCondition {
      * MAX_PAGE_SIZE, default value is 10.
      */
     @NotBlank(message = "keyword can not be null")
-    @Pattern(regexp = SearchConstant.SEARCH_KEYWORD_REGEXP, message = SearchConstant.SEARCH_KEYWORD_MESSAGE)
+    @Pattern(regexp = SearchConstant.SEARCH_KEYWORD_REGEXP,
+            message = SearchConstant.SEARCH_KEYWORD_MESSAGE)
     @Size(max = 100)
     private String keyword;
 

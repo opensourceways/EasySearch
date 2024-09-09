@@ -10,7 +10,6 @@
 */
 package com.search.infrastructure.search.softcenter.dataobject;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,180 +19,180 @@ import java.util.Date;
 @Setter
 public class SoftCenterDo {
     /**
-     * 类型
+     * 类型.
      */
     private String type;
     /**
-     * EPKG
+     * EPKG.
      */
     private String EPKG;
     /**
-     * IMAGE
+     * IMAGE.
      */
     private String IMAGE;
     /**
-     * RPM
+     * RPM.
      */
     private String RPM;
     /**
-     * appVer
+     * appVer.
      */
     private String appVer;
     /**
-     * arch
+     * arch.
      */
     private String arch;
     /**
-     * binDownloadUrl
+     * binDownloadUrl.
      */
     private String binDownloadUrl;
 
     /**
-     * category
+     * category.
      */
     private String category;
     /**
-     * dataType
+     * dataType.
      */
     private String dataType;
     /**
-     * date
+     * date.
      */
     private Date date;
     /**
-     * description
+     * description.
      */
     private String description;
     /**
-     * downloadCount
+     * downloadCount.
      */
     private String downloadCount;
     /**
-     * epkgUpdate
+     * epkgUpdate.
      */
     private Date epkgUpdate;
     /**
-     * epkg_name
+     * epkg_name.
      */
     private String epkg_name;
     /**
-     * eulerHomepage
+     * eulerHomepage.
      */
     private String eulerHomepage;
 
     /**
-     * eulerOsVersion
+     * eulerOsVersion.
      */
     private String eulerOsVersion;
     /**
-     * iconUrl
+     * iconUrl.
      */
     private String iconUrl;
     /**
-     * id
+     * id.
      */
     private String id;
     /**
-     * maintainers
+     * maintainers.
      */
     private String maintainers;
     /**
-     * installation
+     * installation.
      */
     private String installation;
     /**
-     * name
+     * name.
      */
     private String name;
     /**
-     * openeulerVersion;
+     * openeulerVersion.
      */
     private String openeulerVersion;
     /**
-     * originPkg
+     * originPkg.
      */
     private String originPkg;
     /**
-     * os
+     * os.
      */
     private String os;
     /**
-     * pkgId
+     * pkgId.
      */
     private String pkgId;
     /**
-     * pkgIds
+     * pkgIds.
      */
     private String pkgIds;
     /**
-     * provideName
+     * provideName.
      */
     private String provideName;
     /**
-     * providesText
+     * providesText.
      */
     private String providesText;
     /**
-     * requiresText
+     * requiresText.
      */
     private String requiresText;
     /**
-     * rpmSize
+     * rpmSize.
      */
     private String rpmSize;
     /**
-     * rpmUpdate
+     * rpmUpdate.
      */
     private Long rpmUpdate;
     /**
-     * rpmUpdateAt
+     * rpmUpdateAt.
      */
     private String rpmUpdateAt;
     /**
-     * rpm_name
+     * rpm_name.
      */
     private String rpm_name;
     /**
-     * size
+     * size.
      */
     private String size;
 
     /**
-     * srcRepo
+     * srcRepo.
      */
     private String srcRepo;
     /**
-     * status
+     * status.
      */
     private String status;
     /**
-     * summary
+     * summary.
      */
     private String summary;
     /**
-     * tags
+     * tags.
      */
     private String tags;
     /**
-     * tagsText
+     * tagsText.
      */
     private String tagsText;
     /**
-     * upHomepage
+     * upHomepage.
      */
     private String upHomepage;
 
     /**
-     * updatetime
+     * updatetime.
      */
     private String updatetime;
 
     /**
-     * upstreamVersion
+     * upstreamVersion.
      */
     private String upstreamVersion;
     /**
-     * upstreamVersion
+     * upstreamVersion.
      */
     private String version;
 }

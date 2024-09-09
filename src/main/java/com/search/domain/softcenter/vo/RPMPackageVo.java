@@ -20,29 +20,29 @@ public class RPMPackageVo extends FieldBaseVo {
     /**
      * rpm 更新时间.
      */
-    String rpmUpdateAt;
+    private String rpmUpdateAt;
     /**
      * rpm 类别.
      */
-    String rpmCategory;
+    private  String rpmCategory;
     /**
      * rpm 大小.
      */
-    String rpmSize;
+    private  String rpmSize;
     /**
      * 概要.
      */
-    String summary;
+    private  String summary;
     /**
      * requires.
      */
-    String requires;
+    private  String requires;
     /**
      * provides.
      */
-    String provides;
+    private  String provides;
     /**
      * 原始包名.
      */
-    String originPkg;
+    private  String originPkg;
 }

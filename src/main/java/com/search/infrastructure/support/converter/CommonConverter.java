@@ -20,8 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class CommonConverter {
+public final class CommonConverter {
 
+    // Private constructor to prevent instantiation of the CommonConverter class
+    private CommonConverter() {
+        // private constructor to hide the implicit public one
+        throw new AssertionError("CommonConverter class cannot be instantiated.");
+    }
 
     /**
      * Convert an list of map object to an CountVo list.
@@ -64,6 +69,7 @@ public class CommonConverter {
      *
      * @param dateMapList The list of map  to convert
      * @param clazz       to Convert type
+     * @param <T>         to Convert type.
      * @return An list of clazz
      */
     public static <T> List<T> toDoList(final List<Map<String, Object>> dateMapList, Class<T> clazz) {
@@ -78,8 +84,9 @@ public class CommonConverter {
     /**
      * Convert an list of map object to an vo list.
      *
-     * @param doList The list of map  to convert
-     * @param clazz  to Convert type
+     * @param doList The list of map  to convert.
+     * @param clazz  to Convert type.
+     * @param <T>    to Convert type.
      * @return An list of clazz
      */
     public static <T> List<T> toBaseVoList(final List doList, Class<T> clazz) {

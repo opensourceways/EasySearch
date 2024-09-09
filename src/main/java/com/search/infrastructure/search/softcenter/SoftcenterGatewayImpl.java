@@ -16,12 +16,18 @@ import com.search.common.util.SortUtil;
 import com.search.domain.base.vo.CountVo;
 import com.search.domain.softcenter.dto.DocsSoftcenterCondition;
 import com.search.domain.softcenter.gateway.SoftcenterGateway;
-import com.search.domain.softcenter.vo.*;
+
+
+import com.search.domain.softcenter.vo.NameDocsVo;
+import com.search.domain.softcenter.vo.DocsAllVo;
+import com.search.domain.softcenter.vo.RPMPackageVo;
+import com.search.domain.softcenter.vo.ApplicationPackageVo;
+import com.search.domain.softcenter.vo.EPKGPackageVo;
+import com.search.infrastructure.search.softcenter.dataobject.SoftCenterDo;
 import com.search.infrastructure.support.action.BaseFounctionGateway;
 
 import com.search.infrastructure.support.converter.CommonConverter;
 import com.search.infrastructure.search.softcenter.converter.SoftcenterConverter;
-import com.search.infrastructure.search.softcenter.dataobject.*;
 import com.search.infrastructure.search.softcenter.enums.SoftwareTypeEnum;
 import com.search.infrastructure.search.softcenter.enums.SoftwarekeywordTypeEnum;
 import lombok.RequiredArgsConstructor;
@@ -38,13 +44,19 @@ import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
@@ -57,7 +69,7 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
      * Autowired ThreadPoolTaskExecutor bean.
      */
     @Autowired
-    ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     /**
      * Search for different types of data.
@@ -75,7 +87,9 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
         searchRequest.source(sourceBuilder);
         SearchResponse searchResponse = super.executeDefaultEsSearch(searchRequest);
         if (searchResponse != null) {
-            List<Map<String, Object>> dataList = responceHandler.getDefaultsHightResponceToMapList(searchResponse, Arrays.asList("name", "summary"), "description");
+            List<Map<String, Object>> dataList = responceHandler.getDefaultsHightResponceToMapList(searchResponse,
+                    Arrays.asList("name", "summary"),
+                    "description");
             SoftWareVo searchResponce = getSearchResponce(dataList);
             return searchResponce;
         }
@@ -101,14 +115,15 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
         ParsedTerms aggregation = response.getAggregations().get("data");
         List<? extends Terms.Bucket> buckets = aggregation.getBuckets();
         HashMap<String, Long> docCountMap = new HashMap<>();
-        if (buckets != null)
+        if (buckets != null) {
             for (Terms.Bucket bucket : buckets) {
                 docCountMap.put(SoftwareTypeEnum.getFrontDeskTypeByType(bucket.getKeyAsString()), bucket.getDocCount());
             }
+        }
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
             CountVo countVo = new CountVo();
-            countVo.setDoc_count(
-                    docCountMap.get(value.getFrontDeskType()) == null ? 0 : docCountMap.get(value.getFrontDeskType()));
+            Long count = docCountMap.get(value.getFrontDeskType());
+            countVo.setDoc_count(count == null ? Long.valueOf(0) : count);
             countVo.setKey(value.getFrontDeskType());
             countList.add(countVo);
         }
@@ -128,15 +143,16 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
         List<DocsAllVo> responce = new ArrayList<>();
         CountDownLatch countDownLatch = new CountDownLatch(SoftwareTypeEnum.values().length - 2);
         for (SoftwareTypeEnum value : SoftwareTypeEnum.values()) {
-            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value))
+            if (SoftwareTypeEnum.ALL.equals(value) || SoftwareTypeEnum.APPVERSION.equals(value)) {
                 continue;
+            }
 
             threadPoolTaskExecutor.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-
-                        DocsSoftcenterCondition clone = condition.clone();
+                        DocsSoftcenterCondition clone = new DocsSoftcenterCondition();
+                        BeanUtils.copyProperties(clone, condition);
                         clone.setDataType(value.getFrontDeskType());
                         SoftWareVo softWareVo = searchByCondition(clone);
                         if (softWareVo.getTotal() > 0) {
@@ -165,7 +181,8 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
                                                 new NameDocsVo(a.getName(), a.getPkgId(), a.getVersion()));
                                     });
                                     break;
-
+                                default:
+                                    break;
                             }
                             DocsAllVo docsAllVo = new DocsAllVo(
                                     value.getFrontDeskType(), softWareVo.getTotal(), nameList);
@@ -303,8 +320,9 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
             List<Map<String, Object>> dateMapList = dataTypeMap.get(value.getType());
 
             List<SoftCenterDo> softCenterDos = CommonConverter.toDoList(dateMapList, SoftCenterDo.class);
-            if (CollectionUtils.isEmpty(softCenterDos))
+            if (CollectionUtils.isEmpty(softCenterDos)) {
                 continue;
+            }
             switch (value) {
                 case APPLICATION:
                     searchResponce.setApppkg(SoftcenterConverter.convertToApplicationPackage(softCenterDos));
@@ -319,9 +337,11 @@ public class SoftcenterGatewayImpl extends BaseFounctionGateway implements Softc
 
                 case ALL:
                     searchResponce.setAll(SoftcenterConverter.convertToFieldApplication(softCenterDos));
-
+                    break;
                 case APPVERSION:
                     searchResponce.setAppversion(SoftcenterConverter.convertToApplicationVersion(softCenterDos));
+                    break;
+                default:
                     break;
             }
         }

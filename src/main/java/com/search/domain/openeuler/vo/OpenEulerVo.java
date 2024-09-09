@@ -11,7 +11,6 @@
 package com.search.domain.openeuler.vo;
 
 import com.search.domain.base.vo.CommunityBaseVo;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,54 +18,53 @@ import java.util.List;
 
 @Getter
 @Setter
-@Data
 public class OpenEulerVo extends CommunityBaseVo {
     /**
-     * anchor
+     * anchor.
      */
-    Boolean anchor;
+    private Boolean anchor;
     /**
-     * 归档策略
+     * 归档策略.
      */
     private String archivePolicy;
     /**
-     * 作者
+     * 作者.
      */
     private List author;
     /**
-     * 横幅
+     * 横幅.
      */
     private String banner;
     /**
-     * 公司
+     * 公司.
      */
     private String company;
     /**
-     * 欧拉论坛ID
+     * 欧拉论坛ID.
      */
     private String eulerForumId;
     /**
-     * 行业
+     * 行业.
      */
     private String industry;
     /**
-     * 图片
+     * 图片.
      */
     private String img;
     /**
-     * 第二标题,用于service
+     * 第二标题,用于service.
      */
     private String secondaryTitle;
     /**
-     * 信号
+     * 信号.
      */
     private String sig;
     /**
-     * 概括
+     * 概括.
      */
     private String summary;
     /**
-     * 标题模板
+     * 标题模板.
      */
     private String titletemplate;
 

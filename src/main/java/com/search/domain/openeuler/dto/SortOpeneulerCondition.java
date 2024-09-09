@@ -12,7 +12,6 @@ package com.search.domain.openeuler.dto;
 
 import com.search.adapter.condition.SortCondition;
 import com.search.domain.base.dto.SearchSortBaseCondition;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,22 +21,21 @@ public class SortOpeneulerCondition extends SearchSortBaseCondition {
     /**
      * 类别.
      */
-    String category;
+    private String category;
     /**
      * 标签.
      */
-    String tags;
+    private String tags;
     /**
      * 档案.
      */
-    String archives;
+    private String archives;
 
     /**
-     * 有参构造，SortOpeneulerCondition
+     * 有参构造，SortOpeneulerCondition.
      *
      * @param index     数据索引 .
-     * @param condition 前台请求封装条件
-     * @return SortOpeneulerCondition.
+     * @param condition 前台请求封装条件.
      */
     public SortOpeneulerCondition(String index, SortCondition condition) {
         super.index = index;

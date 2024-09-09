@@ -16,7 +16,6 @@ import com.search.adapter.vo.SortResponceVo;
 import com.search.adapter.vo.TagsResponceVo;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.base.vo.TagsVo;
-import com.search.domain.openeuler.vo.OpenEulerVo;
 import com.search.domain.opengauss.dto.DocsOpengaussCondition;
 import com.search.domain.opengauss.dto.SortOpengaussCondition;
 import com.search.domain.opengauss.dto.TagsOpengaussCondition;
@@ -31,7 +30,12 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +54,10 @@ public class OpengaussGatewayImpl extends BaseFounctionGateway implements Openga
         List<Map<String, Object>> dateMapList = super.getDefaultSearchByCondition(searchDocsCondition);
         List<OpenGaussDo> openGaussDos = CommonConverter.toDoList(dateMapList, OpenGaussDo.class);
         List<OpenGaussVo> openGaussVos = CommonConverter.toBaseVoList(openGaussDos, OpenGaussVo.class);
-        DocsResponceVo docsResponceVo = new DocsResponceVo(openGaussVos, searchDocsCondition.getPageSize(), searchDocsCondition.getPage(), searchDocsCondition.getKeyword());
+        DocsResponceVo docsResponceVo = new DocsResponceVo(openGaussVos,
+                searchDocsCondition.getPageSize(),
+                searchDocsCondition.getPage(),
+                searchDocsCondition.getKeyword());
         return docsResponceVo;
     }
 
@@ -78,7 +85,14 @@ public class OpengaussGatewayImpl extends BaseFounctionGateway implements Openga
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
             List<OpenGaussDo> openGaussDos = CommonConverter.toDoList(dateMapList, OpenGaussDo.class);
             List<OpenGaussVo> openGaussVos = CommonConverter.toBaseVoList(openGaussDos, OpenGaussVo.class);
-            SortResponceVo sortResponceVo = new SortResponceVo(openGaussVos, sortCondition.getPageSize(), sortCondition.getPage(), response.getHits().getTotalHits().value);
+            long total = 0L;
+            if (response.getHits() != null && response.getHits().getTotalHits() != null) {
+                total = response.getHits().getTotalHits().value;
+            }
+            SortResponceVo sortResponceVo = new SortResponceVo(openGaussVos,
+                    sortCondition.getPageSize(),
+                    sortCondition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;
@@ -108,14 +122,21 @@ public class OpengaussGatewayImpl extends BaseFounctionGateway implements Openga
             List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
             List<OpenGaussDo> openGaussDos = CommonConverter.toDoList(dateMapList, OpenGaussDo.class);
             List<OpenGaussVo> openGaussVos = CommonConverter.toBaseVoList(openGaussDos, OpenGaussVo.class);
-            SortResponceVo sortResponceVo = new SortResponceVo(openGaussVos, sortCondition.getPageSize(), sortCondition.getPage(), response.getHits().getTotalHits().value);
+            long total = 0L;
+            if (response.getHits() != null && response.getHits().getTotalHits() != null) {
+                total = response.getHits().getTotalHits().value;
+            }
+            SortResponceVo sortResponceVo = new SortResponceVo(openGaussVos,
+                    sortCondition.getPageSize(),
+                    sortCondition.getPage(),
+                    total);
             return sortResponceVo;
         }
         return null;
     }
 
     /**
-     * Search for  Opengauss document data
+     * Search for  Opengauss document data.
      *
      * @param condition The search condition for querying different types of data.
      * @return SortResponceVo<OpenEulerVo>.
@@ -125,7 +146,10 @@ public class OpengaussGatewayImpl extends BaseFounctionGateway implements Openga
         SearchRequest divideDocsSearch = requestBuilder.getDivideDocsSearch(condition);
         SearchResponse searchResponse = super.executeDefaultEsSearch(divideDocsSearch);
         if (searchResponse != null) {
-            List<Map<String, Object>> dateMapList = responceHandler.getDefaultsHightResponceToMapList(searchResponse, Arrays.asList("title"), "textContent");
+            List<Map<String, Object>> dateMapList = responceHandler.getDefaultsHightResponceToMapList(
+                    searchResponse,
+                    Arrays.asList("title"),
+                    "textContent");
             if (dateMapList.size() > 2) {
                 TagsOpengaussCondition searchTags = new TagsOpengaussCondition();
                 searchTags.setCategory("docs");
@@ -140,7 +164,8 @@ public class OpengaussGatewayImpl extends BaseFounctionGateway implements Openga
                     });
                 }
                 ArrayList<Map> scoreList = new ArrayList<>();
-                Map<String, List<Map<String, Object>>> articleName = dateMapList.stream().collect(Collectors.groupingBy(m -> String.valueOf(m.get("articleName"))));
+                Map<String, List<Map<String, Object>>> articleName = dateMapList.stream().
+                        collect(Collectors.groupingBy(m -> String.valueOf(m.get("articleName"))));
                 articleName.forEach((k, v) -> {
                     v.sort((u1, u2) -> Float.compare(Float.parseFloat(String.valueOf(u2.get("score"))), Float.parseFloat(String.valueOf(u1.get("score")))));
                     scoreList.add(v.get(0));
@@ -154,8 +179,16 @@ public class OpengaussGatewayImpl extends BaseFounctionGateway implements Openga
             }
             List<OpenGaussDo> openGaussDos = CommonConverter.toDoList(dateMapList, OpenGaussDo.class);
             List<OpenGaussVo> openGaussVos = CommonConverter.toBaseVoList(openGaussDos, OpenGaussVo.class);
-            SortResponceVo sortResponceVo = new SortResponceVo(openGaussVos, condition.getPageSize(), condition.getPage(), searchResponse.getHits().getTotalHits().value);
+            long total = 0L;
+            if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits() != null) {
+                total = searchResponse.getHits().getTotalHits().value;
+            }
+            SortResponceVo sortResponceVo = new SortResponceVo(openGaussVos,
+                    condition.getPageSize(),
+                    condition.getPage(),
+                    total);
             return sortResponceVo;
+
         }
         return null;
     }

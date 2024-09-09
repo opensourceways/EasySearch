@@ -112,7 +112,8 @@ public class BaseFounctionGateway {
     public List<Map<String, Object>> getDefaultSearchByCondition(SearchDocsBaseCondition condition) {
         SearchRequest defaultSearchRequest = requestBuilder.getDefaultDocsSearchRequest(condition);
         SearchResponse searchResponse = executeDefaultEsSearch(defaultSearchRequest);
-        List<Map<String, Object>> dateMapList = responceHandler.getDefaultsHightResponceToMapList(searchResponse, Arrays.asList("title"), "textContent");
+        List<Map<String, Object>> dateMapList = responceHandler.getDefaultsHightResponceToMapList(
+                searchResponse, Arrays.asList("title"), "textContent");
         return dateMapList;
     }
 
@@ -150,15 +151,15 @@ public class BaseFounctionGateway {
         }
         for (int i = 0; i <= 3; i++) {
             StringBuilder sb = new StringBuilder();
-            for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option> my_sugg : suggResponse.getSuggest().getSuggestion(suggFiled)) {
+            for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option> mySugg : suggResponse.getSuggest().getSuggestion(suggFiled)) {
 
-                String op = my_sugg.getText().string();
+                String op = mySugg.getText().string();
 
                 boolean hc = General.haveChinese(op);
 
                 if (!hc) {
-                    if (my_sugg.getOptions().size() > i) {
-                        op = my_sugg.getOptions().get(i).getText().string();
+                    if (mySugg.getOptions().size() > i) {
+                        op = mySugg.getOptions().get(i).getText().string();
                         sb.append("<em>").append(op).append("</em>").append(" ");
                     } else {
                         sb.append(op).append(" ");

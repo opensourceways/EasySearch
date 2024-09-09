@@ -9,11 +9,12 @@
  See the Mulan PSL v2 for more details.
 */
 package com.search.domain.base.vo;
+import lombok.Getter;
+import lombok.Setter;
 
-import lombok.Data;
 
-
-@Data
+@Getter
+@Setter
 public class CommunityBaseVo {
     /**
      * 标题.

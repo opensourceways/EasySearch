@@ -1,7 +1,7 @@
 //package com.search.common.config.es;
 //
+//
 //import com.search.common.exception.TrustManagerException;
-//import lombok.extern.slf4j.Slf4j;
 //import org.apache.http.HttpHost;
 //import org.apache.http.auth.AuthScope;
 //import org.apache.http.auth.UsernamePasswordCredentials;
@@ -25,7 +25,12 @@
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;
 //
-//import javax.net.ssl.*;
+//import javax.net.ssl.HostnameVerifier;
+//import javax.net.ssl.SSLContext;
+//import javax.net.ssl.SSLSession;
+//import javax.net.ssl.TrustManager;
+//import javax.net.ssl.TrustManagerFactory;
+//import javax.net.ssl.X509TrustManager;
 //import java.io.File;
 //import java.io.FileInputStream;
 //import java.io.FileNotFoundException;
@@ -40,25 +45,54 @@
 //
 //@Configuration
 //@EnableConfigurationProperties(ElasticsearchProperties.class)
-//@Slf4j
 //public class ElasticSearchConfig {
-//
-//    private static final Logger logger = LoggerFactory.getLogger(ElasticSearchConfig.class);
+//    /**
+//     * logger.
+//     */
+//    private static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchConfig.class);
+//    /**
+//     * host.
+//     */
 //    @Value("${elasticsearch.host}")
 //    public String elasticsearchHost;
+//    /**
+//     * port.
+//     */
 //    @Value("${elasticsearch.port}")
 //    public int elasticsearchPort;
+//
+//    /**
+//     * protocol.
+//     */
 //    @Value("${elasticsearch.protocol}")
 //    public String elasticsearchProtocol;
+//    /**
+//     * username.
+//     */
 //    @Value("${elasticsearch.username}")
 //    public String elasticsearchUsername;
+//
+//    /**
+//     * password.
+//     */
 //    @Value("${elasticsearch.password}")
 //    public String elasticsearchPassword;
+//    /**
+//     * cerFilePath.
+//     */
 //    @Value("${elasticsearch.cerFilePath}")
 //    public String cerFilePath;
+//    /**
+//     * cerPassword.
+//     */
 //    @Value("${elasticsearch.cerPassword}")
 //    public String cerPassword;
 //
+//    /**
+//     * create a RestHighLevelClient.
+//     *
+//     * @return a RestHighLevelClient.
+//     */
 //    @Bean(destroyMethod = "close")
 //    public RestHighLevelClient elasticsearchClient() {
 //        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -66,63 +100,58 @@
 //        SSLContext sc = null;
 //        try {
 //            TrustManager[] tm = {new MyX509TrustManager(cerFilePath, cerPassword)};
-//            // sc = SSLContext.getInstance("SSL", "SunJSSE");
-//            /*//也可以使用
-//            sc = SSLContext.getInstance("TLSv1.2");
-//            sc.init(null, tm, SecureRandom.getInstanceStrong());*/
+//            sc = SSLContext.getInstance("SSL", "SunJSSE");
+//            //也可以使用SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+//            sc.init(null, tm, SecureRandom.getInstanceStrong());
 //
-//                sc = SSLContext.getInstance("SSL");
-//                sc.init(null, trustAllCerts, new SecureRandom());
 //            SSLIOSessionStrategy sessionStrategy = new SSLIOSessionStrategy(sc, new NoopHostnameVerifier());
 //            SecuredHttpClientConfigCallback httpClientConfigCallback = new SecuredHttpClientConfigCallback(sessionStrategy,
 //                    credentialsProvider);
 //
-//            RestClientBuilder builder = RestClient.builder(constructHttpHosts(Collections.singletonList(elasticsearchHost), elasticsearchPort, elasticsearchProtocol))
+//            RestClientBuilder builder = RestClient.builder(constructHttpHosts(
+//                    Collections.singletonList(elasticsearchHost), elasticsearchPort, elasticsearchProtocol))
 //                    .setRequestConfigCallback(requestConfig -> requestConfig.setConnectTimeout(5 * 1000)
 //                            .setConnectionRequestTimeout(5 * 1000)
 //                            .setSocketTimeout(30 * 1000))
 //                    .setHttpClientConfigCallback(httpClientConfigCallback);
 //            final RestHighLevelClient client = new RestHighLevelClient(builder);
-//            //  logger.info("es rest client build success {} ", client);
+//            LOGGER.info("es rest client build success {} ", client);
 //
 //            ClusterHealthRequest request = new ClusterHealthRequest();
 //            ClusterHealthResponse response = client.cluster().health(request, RequestOptions.DEFAULT);
-//            logger.info("es rest client health response {} ", response);
+//            LOGGER.info("es rest client health response {} ", response);
 //
 //            return client;
 //        } catch (Exception e) {
-//            logger.error(e.getMessage());
+//            LOGGER.error(e.getMessage());
 //            return null;
 //        }
 //    }
-//    public static TrustManager[] trustAllCerts = new TrustManager[] {
-//            new X509TrustManager() {
-//                @Override
-//                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-//                }
-//                @Override
-//                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-//                }
-//                @Override
-//                public X509Certificate[] getAcceptedIssuers() {
-//                    return null;
-//                }
-//            }
-//    };
+//
 //    /**
-//     * constructHttpHosts函数转换host集群节点ip列表。
+//     * constructHttpHosts函数转换host集群节点ip列表.
+//     *
+//     * @param host     host.
+//     * @param port     port.
+//     * @param protocol protocol.
+//     * @return HttpHost[].
 //     */
 //    public static HttpHost[] constructHttpHosts(List<String> host, int port, String protocol) {
 //        return host.stream().map(p -> new HttpHost(p, port, protocol)).toArray(HttpHost[]::new);
 //    }
 //
 //    /**
-//     * SecuredHttpClientConfigCallback类定义。
+//     * SecuredHttpClientConfigCallback类定义.
 //     */
 //    static class SecuredHttpClientConfigCallback implements RestClientBuilder.HttpClientConfigCallback {
+//        /**
+//         * credentialsProvider.
+//         */
 //        @Nullable
 //        private final CredentialsProvider credentialsProvider;
-//
+//        /**
+//         * sslStrategy.
+//         */
 //        private final SSLIOSessionStrategy sslStrategy;
 //
 //        SecuredHttpClientConfigCallback(final SSLIOSessionStrategy sslStrategy,
@@ -151,6 +180,9 @@
 //    }
 //
 //    public static class MyX509TrustManager implements X509TrustManager {
+//        /**
+//         * sunJSSEX509TrustManager.
+//         */
 //        X509TrustManager sunJSSEX509TrustManager;
 //
 //        MyX509TrustManager(String cerFilePath, String cerPassword) throws TrustManagerException, FileNotFoundException {
@@ -159,7 +191,7 @@
 //                throw new FileNotFoundException("Wrong Certification Path");
 //            }
 //            try (InputStream in = new FileInputStream(file)) {
-//                log.info("Loading Keystore {} ...", file);
+//                LOGGER.info("Loading Keystore {} ...", file);
 //                KeyStore ks = KeyStore.getInstance("JKS");
 //                ks.load(in, cerPassword.toCharArray());
 //                TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
@@ -176,6 +208,12 @@
 //            }
 //        }
 //
+//        /**
+//         * check Client Trusted.
+//         *
+//         * @param chain    X509Certificate Array.
+//         * @param authType authType.
+//         */
 //        @Override
 //        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 //            for (X509Certificate cert : chain) {
@@ -187,6 +225,12 @@
 //            }
 //        }
 //
+//        /**
+//         * checkServerTrusted.
+//         *
+//         * @param chain    X509Certificate Array.
+//         * @param authType authType.
+//         */
 //        @Override
 //        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 //            for (X509Certificate cert : chain) {
@@ -196,6 +240,11 @@
 //            }
 //        }
 //
+//        /**
+//         * X509Certificate.
+//         *
+//         * @return X509Certificate array.
+//         */
 //        @Override
 //        public X509Certificate[] getAcceptedIssuers() {
 //            return new X509Certificate[0];
@@ -203,9 +252,17 @@
 //    }
 //
 //    public static class NullHostNameVerifier implements HostnameVerifier {
+//        /**
+//         * verify.
+//         *
+//         * @param hostName hostName.
+//         * @param session  session.
+//         * @return boolean.
+//         */
 //        @Override
 //        public boolean verify(String hostName, SSLSession session) {
 //            return !Objects.isNull(hostName) || !Objects.isNull(session);
 //        }
 //    }
+//
 //}

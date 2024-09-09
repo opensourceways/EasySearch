@@ -8,61 +8,70 @@
  MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
  See the Mulan PSL v2 for more details.
 */
-
 package com.search.common.config.web;
 
 import com.search.common.constant.SearchConstant;
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import com.search.common.thread.ThreadLocalCache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 
 
-import java.io.IOException;
+public class WebRefferInterceptor implements HandlerInterceptor {
 
-/**
- * 请求头拦截器.
- */
-@Slf4j
-public class RequestHeaderFilter implements Filter {
     /**
      * Referer pass domain.
      */
     private String allowDomains;
 
-
     /**
-     * check header.
-     *
-     * @param servletRequest  The request.
-     * @param servletResponse The response.
-     * @param filterChain     The filterChain.
+     * @param servletRequest  – current HTTP request
+     * @param servletResponse – current HTTP response
+     * @param handler         – chosen handler to execute, for type and/or instance evaluation
+     * @return : true if the execution chain should proceed with the next interceptor or the handler itself. Else,
+     * DispatcherServlet assumes that this interceptor has already dealt with the response itself.
      */
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-            throws IOException, ServletException {
+    public boolean preHandle(HttpServletRequest servletRequest, HttpServletResponse servletResponse, Object handler) {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String referer = request.getHeader("Referer");
         if (allowDomains == null || allowDomains.length() == 0) {
-            filterChain.doFilter(request, response);
+            return true;
         }
         String[] domains = allowDomains.split(";");
         boolean checkReferer = checkDomain(domains, referer);
         if (!checkReferer) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+            return false;
         }
-        filterChain.doFilter(request, response);
+
+        return true;
     }
 
+    /**
+     * @param request      – current HTTP request
+     * @param response     – current HTTP response
+     * @param handler      – chosen handler to execute, for type and/or instance evaluation
+     * @param modelAndView modelAndView – the ModelAndView that the handler returned (can also be null)
+     */
     @Override
-    public void destroy() {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
+
+    }
+
+    /**
+     * @param request  – current HTTP request
+     * @param response – current HTTP response
+     * @param handler  – chosen handler to execute, for type and/or instance evaluation
+     * @param ex       any exception thrown on handler execution, if any;
+     *                 this does not include exceptions that have been handled through an exception resolver
+     */
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        ThreadLocalCache.remove();
 
     }
 
@@ -118,7 +127,7 @@ public class RequestHeaderFilter implements Filter {
      *
      * @param allowDomains configdomain.
      */
-    public RequestHeaderFilter(String allowDomains) {
+    public WebRefferInterceptor(String allowDomains) {
         this.allowDomains = allowDomains;
     }
 }

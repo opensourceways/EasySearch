@@ -12,10 +12,9 @@ package com.search.common.exception;
 
 public class TrustManagerException extends Exception {
     /**
-     * 有参构造
+     * 有参构造.
      *
      * @param msg 响应消息.
-     * @return TrustManagerException.
      */
     public TrustManagerException(String msg) {
         super("error info: " + msg);

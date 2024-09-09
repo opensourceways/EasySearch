@@ -12,13 +12,15 @@ package com.search.domain.mindspore.dto;
 
 import com.search.adapter.condition.DocsCondition;
 import com.search.domain.base.dto.SearchDocsBaseCondition;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 public class DocsMindsporeCondition extends SearchDocsBaseCondition {
     /**
      * Mindspore Limit list.
@@ -31,31 +33,30 @@ public class DocsMindsporeCondition extends SearchDocsBaseCondition {
     private List<MindsporeFilter> filter;
 
     /**
-     * 有参构造，初始化DocsMindsporeCondition
+     * 有参构造，初始化DocsMindsporeCondition.
      *
      * @param index     数据索引 .
-     * @param condition 前台请求封装条件
-     * @return DocsMindsporeCondition.
+     * @param condition 前台请求封装条件.
      */
     public DocsMindsporeCondition(String index, DocsCondition condition) {
-        super.index = index;
-        super.pageFrom = (condition.getPage() - 1) * condition.getPageSize();
-        super.page = condition.getPage();
-        super.pageSize = condition.getPageSize();
-        super.keyword = condition.getKeyword();
-        super.type = condition.getType();
+        this.index = index;
+        this.pageFrom = (condition.getPage() - 1) * condition.getPageSize();
+        this.page = condition.getPage();
+        this.pageSize = condition.getPageSize();
+        this.keyword = condition.getKeyword();
+        this.type = condition.getType();
         setMindsporeLimit(condition);
         setMindsporeFilter(condition);
     }
 
     /**
-     * 根据DocsCondition封装社区limit obj
+     * 根据DocsCondition封装社区limit obj.
      *
      * @param condition 前台请求封装条件.
      */
     public void setMindsporeLimit(DocsCondition condition) {
         ArrayList<MindsporeLimit> mindsporeLimits = new ArrayList<>();
-        if (Objects.nonNull(condition.getFilter()))
+        if (Objects.nonNull(condition.getFilter())) {
             condition.getLimit().stream().forEach(a -> {
                 MindsporeLimit mindsporeLimit = new MindsporeLimit();
                 mindsporeLimit.setComponents(a.getComponents());
@@ -63,17 +64,18 @@ public class DocsMindsporeCondition extends SearchDocsBaseCondition {
                 mindsporeLimit.setName(a.getName());
                 mindsporeLimits.add(mindsporeLimit);
             });
+        }
         this.limit = mindsporeLimits;
     }
 
     /**
-     * 根据DocsCondition封装社区filter obj
+     * 根据DocsCondition封装社区filter obj.
      *
      * @param condition 前台请求封装条件.
      */
     public void setMindsporeFilter(DocsCondition condition) {
         ArrayList<MindsporeFilter> mindsporeFilters = new ArrayList<>();
-        if (Objects.nonNull(condition.getFilter()))
+        if (Objects.nonNull(condition.getFilter())) {
             condition.getLimit().stream().forEach(a -> {
                 MindsporeFilter mindsporeFilter = new MindsporeFilter();
                 mindsporeFilter.setComponents(a.getComponents());
@@ -81,26 +83,48 @@ public class DocsMindsporeCondition extends SearchDocsBaseCondition {
                 mindsporeFilter.setName(a.getName());
                 mindsporeFilters.add(mindsporeFilter);
             });
+        }
+
         this.filter = mindsporeFilters;
     }
 
     /**
      * MindsporeLimit obj.
      */
-    @Data
-    public class MindsporeLimit {
-        String components;
-        String version;
-        String name;
+    @Getter
+    @Setter
+    public static  class MindsporeLimit {
+        /**
+         * 内容.
+         */
+        private String components;
+        /**
+         * 版本.
+         */
+        private String version;
+        /**
+         * 名称.
+         */
+        private String name;
     }
 
     /**
      * MindsporeFilter obj.
      */
-    @Data
-    public class MindsporeFilter {
-        String components;
-        String version;
-        String name;
+    @Getter
+    @Setter
+    public static class MindsporeFilter {
+        /**
+         * 内容.
+         */
+        private String components;
+        /**
+         * 版本.
+         */
+        private String version;
+        /**
+         * 名称.
+         */
+        private String name;
     }
 }

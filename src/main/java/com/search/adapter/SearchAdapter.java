@@ -32,7 +32,6 @@ import com.search.domain.opengauss.dto.SortOpengaussCondition;
 import com.search.domain.opengauss.dto.TagsOpengaussCondition;
 import com.search.domain.opengauss.gateway.OpengaussGateway;
 import com.search.domain.openmind.dto.DocsOpenmindCondition;
-import com.search.domain.openmind.dto.SortOpenmindCondition;
 import com.search.domain.openmind.gateway.OpenmindGateway;
 import com.search.domain.softcenter.dto.DocsSoftcenterCondition;
 import com.search.domain.softcenter.gateway.SoftcenterGateway;
@@ -64,7 +63,7 @@ public class SearchAdapter {
     private final SoftcenterGateway softcenterGateway;
 
     /**
-     * 根据数据源适配gateway以实现搜索符合条件的各种类型数据
+     * 根据数据源适配gateway以实现搜索符合条件的各种类型数据.
      *
      * @param condition The search condition for querying different types of data.
      * @return ResponceResult.
@@ -195,6 +194,7 @@ public class SearchAdapter {
      * 根据数据源适配gateway以实现搜索特定type数据.
      *
      * @param condition The search condition for querying different types of data.
+     * @param type      data type.
      * @return ResponceResult.
      */
     public ResponceResult getDivideSearch(SortCondition condition, String type) {
@@ -221,7 +221,7 @@ public class SearchAdapter {
     }
 
     /**
-     * 根据数据源适配gateway以实现搜索文档数据
+     * 根据数据源适配gateway以实现搜索文档数据.
      *
      * @param condition The search condition for querying different types of data.
      * @return ResponceResult.
@@ -259,7 +259,7 @@ public class SearchAdapter {
     public ResponceResult getDocAllByCondition(DocsCondition condition) {
 
         String dataSource = ThreadLocalCache.getDataSource();
-        String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
+      //  String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
         switch (dataSource) {
             case SourceConstant.SOURCE_SOFTCENTER:
                 DocsSoftcenterCondition docsSoftcenterCondition = new DocsSoftcenterCondition();

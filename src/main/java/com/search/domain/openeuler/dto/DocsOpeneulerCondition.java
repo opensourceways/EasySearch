@@ -12,14 +12,16 @@ package com.search.domain.openeuler.dto;
 
 import com.search.adapter.condition.DocsCondition;
 import com.search.domain.base.dto.SearchDocsBaseCondition;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 public class DocsOpeneulerCondition extends SearchDocsBaseCondition {
     /**
      * Openeuler Limit list.
@@ -31,11 +33,10 @@ public class DocsOpeneulerCondition extends SearchDocsBaseCondition {
     private List<OpeneulerFilter> filter;
 
     /**
-     * 有参构造，初始化DocsOpeneulerCondition
+     * 有参构造，初始化DocsOpeneulerCondition.
      *
      * @param index     数据索引 .
      * @param condition 前台请求封装条件
-     * @return DocsOpeneulerCondition.
      */
     public DocsOpeneulerCondition(String index, DocsCondition condition) {
         super.index = index;
@@ -49,54 +50,70 @@ public class DocsOpeneulerCondition extends SearchDocsBaseCondition {
     }
 
     /**
-     * 根据DocsCondition封装社区limit obj
+     * 根据DocsCondition封装社区limit obj.
      *
      * @param condition 前台请求封装条件.
      */
     public void setOpeneulerLimit(DocsCondition condition) {
         ArrayList<OpeneulerLimit> openeulerLimits = new ArrayList<>();
-        if (!Objects.isNull(condition.getLimit()))
+        if (!Objects.isNull(condition.getLimit())) {
             condition.getLimit().stream().forEach(a -> {
                 OpeneulerLimit openeulerLimit = new OpeneulerLimit();
                 openeulerLimit.setType(a.getType());
                 openeulerLimit.setVersion(a.getVersion());
                 openeulerLimits.add(openeulerLimit);
             });
+        }
         this.limit = openeulerLimits;
     }
 
     /**
-     * 根据DocsCondition封装社区filter obj
+     * 根据DocsCondition封装社区filter obj.
      *
      * @param condition 前台请求封装条件.
      */
     public void setOpeneulerFilter(DocsCondition condition) {
         ArrayList<OpeneulerFilter> openeulerFilters = new ArrayList<>();
-        if (!Objects.isNull(condition.getFilter()))
+        if (!Objects.isNull(condition.getFilter())) {
             condition.getLimit().stream().forEach(a -> {
                 OpeneulerFilter openeulerFilter = new OpeneulerFilter();
                 openeulerFilter.setType(a.getType());
                 openeulerFilter.setVersion(a.getVersion());
                 openeulerFilters.add(openeulerFilter);
             });
+        }
         this.filter = openeulerFilters;
     }
 
     /**
      * OpeneulerLimit obj.
      */
-    @Data
-    private class OpeneulerLimit {
-        String type;
-        String version;
+    @Getter
+    @Setter
+    private static class OpeneulerLimit {
+        /**
+         * 类型.
+         */
+        private String type;
+        /**
+         * 版本.
+         */
+        private String version;
     }
 
     /**
      * OpeneulerFilter obj.
      */
-    @Data
-    private class OpeneulerFilter {
-        String type;
-        String version;
+    @Getter
+    @Setter
+    private static class OpeneulerFilter {
+        /**
+         * 类型.
+         */
+        private String type;
+        /**
+         * 版本.
+         */
+        private String version;
     }
 }

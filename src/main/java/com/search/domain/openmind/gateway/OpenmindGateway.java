@@ -63,7 +63,7 @@ public interface OpenmindGateway {
     SortResponceVo<OpenMindVo> getDvideSearchSortByCondition(SortOpenmindCondition sortCondition);
 
     /**
-     * Search for  Openmind document data
+     * Search for  Openmind document data.
      *
      * @param DivideDocsBaseCondition The search condition .
      * @return SortResponceVo<OpenMindVo>.

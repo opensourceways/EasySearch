@@ -11,7 +11,6 @@
 package com.search.adapter.vo;
 
 import com.search.domain.base.vo.TagsVo;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,5 +22,5 @@ public class TagsResponceVo {
     /**
      * list of TagsVo.
      */
-    List<TagsVo> totalNum;
+    private List<TagsVo> totalNum;
 }

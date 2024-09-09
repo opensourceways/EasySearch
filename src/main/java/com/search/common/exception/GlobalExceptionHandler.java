@@ -12,9 +12,6 @@
 package com.search.common.exception;
 
 import com.search.common.entity.ResponceResult;
-import com.search.common.util.ObjectMapperUtil;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,8 +23,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -63,7 +58,8 @@ public class GlobalExceptionHandler {
         BindingResult bindingResult = e.getBindingResult();
         StringBuilder sb = new StringBuilder();
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            sb.append("[").append(fieldError.getField()).append("->").append(fieldError.getDefaultMessage()).append("]");
+            sb.append("[").append(fieldError.getField()).append("->").
+                    append(fieldError.getDefaultMessage()).append("]");
         }
         return ResponceResult.fail("查询失败", null);
     }
@@ -92,24 +88,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResponceResult exception(Exception e) {
-        LOGGER.error("异常:", e.getMessage());
+        LOGGER.error("异常:", e.toString());
         return ResponceResult.fail("查询失败", null);
     }
 
-    /**
-     * 响应json格式字符串
-     *
-     * @param request   {HttpServletRequest}
-     * @param response  {HttpServletResponse}
-     * @param sysResult {SysResult}
-     */
-    private void responseJson(HttpServletRequest request, HttpServletResponse response, ResponceResult sysResult) {
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json; charset=utf-8");
-        try (PrintWriter out = response.getWriter()) {
-            out.append(ObjectMapperUtil.writeValueAsString(sysResult));
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-        }
-    }
 }

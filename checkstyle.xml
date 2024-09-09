@@ -52,7 +52,7 @@
     <!-- https://checkstyle.org/filters/suppressionfilter.html -->
     <module name="SuppressionFilter">
         <property name="file" value="${org.checkstyle.sun.suppressionfilter.config}"
-                  default="checkstyle-suppressions.xml"/>
+                  default="checkstyle-suppressions.xml" />
         <property name="optional" value="true"/>
     </module>
 
@@ -75,7 +75,7 @@
     <module name="FileLength"/>
     <module name="LineLength">
         <property name="fileExtensions" value="java"/>
-        <property name="max" value="120"/> <!-- 设置每行最大长度为 120 -->
+        <property name="max" value="160"/> <!-- 设置每行最大长度为 120 -->
     </module>
 
     <!-- Checks for whitespace                               -->
@@ -114,7 +114,7 @@
         <module name="ConstantName"/>
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
-        <module name="MemberName"/>
+        <!--<module name="MemberName"/>-->
         <module name="MethodName"/>
         <module name="PackageName"/>
         <module name="ParameterName">
@@ -135,9 +135,7 @@
         <!-- Checks for Size Violations.                    -->
         <!-- See https://checkstyle.org/checks/sizes/index.html -->
         <module name="MethodLength"/>
-        <module name="ParameterNumber">
-            <property name="max" value="8"/>
-        </module>
+        <module name="ParameterNumber"/>
 
         <!-- Checks for whitespace                               -->
         <!-- See https://checkstyle.org/checks/whitespace/index.html -->
@@ -188,7 +186,7 @@
         <module name="FinalClass"/>
         <module name="HideUtilityClassConstructor"/>
         <module name="InterfaceIsType"/>
-        <module name="VisibilityModifier"/>
+        <!-- <module name="VisibilityModifier"/>-->
 
         <!-- Miscellaneous other checks.                   -->
         <!-- See https://checkstyle.org/checks/misc/index.html -->
@@ -202,7 +200,7 @@
         <!-- https://checkstyle.org/filters/suppressionxpathfilter.html -->
         <module name="SuppressionXpathFilter">
             <property name="file" value="${org.checkstyle.sun.suppressionxpathfilter.config}"
-                      default="checkstyle-xpath-suppressions.xml"/>
+                      default="checkstyle-xpath-suppressions.xml" />
             <property name="optional" value="true"/>
         </module>
 

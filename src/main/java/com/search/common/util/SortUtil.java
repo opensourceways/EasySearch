@@ -13,7 +13,12 @@ package com.search.common.util;
 
 import com.search.domain.softcenter.vo.DocsAllVo;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public final class SortUtil {
     // Private constructor to prevent instantiation of the utility class
@@ -26,15 +31,16 @@ public final class SortUtil {
      * The order of tags.
      */
     private static final List<String> ORDERS = List.of("RPM", "IMAGE", "EPKG");
-
-
+    /**
+     * The order of dateType.
+     */
     private static final List<String> RESPONCEORDERS = Arrays.asList("rpmpkg", "apppkg", "epkgpkg");
 
     /**
      * sort the tags.
      *
-     * @param tags The origin tags
-     * @return A list sorted
+     * @param tags The origin tags.
+     * @return A list sorted.
      */
     public static List<String> sortTags(Collection<String> tags) {
         List<String> list = new ArrayList<>(tags);
@@ -51,7 +57,7 @@ public final class SortUtil {
     /**
      * sort the responce.
      *
-     * @param responce responce
+     * @param responce responce.
      */
     public static void sortResponce(List<DocsAllVo> responce) {
         responce.sort(Comparator.comparingInt(a -> RESPONCEORDERS.indexOf(a.getKey())));

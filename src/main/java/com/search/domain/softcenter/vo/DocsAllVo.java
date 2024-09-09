@@ -11,24 +11,25 @@
 package com.search.domain.softcenter.vo;
 
 import com.search.domain.base.vo.CountVo;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class DocsAllVo extends CountVo {
     /**
      * list of nameDocs.
      */
-    List<NameDocsVo> nameDocs;
+   private List<NameDocsVo> nameDocs;
 
     /**
-     * 有参构造，初始化DocsAllVo
+     * 有参构造，初始化DocsAllVo.
      *
      * @param key      数据类型 .
      * @param docCount 该类型数据总数
      * @param nameDocs 该类型数据top3.
-     * @return DocsAllVo.
      */
     public DocsAllVo(String key, Long docCount, List<NameDocsVo> nameDocs) {
         this.key = key;

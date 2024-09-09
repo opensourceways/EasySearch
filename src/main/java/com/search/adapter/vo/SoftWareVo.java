@@ -11,8 +11,11 @@
 package com.search.adapter.vo;
 
 import com.search.domain.base.vo.CommunityBaseVo;
-import com.search.domain.softcenter.vo.*;
-import lombok.Data;
+import com.search.domain.softcenter.vo.ApplicationPackageVo;
+import com.search.domain.softcenter.vo.EPKGPackageVo;
+import com.search.domain.softcenter.vo.FieldApplicationVo;
+import com.search.domain.softcenter.vo.RPMPackageVo;
+import com.search.domain.softcenter.vo.ApplicationVersionVo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,32 +28,35 @@ public class SoftWareVo extends CommunityBaseVo {
     /**
      * the list of all data types.
      */
-    List<FieldApplicationVo> all;
+    private List<FieldApplicationVo> all;
 
     /**
      * the list of rpmpkg data types.
      */
-    List<RPMPackageVo> rpmpkg;
+    private List<RPMPackageVo> rpmpkg;
 
     /**
      * the list of apppkg data types.
      */
-    List<ApplicationPackageVo> apppkg;
+    private List<ApplicationPackageVo> apppkg;
 
     /**
      * the list of epkgpkg data types.
      */
-    List<EPKGPackageVo> epkgpkg;
+    private List<EPKGPackageVo> epkgpkg;
     /**
      * the list of appversion data types.
      */
-    List<ApplicationVersionVo> appversion;
+    private List<ApplicationVersionVo> appversion;
 
     /**
      * result count.
      */
-    long total;
+    private long total;
 
+    /**
+     * 无参构造.
+     */
     public SoftWareVo() {
         this.all = new ArrayList<>();
         this.rpmpkg = new ArrayList<>();

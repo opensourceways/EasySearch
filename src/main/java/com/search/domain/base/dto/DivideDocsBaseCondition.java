@@ -11,18 +11,21 @@
 package com.search.domain.base.dto;
 
 import com.search.adapter.condition.DevideCondition;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+
+@Getter
+@Setter
 public class DivideDocsBaseCondition {
     /**
      * 输入框关键字.
      */
-    private String keyword;
+    protected String keyword;
     /**
      * 版本.
      */
-    private String version;
+    protected String version;
     /**
      * 数据索引.
      */
@@ -45,12 +48,11 @@ public class DivideDocsBaseCondition {
     protected String type;
 
     /**
-     * 有参构造，初始化condition
+     * 有参构造，初始化condition.
      *
      * @param index     数据索引 .
      * @param type      类型.
-     * @param condition 前台请求封装条件
-     * @return DivideDocsBaseCondition.
+     * @param condition 前台请求封装条件.
      */
     public DivideDocsBaseCondition(String index, String type, DevideCondition condition) {
         this.index = index;

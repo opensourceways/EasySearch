@@ -11,37 +11,37 @@
 package com.search.domain.softcenter.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class ApplicationPackageVo extends FieldBaseVo {
     /**
-     * tags
+     * tags.
      */
-    List<String> tags;
+    private List<String> tags;
     /**
-     * iconUrl
+     * iconUrl.
      */
-    String iconUrl;
+    private String iconUrl;
     /**
-     * category
+     * category.
      */
-    String category;
+    private String category;
     /**
-     * pkgIds
+     * pkgIds.
      */
-    ApplicationPkgIdsVo pkgIds;
+    private ApplicationPkgIdsVo pkgIds;
     /**
-     * appVer
+     * appVer.
      */
-    String appVer;
+    private String appVer;
 
     /**
-     * 无参构造
-     *
-     * @return ApplicationPackageVo.
+     * 无参构造.
      */
     public ApplicationPackageVo() {
         ApplicationPkgIdsVo applicationPkgIdsVo = new ApplicationPkgIdsVo();
@@ -51,13 +51,23 @@ public class ApplicationPackageVo extends FieldBaseVo {
     /**
      * ApplicationPkgIdsVo obj.
      */
-    @Data
-    public class ApplicationPkgIdsVo {
+    @Getter
+    @Setter
+    public static class ApplicationPkgIdsVo {
+        /**
+         * image pkgid.
+         */
         @JsonProperty("IMAGE")
-        String IMAGE;
+        private String IMAGE;
+        /**
+         * epkg pkgid.
+         */
         @JsonProperty("EPKG")
-        String EPKG;
+        private String EPKG;
+        /**
+         * RPM pkgid.
+         */
         @JsonProperty("RPM")
-        String RPM;
+        private String RPM;
     }
 }
