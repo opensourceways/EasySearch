@@ -56,12 +56,11 @@ public class DocsMindsporeCondition extends SearchDocsBaseCondition {
      */
     public void setMindsporeLimit(DocsCondition condition) {
         ArrayList<MindsporeLimit> mindsporeLimits = new ArrayList<>();
-        if (Objects.nonNull(condition.getFilter())) {
+        if (Objects.nonNull(condition.getLimit())) {
             condition.getLimit().stream().forEach(a -> {
                 MindsporeLimit mindsporeLimit = new MindsporeLimit();
                 mindsporeLimit.setComponents(a.getComponents());
                 mindsporeLimit.setVersion(a.getVersion());
-                mindsporeLimit.setName(a.getName());
                 mindsporeLimits.add(mindsporeLimit);
             });
         }
@@ -76,11 +75,10 @@ public class DocsMindsporeCondition extends SearchDocsBaseCondition {
     public void setMindsporeFilter(DocsCondition condition) {
         ArrayList<MindsporeFilter> mindsporeFilters = new ArrayList<>();
         if (Objects.nonNull(condition.getFilter())) {
-            condition.getLimit().stream().forEach(a -> {
+            condition.getFilter().stream().forEach(a -> {
                 MindsporeFilter mindsporeFilter = new MindsporeFilter();
                 mindsporeFilter.setComponents(a.getComponents());
                 mindsporeFilter.setVersion(a.getVersion());
-                mindsporeFilter.setName(a.getName());
                 mindsporeFilters.add(mindsporeFilter);
             });
         }
@@ -93,7 +91,7 @@ public class DocsMindsporeCondition extends SearchDocsBaseCondition {
      */
     @Getter
     @Setter
-    public static  class MindsporeLimit {
+    public static class MindsporeLimit {
         /**
          * 内容.
          */
@@ -102,10 +100,6 @@ public class DocsMindsporeCondition extends SearchDocsBaseCondition {
          * 版本.
          */
         private String version;
-        /**
-         * 名称.
-         */
-        private String name;
     }
 
     /**
@@ -122,9 +116,5 @@ public class DocsMindsporeCondition extends SearchDocsBaseCondition {
          * 版本.
          */
         private String version;
-        /**
-         * 名称.
-         */
-        private String name;
     }
 }

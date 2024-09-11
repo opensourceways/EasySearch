@@ -54,6 +54,17 @@ public class SearchController {
     }
 
     /**
+     * 实现搜索数据的标签.
+     *
+     * @param searchTags controller conditon.
+     * @return ResponceResult.
+     */
+    @PostMapping("tags")
+    public ResponceResult getTags(@RequestBody @Validated TagsCondition searchTags) {
+        return searchAdapter.getTagsByCondition(searchTags);
+    }
+
+    /**
      * 搜索符合特定类型的数据.
      *
      * @param condition controller conditon.
@@ -64,16 +75,6 @@ public class SearchController {
         return searchAdapter.geSortByCondition(condition);
     }
 
-    /**
-     * 实现搜索数据的标签.
-     *
-     * @param searchTags controller conditon.
-     * @return ResponceResult.
-     */
-    @PostMapping("tags")
-    public ResponceResult getTags(@RequestBody @Validated TagsCondition searchTags) {
-        return searchAdapter.getTagsByCondition(searchTags);
-    }
 
     /**
      * 搜索符合条件数据的特定字段以及数量.

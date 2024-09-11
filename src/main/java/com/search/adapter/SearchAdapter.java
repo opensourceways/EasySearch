@@ -20,7 +20,6 @@ import com.search.common.entity.ResponceResult;
 import com.search.common.thread.ThreadLocalCache;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.mindspore.dto.DocsMindsporeCondition;
-import com.search.domain.mindspore.dto.SortMindsporeCondition;
 import com.search.domain.mindspore.dto.TagsMindsporeCondition;
 import com.search.domain.mindspore.gateway.MindSporeGateway;
 import com.search.domain.openeuler.dto.DocsOpeneulerCondition;
@@ -148,9 +147,6 @@ public class SearchAdapter {
                 SortOpeneulerCondition sortOpeneulerCondition = new SortOpeneulerCondition(index, condition);
                 return ResponceResult.ok(openeulerGateway.getSearchSortByCondition(sortOpeneulerCondition));
 
-            case SourceConstant.SOURCE_MINDSPORE:
-                SortMindsporeCondition sortMindsporeCondition = new SortMindsporeCondition();
-                return ResponceResult.ok(mindSporeGateway.getSearchSortByCondition(sortMindsporeCondition));
 
             case SourceConstant.SOURCE_OPENGAUSS:
                 SortOpengaussCondition sortOpengaussCondition = new SortOpengaussCondition();
@@ -207,10 +203,6 @@ public class SearchAdapter {
                 SortOpeneulerCondition sortOpeneulerCondition = new SortOpeneulerCondition(index, condition);
                 return ResponceResult.ok(openeulerGateway.getDvideSearchSortByCondition(sortOpeneulerCondition));
 
-            case SourceConstant.SOURCE_MINDSPORE:
-                SortMindsporeCondition sortMindsporeCondition = new SortMindsporeCondition();
-                return ResponceResult.ok(mindSporeGateway.getDvideSearchSortByCondition(sortMindsporeCondition));
-
             case SourceConstant.SOURCE_OPENGAUSS:
                 SortOpengaussCondition sortOpengaussCondition = new SortOpengaussCondition();
                 return ResponceResult.ok(opengaussGateway.getDvideSearchSortByCondition(sortOpengaussCondition));
@@ -235,9 +227,6 @@ public class SearchAdapter {
             case SourceConstant.SOURCE_OPENEULER:
                 return ResponceResult.ok(openeulerGateway.searchDocByType(divideDocsBaseCondition));
 
-            case SourceConstant.SOURCE_MINDSPORE:
-                return ResponceResult.ok(mindSporeGateway.searchDocByType(divideDocsBaseCondition));
-
             case SourceConstant.SOURCE_OPENGAUSS:
                 return ResponceResult.ok(opengaussGateway.searchDocByType(divideDocsBaseCondition));
 
@@ -259,7 +248,6 @@ public class SearchAdapter {
     public ResponceResult getDocAllByCondition(DocsCondition condition) {
 
         String dataSource = ThreadLocalCache.getDataSource();
-      //  String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
         switch (dataSource) {
             case SourceConstant.SOURCE_SOFTCENTER:
                 DocsSoftcenterCondition docsSoftcenterCondition = new DocsSoftcenterCondition();
