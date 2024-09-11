@@ -11,18 +11,33 @@
 package com.search.domain.mindspore.vo;
 
 import com.search.domain.base.vo.CommunityBaseVo;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class MindSporeVo extends CommunityBaseVo {
     /**
-     * 内容.
+     * 档案.
+     */
+    private String archives;
+    /**
+     * 成分.
      */
     private String components;
     /**
-     * 子类别.
+     * 子类.
      */
     private String subclass;
 
+    /**
+     * 类型.
+     */
+    private String type;
 
+
+    /**
+     * 版本.
+     */
+    private String version;
 }
