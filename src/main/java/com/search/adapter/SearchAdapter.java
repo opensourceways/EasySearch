@@ -20,7 +20,6 @@ import com.search.common.entity.ResponceResult;
 import com.search.common.thread.ThreadLocalCache;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.mindspore.dto.DocsMindsporeCondition;
-import com.search.domain.mindspore.dto.SortMindsporeCondition;
 import com.search.domain.mindspore.dto.TagsMindsporeCondition;
 import com.search.domain.mindspore.gateway.MindSporeGateway;
 import com.search.domain.openeuler.dto.DocsOpeneulerCondition;
@@ -249,7 +248,6 @@ public class SearchAdapter {
     public ResponceResult getDocAllByCondition(DocsCondition condition) {
 
         String dataSource = ThreadLocalCache.getDataSource();
-        //  String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
         switch (dataSource) {
             case SourceConstant.SOURCE_SOFTCENTER:
                 DocsSoftcenterCondition docsSoftcenterCondition = new DocsSoftcenterCondition();

@@ -12,22 +12,16 @@ package com.search.infrastructure.search.mindspore;
 
 import com.search.adapter.vo.CountResponceVo;
 import com.search.adapter.vo.DocsResponceVo;
-import com.search.adapter.vo.SortResponceVo;
 import com.search.adapter.vo.TagsResponceVo;
-import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.mindspore.dto.DocsMindsporeCondition;
-import com.search.domain.mindspore.dto.SortMindsporeCondition;
 import com.search.domain.mindspore.dto.TagsMindsporeCondition;
 import com.search.domain.mindspore.gateway.MindSporeGateway;
 import com.search.domain.mindspore.vo.MindSporeVo;
-import com.search.domain.openmind.vo.OpenMindVo;
 import com.search.infrastructure.support.action.BaseFounctionGateway;
 import com.search.infrastructure.support.converter.CommonConverter;
 import com.search.infrastructure.search.mindspore.dataobject.MindsporeDo;
-import com.search.infrastructure.search.openmind.dataobject.OpenMindDo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -67,31 +61,6 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         return super.getDefaultSearchCountByCondition(condition);
     }
 
-    /**
-     * Search for sort  of  MindSpore data.
-     *
-     * @param sortCondition The search condition for MindSpore.
-     * @return SortResponceVo<MindSporeVo>.
-     */
-    @Override
-    public SortResponceVo getSearchSortByCondition(SortMindsporeCondition sortCondition) {
-        SearchResponse response = super.getSearchSortListByCondition(sortCondition);
-        if (response != null) {
-            List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
-            List<MindsporeDo> mindsporeDos = CommonConverter.toDoList(dateMapList, MindsporeDo.class);
-            List<MindSporeVo> mindSporeVos = CommonConverter.toBaseVoList(mindsporeDos, MindSporeVo.class);
-            long total = 0L;
-            if (response.getHits() != null && response.getHits().getTotalHits() != null) {
-                total = response.getHits().getTotalHits().value;
-            }
-            SortResponceVo<MindSporeVo> sortResponceVo = new SortResponceVo(mindSporeVos,
-                    sortCondition.getPageSize(),
-                    sortCondition.getPage(),
-                    total);
-            return sortResponceVo;
-        }
-        return null;
-    }
 
     /**
      * Search the tags of   MindSpore data..
@@ -102,57 +71,6 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
     @Override
     public TagsResponceVo getSearchTagsByCondition(TagsMindsporeCondition tagsCondition) {
         return super.getDefaultSearchTagsByCondition(tagsCondition);
-    }
-
-    /**
-     * get Dvide Search Sort  of   MindSpore data.
-     *
-     * @param sortCondition The search condition for querying .
-     * @return SortResponceVo<OpenEulerVo>.
-     */
-    @Override
-    public SortResponceVo getDvideSearchSortByCondition(SortMindsporeCondition sortCondition) {
-        SearchResponse response = super.getDvideSearchSortByCondition(sortCondition);
-        if (response != null) {
-            List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(response);
-            List<OpenMindDo> openMindDos = CommonConverter.toDoList(dateMapList, OpenMindDo.class);
-            List<OpenMindVo> openMindVos = CommonConverter.toBaseVoList(openMindDos, OpenMindVo.class);
-            long total = 0L;
-            if (response.getHits() != null && response.getHits().getTotalHits() != null) {
-                total = response.getHits().getTotalHits().value;
-            }
-            SortResponceVo<OpenMindVo> sortResponceVo = new SortResponceVo(openMindVos,
-                    sortCondition.getPageSize(),
-                    sortCondition.getPage(),
-                    total);
-            return sortResponceVo;
-        }
-        return null;
-    }
-
-    /**
-     * Search for  MindSpore document data.
-     *
-     * @param condition The search condition for querying different types of data.
-     * @return SortResponceVo<OpenEulerVo>.
-     */
-    @Override
-    public SortResponceVo<MindSporeVo> searchDocByType(DivideDocsBaseCondition condition) {
-        SearchResponse searchResponse = super.getSearchDocByType(condition);
-        if (searchResponse != null) {
-            List<Map<String, Object>> dateMapList = responceHandler.handResponceHitsToMapList(searchResponse);
-            List<OpenMindDo> openMindDos = CommonConverter.toDoList(dateMapList, OpenMindDo.class);
-            List<OpenMindVo> openMindVos = CommonConverter.toBaseVoList(openMindDos, OpenMindVo.class);
-            long total = 0L;
-            if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits() != null) {
-                total = searchResponse.getHits().getTotalHits().value;
-            }
-            SortResponceVo<MindSporeVo> sortResponceVo = new SortResponceVo(openMindVos, condition.getPageSize(),
-                    condition.getPage(),
-                    total);
-            return sortResponceVo;
-        }
-        return null;
     }
 
 
