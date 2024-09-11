@@ -12,11 +12,8 @@ package com.search.domain.mindspore.gateway;
 
 import com.search.adapter.vo.CountResponceVo;
 import com.search.adapter.vo.DocsResponceVo;
-import com.search.adapter.vo.SortResponceVo;
 import com.search.adapter.vo.TagsResponceVo;
-import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.mindspore.dto.DocsMindsporeCondition;
-import com.search.domain.mindspore.dto.SortMindsporeCondition;
 import com.search.domain.mindspore.dto.TagsMindsporeCondition;
 import com.search.domain.mindspore.vo.MindSporeVo;
 
@@ -37,13 +34,6 @@ public interface MindSporeGateway {
      */
     CountResponceVo getSearchCountByCondition(DocsMindsporeCondition searchDocsCondition);
 
-    /**
-     * Search for sort  of  MindSpore data.
-     *
-     * @param sortCondition The search condition for MindSpore.
-     * @return SortResponceVo<MindSporeVo>.
-     */
-    SortResponceVo<MindSporeVo> getSearchSortByCondition(SortMindsporeCondition sortCondition);
 
     /**
      * Search the tags of   MindSpore data..
@@ -53,19 +43,5 @@ public interface MindSporeGateway {
      */
     TagsResponceVo getSearchTagsByCondition(TagsMindsporeCondition tagsCondition);
 
-    /**
-     * get Dvide Search Sort  of   MindSpore data.
-     *
-     * @param sortCondition The search condition for querying .
-     * @return SortResponceVo<OpenEulerVo>.
-     */
-    SortResponceVo<MindSporeVo> getDvideSearchSortByCondition(SortMindsporeCondition sortCondition);
 
-    /**
-     * Search for  MindSpore document data.
-     *
-     * @param DivideDocsBaseCondition The search condition for querying different types of data.
-     * @return SortResponceVo<OpenEulerVo>.
-     */
-    SortResponceVo<MindSporeVo> searchDocByType(DivideDocsBaseCondition DivideDocsBaseCondition);
 }
