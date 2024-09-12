@@ -19,6 +19,7 @@ import com.search.adapter.vo.TagsResponceVo;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.openeuler.dto.DocsOpeneulerCondition;
 import com.search.domain.openeuler.dto.SortOpeneulerCondition;
+import com.search.domain.openeuler.dto.SuggOpeneulerCondition;
 import com.search.domain.openeuler.dto.TagsOpeneulerCondition;
 import com.search.domain.openeuler.gateway.OpeneulerGateway;
 import com.search.domain.openeuler.vo.OpenEulerVo;
@@ -45,12 +46,17 @@ public class OpeneulerGatewayImpl extends BaseFounctionGateway implements Openeu
     /**
      * Implement search suggestions.
      *
-     * @param docsOpeneulerCondition The search condition for querying different types of data.
+     * @param suggOpeneulerCondition The search condition for querying different types of data.
      * @return SuggResponceVo.
      */
     @Override
-    public SuggResponceVo getSuggByCondition(DocsOpeneulerCondition docsOpeneulerCondition) {
-        return super.getDefaultSuggByCondition(docsOpeneulerCondition);
+    public SuggResponceVo getSuggByCondition(SuggOpeneulerCondition suggOpeneulerCondition) {
+        suggOpeneulerCondition.setAnalyzer("ik_smart");
+        suggOpeneulerCondition.setFieldname("textContent");
+        suggOpeneulerCondition.setMinWordLength(2);
+        suggOpeneulerCondition.setPrefixLength(0);
+        suggOpeneulerCondition.setSize(3);
+        return super.getDefaultSuggByCondition(suggOpeneulerCondition);
     }
 
     /**

@@ -12,8 +12,10 @@ package com.search.domain.mindspore.gateway;
 
 import com.search.adapter.vo.CountResponceVo;
 import com.search.adapter.vo.DocsResponceVo;
+import com.search.adapter.vo.SuggResponceVo;
 import com.search.adapter.vo.TagsResponceVo;
 import com.search.domain.mindspore.dto.DocsMindsporeCondition;
+import com.search.domain.mindspore.dto.SuggMindsporeCondition;
 import com.search.domain.mindspore.dto.TagsMindsporeCondition;
 import com.search.domain.mindspore.vo.MindSporeVo;
 
@@ -43,5 +45,11 @@ public interface MindSporeGateway {
      */
     TagsResponceVo getSearchTagsByCondition(TagsMindsporeCondition tagsCondition);
 
-
+    /**
+     * Implement search suggestions.
+     *
+     * @param searchSuggBaseCondition SuggBaseCondition.
+     * @return SuggResponceVo.
+     */
+    SuggResponceVo getSuggByCondition(SuggMindsporeCondition searchSuggBaseCondition);
 }

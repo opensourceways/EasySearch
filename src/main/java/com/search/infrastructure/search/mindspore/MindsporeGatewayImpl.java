@@ -12,8 +12,10 @@ package com.search.infrastructure.search.mindspore;
 
 import com.search.adapter.vo.CountResponceVo;
 import com.search.adapter.vo.DocsResponceVo;
+import com.search.adapter.vo.SuggResponceVo;
 import com.search.adapter.vo.TagsResponceVo;
 import com.search.domain.mindspore.dto.DocsMindsporeCondition;
+import com.search.domain.mindspore.dto.SuggMindsporeCondition;
 import com.search.domain.mindspore.dto.TagsMindsporeCondition;
 import com.search.domain.mindspore.gateway.MindSporeGateway;
 import com.search.domain.mindspore.vo.MindSporeVo;
@@ -73,5 +75,20 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         return super.getDefaultSearchTagsByCondition(tagsCondition);
     }
 
+    /**
+     * Implement search suggestions.
+     *
+     * @param suggMindsporeCondition The search condition for querying different types of data.
+     * @return SuggResponceVo.
+     */
+    @Override
+    public SuggResponceVo getSuggByCondition(SuggMindsporeCondition suggMindsporeCondition) {
+        suggMindsporeCondition.setAnalyzer("ik_smart");
+        suggMindsporeCondition.setFieldname("title");
+        suggMindsporeCondition.setMinWordLength(2);
+        suggMindsporeCondition.setPrefixLength(0);
+        suggMindsporeCondition.setSize(3);
+        return super.getDefaultSuggByCondition(suggMindsporeCondition);
+    }
 
 }
