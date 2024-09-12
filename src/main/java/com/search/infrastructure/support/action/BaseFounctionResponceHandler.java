@@ -9,7 +9,6 @@
  See the Mulan PSL v2 for more details.
 */
 package com.search.infrastructure.support.action;
-
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 @Component
 public class BaseFounctionResponceHandler {
@@ -41,6 +41,23 @@ public class BaseFounctionResponceHandler {
     }
 
     /**
+     * Convert an  sugg SearchResponse object to an list.
+     *
+     * @param suggResponse SearchResponse.
+     * @param name         suggname.
+     * @return An list of sring.
+     */
+    public List<String> handSuggResponceToList(SearchResponse suggResponse, String name) {
+        ArrayList<String> suggList = new ArrayList<>();
+        if (suggResponse.getSuggest() != null && suggResponse.getSuggest().getSuggestion(name) != null) {
+            suggResponse.getSuggest().getSuggestion(name).forEach(a -> {
+                suggList.add(a.getText().toString());
+            });
+        }
+        return suggList;
+    }
+
+    /**
      * Convert an SearchResponse object to an list.
      *
      * @param response SearchResponse.
@@ -50,6 +67,10 @@ public class BaseFounctionResponceHandler {
     public List<Map<String, Object>> handAggregationToCountList(SearchResponse response, String term) {
         List<Map<String, Object>> numberList = new ArrayList<>();
         ParsedTerms aggregation = response.getAggregations().get(term);
+        Map<String, Object> numberMap = new HashMap<>();
+        numberMap.put("doc_count", response.getHits().getTotalHits().value);
+        numberMap.put("key", "all");
+        numberList.add(numberMap);
         List<? extends Terms.Bucket> buckets = aggregation.getBuckets();
         for (Terms.Bucket bucket : buckets) {
             Map<String, Object> countMap = new HashMap<>();

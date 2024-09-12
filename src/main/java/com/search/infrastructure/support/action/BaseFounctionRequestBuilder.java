@@ -14,6 +14,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.search.common.thread.ThreadLocalCache;
 import com.search.common.util.General;
 import com.search.common.util.ObjectMapperUtil;
+
+import com.search.domain.base.dto.SearchSuggBaseCondition;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.base.dto.SearchDocsBaseCondition;
 import com.search.domain.base.dto.SearchSortBaseCondition;
@@ -35,6 +37,10 @@ import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilders;
+import org.elasticsearch.search.suggest.SuggestionBuilder;
+import org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -251,6 +257,33 @@ public class BaseFounctionRequestBuilder {
         sourceBuilder.from(condition.getPageFrom()).size(condition.getPageSize());
         sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
         return defaultSearchRequest;
+    }
+
+
+    /**
+     * 根据SearchSuggBaseCondition 组建SearchRequest.
+     *
+     * @param condition SearchDocsBaseCondition.
+     * @return SearchRequest.
+     */
+    public SearchRequest getDefaultSuggSearchRequest(SearchSuggBaseCondition condition) {
+        String saveIndex = condition.getIndex();
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        SuggestionBuilder<TermSuggestionBuilder> termSuggestionBuilder =
+                SuggestBuilders.termSuggestion(condition.getFieldname())
+                        .text(condition.getKeyword())
+                        .minWordLength(condition.getMinWordLength())
+                        .prefixLength(condition.getPrefixLength())
+                        .analyzer(condition.getAnalyzer())
+                        .size(condition.getSize())
+                        .suggestMode(TermSuggestionBuilder.SuggestMode.ALWAYS);
+
+        SuggestBuilder suggestBuilder = new SuggestBuilder();
+        suggestBuilder.addSuggestion(condition.getFieldname(), termSuggestionBuilder);
+
+        SearchRequest suggRequest = new SearchRequest(saveIndex);
+        suggRequest.source(searchSourceBuilder.suggest(suggestBuilder));
+        return suggRequest;
     }
 
     /**
