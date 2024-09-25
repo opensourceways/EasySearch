@@ -8,39 +8,22 @@
  MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
  See the Mulan PSL v2 for more details.
 */
-package com.search.domain.base.vo;
+package com.search.adapter.condition;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.search.common.constant.SearchConstant;
+import jakarta.validation.constraints.Pattern;
+import lombok.Data;
 
-@Getter
-@Setter
-public class TagsVo {
+@Data
+public class WordConditon {
     /**
-     * 数据大类.
+     * 输入语言.
      */
-    private String key;
+    private String query;
     /**
-     * 文档数量.
+     * 语言,用于选择数据源.
      */
-    private Long count;
+    @Pattern(regexp = SearchConstant.LANG_REGEXP)
+    private String lang;
 
-
-    /**
-     * 无参构造，初始化TagsVo.
-     */
-    public TagsVo() {
-
-    }
-
-    /**
-     * 有参构造，初始化TagsVo.
-     *
-     * @param key   关键字 .
-     * @param count 总量.
-     */
-    public TagsVo(String key, Long count) {
-        this.key = key;
-        this.count = count;
-    }
 }

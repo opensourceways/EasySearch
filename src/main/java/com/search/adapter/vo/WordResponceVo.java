@@ -8,39 +8,27 @@
  MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
  See the Mulan PSL v2 for more details.
 */
-package com.search.domain.base.vo;
+package com.search.adapter.vo;
 
+import com.search.domain.base.vo.TagsVo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
-public class TagsVo {
+public class WordResponceVo {
     /**
-     * 数据大类.
+     * the list of word.
      */
-    private String key;
-    /**
-     * 文档数量.
-     */
-    private Long count;
-
+    List<TagsVo> word;
 
     /**
-     * 无参构造，初始化TagsVo.
+     * 无参构造.
      */
-    public TagsVo() {
-
-    }
-
-    /**
-     * 有参构造，初始化TagsVo.
-     *
-     * @param key   关键字 .
-     * @param count 总量.
-     */
-    public TagsVo(String key, Long count) {
-        this.key = key;
-        this.count = count;
+    public WordResponceVo() {
+        this.word = new ArrayList<>();
     }
 }

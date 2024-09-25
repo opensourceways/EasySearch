@@ -8,39 +8,43 @@
  MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
  See the Mulan PSL v2 for more details.
 */
-package com.search.domain.base.vo;
+package com.search.domain.base.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class TagsVo {
+public class SearchSuggBaseCondition {
     /**
-     * 数据大类.
+     * 输入框关键字.
      */
-    private String key;
-    /**
-     * 文档数量.
-     */
-    private Long count;
-
+    protected String keyword;
 
     /**
-     * 无参构造，初始化TagsVo.
+     * 建议返回的更正词的最大数量.
      */
-    public TagsVo() {
-
-    }
+    protected Integer size;
+    /**
+     * 数据索引.
+     */
+    protected String index;
 
     /**
-     * 有参构造，初始化TagsVo.
-     *
-     * @param key   关键字 .
-     * @param count 总量.
+     * termSuggestion 字段.
      */
-    public TagsVo(String key, Long count) {
-        this.key = key;
-        this.count = count;
-    }
+    protected String fieldname;
+    /**
+     * 建议文本术语必须具有的最小长度才能进行更正。默认值为 4.
+     */
+    protected Integer minWordLength;
+    /**
+     * 必须满足搜索词的前端的多少个字符.
+     */
+    protected Integer prefixLength;
+    /**
+     * 分析器.
+     */
+    protected String analyzer;
+
 }

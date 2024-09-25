@@ -53,7 +53,7 @@ public class DocsCondition {
      * MAX_PAGE_SIZE, default value is 10.
      */
     @NotBlank(message = "keyword can not be null")
-    @Pattern(regexp = SearchConstant.SEARCH_KEYWORD_REGEXP, message = SearchConstant.SEARCH_KEYWORD_MESSAGE)
+  //  @Pattern(regexp = SearchConstant.SEARCH_KEYWORD_REGEXP, message = SearchConstant.SEARCH_KEYWORD_MESSAGE)
     @Size(max = 100)
     private String keyword;
 

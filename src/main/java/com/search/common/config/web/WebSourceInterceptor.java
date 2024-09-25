@@ -18,6 +18,7 @@ import com.search.common.thread.ThreadLocalCache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -55,7 +56,7 @@ public class WebSourceInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest servletRequest, HttpServletResponse servletResponse, Object handler) {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String source = request.getHeader(SourceConstant.REQUETS_HEADER_SOURCE);
-        if (this.allowSources != null) {
+        if (StringUtils.hasText(this.allowSources)) {
             List<String> allowSourcesList = Arrays.asList(allowSources.split(","));
             if (!allowSourcesList.contains(source)) {
                 throw new ParamErrorException("current support dateSource:" + allowSources);

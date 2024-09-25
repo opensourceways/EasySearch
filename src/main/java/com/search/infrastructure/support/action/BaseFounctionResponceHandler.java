@@ -17,11 +17,13 @@ import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 @Component
 public class BaseFounctionResponceHandler {
@@ -41,22 +43,52 @@ public class BaseFounctionResponceHandler {
     }
 
     /**
+     * Convert an  sugg SearchResponse object to an list.
+     *
+     * @param suggResponse SearchResponse.
+     * @param name         suggname.
+     * @return An list of sring.
+     */
+    public List<String> handSuggResponceToList(SearchResponse suggResponse, String name) {
+        ArrayList<String> suggList = new ArrayList<>();
+        if (suggResponse.getSuggest() != null && suggResponse.getSuggest().getSuggestion(name) != null) {
+            suggResponse.getSuggest().getSuggestion(name).forEach(a -> {
+                if (!CollectionUtils.isEmpty(a.getOptions())) {
+                    a.getOptions().stream().forEach(t -> {
+                        suggList.add(t.getText() + "");
+                    });
+                }
+            });
+        }
+        return suggList;
+    }
+
+    /**
      * Convert an SearchResponse object to an list.
      *
-     * @param response SearchResponse.
-     * @param term     term.
+     * @param response   SearchResponse.
+     * @param term       term.
+     * @param isNeeedAll isNeeedAll.
      * @return An list of map.
      */
-    public List<Map<String, Object>> handAggregationToCountList(SearchResponse response, String term) {
+    public List<Map<String, Object>> handAggregationToCountList(SearchResponse response, String term, Boolean isNeeedAll) {
         List<Map<String, Object>> numberList = new ArrayList<>();
         ParsedTerms aggregation = response.getAggregations().get(term);
+        Map<String, Object> numberMap = new HashMap<>();
+        if (isNeeedAll) {
+            numberList.add(numberMap);
+        }
+        Long all = 0L;
         List<? extends Terms.Bucket> buckets = aggregation.getBuckets();
         for (Terms.Bucket bucket : buckets) {
             Map<String, Object> countMap = new HashMap<>();
             countMap.put("key", bucket.getKeyAsString());
             countMap.put("doc_count", bucket.getDocCount());
             numberList.add(countMap);
+            all += bucket.getDocCount();
         }
+        numberMap.put("doc_count", all);
+        numberMap.put("key", "all");
         return numberList;
     }
 

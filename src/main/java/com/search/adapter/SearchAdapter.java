@@ -14,16 +14,20 @@ import com.search.adapter.condition.DevideCondition;
 import com.search.adapter.condition.DocsCondition;
 import com.search.adapter.condition.TagsCondition;
 import com.search.adapter.condition.SortCondition;
+import com.search.adapter.condition.WordConditon;
 import com.search.common.constant.SearchConstant;
 import com.search.common.constant.SourceConstant;
 import com.search.common.entity.ResponceResult;
 import com.search.common.thread.ThreadLocalCache;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.mindspore.dto.DocsMindsporeCondition;
+import com.search.domain.mindspore.dto.SuggMindsporeCondition;
 import com.search.domain.mindspore.dto.TagsMindsporeCondition;
+import com.search.domain.mindspore.dto.WordMindsporeConditon;
 import com.search.domain.mindspore.gateway.MindSporeGateway;
 import com.search.domain.openeuler.dto.DocsOpeneulerCondition;
 import com.search.domain.openeuler.dto.SortOpeneulerCondition;
+import com.search.domain.openeuler.dto.SuggOpeneulerCondition;
 import com.search.domain.openeuler.dto.TagsOpeneulerCondition;
 import com.search.domain.openeuler.gateway.OpeneulerGateway;
 import com.search.domain.opengauss.dto.DocsOpengaussCondition;
@@ -270,8 +274,33 @@ public class SearchAdapter {
         String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
         switch (dataSource) {
             case SourceConstant.SOURCE_OPENEULER:
-                DocsOpeneulerCondition docsOpeneulerCondition = new DocsOpeneulerCondition(index, condition);
-                return ResponceResult.ok(openeulerGateway.getSuggByCondition(docsOpeneulerCondition));
+                SuggOpeneulerCondition suggOpeneulerCondition = new SuggOpeneulerCondition(condition, index);
+                return ResponceResult.ok(openeulerGateway.getSuggByCondition(suggOpeneulerCondition));
+
+            case SourceConstant.SOURCE_MINDSPORE:
+                SuggMindsporeCondition docsMindsporeCondition = new SuggMindsporeCondition(condition, index);
+                return ResponceResult.ok(mindSporeGateway.getSuggByCondition(docsMindsporeCondition));
+            default:
+                return ResponceResult.fail("not supported currently source", null);
+        }
+    }
+
+
+    /**
+     * 根据数据源适配gateway以实现搜索提示.
+     *
+     * @param condition The search condition for querying different types of data.
+     * @return ResponceResult.
+     */
+    public ResponceResult getWordByCondition(WordConditon condition) {
+
+        String dataSource = ThreadLocalCache.getDataSource();
+        String index = dataSource + SearchConstant.INDEX_CONNECT + condition.getLang();
+        switch (dataSource) {
+
+            case SourceConstant.SOURCE_MINDSPORE:
+                WordMindsporeConditon wordMindsporeConditon = new WordMindsporeConditon(condition, index);
+                return ResponceResult.ok(mindSporeGateway.getWordByConditon(wordMindsporeConditon));
             default:
                 return ResponceResult.fail("not supported currently source", null);
         }

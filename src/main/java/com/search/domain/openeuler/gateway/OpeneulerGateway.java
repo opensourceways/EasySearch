@@ -19,6 +19,7 @@ import com.search.adapter.vo.TagsResponceVo;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.openeuler.dto.DocsOpeneulerCondition;
 import com.search.domain.openeuler.dto.SortOpeneulerCondition;
+import com.search.domain.openeuler.dto.SuggOpeneulerCondition;
 import com.search.domain.openeuler.dto.TagsOpeneulerCondition;
 import com.search.domain.openeuler.vo.OpenEulerVo;
 
@@ -27,10 +28,10 @@ public interface OpeneulerGateway {
     /**
      * Implement search suggestions.
      *
-     * @param docsOpeneulerCondition The search condition for querying different types of data.
+     * @param suggOpeneulerCondition The search condition for querying different types of data.
      * @return SuggResponceVo.
      */
-    SuggResponceVo getSuggByCondition(DocsOpeneulerCondition docsOpeneulerCondition);
+    SuggResponceVo getSuggByCondition(SuggOpeneulerCondition suggOpeneulerCondition);
 
     /**
      * Search for different types of  Openeuler data.

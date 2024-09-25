@@ -8,39 +8,24 @@
  MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
  See the Mulan PSL v2 for more details.
 */
-package com.search.domain.base.vo;
+package com.search.domain.openeuler.dto;
 
+import com.search.adapter.condition.DocsCondition;
+import com.search.domain.base.dto.SearchSuggBaseCondition;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class TagsVo {
+public class SuggOpeneulerCondition extends SearchSuggBaseCondition {
     /**
-     * 数据大类.
-     */
-    private String key;
-    /**
-     * 文档数量.
-     */
-    private Long count;
-
-
-    /**
-     * 无参构造，初始化TagsVo.
-     */
-    public TagsVo() {
-
-    }
-
-    /**
-     * 有参构造，初始化TagsVo.
+     * 有参构造，初始化SuggOpeneulerCondition.
      *
-     * @param key   关键字 .
-     * @param count 总量.
+     * @param index     数据索引 .
+     * @param condition 前台请求封装条件.
      */
-    public TagsVo(String key, Long count) {
-        this.key = key;
-        this.count = count;
+    public SuggOpeneulerCondition(DocsCondition condition, String index) {
+        super.keyword = condition.getKeyword();
+        super.index = index;
     }
 }
