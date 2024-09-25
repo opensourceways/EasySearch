@@ -12,7 +12,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +20,6 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequestMapping("/search/sort")
-@ConditionalOnProperty(name = "controller.enabled.community", havingValue = "true")
 public class DivideController {
     @Autowired
     private DivideService divideService;

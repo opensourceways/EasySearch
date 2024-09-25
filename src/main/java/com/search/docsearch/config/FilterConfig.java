@@ -1,9 +1,11 @@
 package com.search.docsearch.config;
 
 
-import com.search.docsearch.filter.ContentTypeFilter;
-import com.search.docsearch.filter.CrossFilter;
+import com.search.docsearch.filter.RequestRefferFilter;
+import com.search.docsearch.filter.TokenFilter;
+import com.search.docsearch.filter.ResponceHeaderFilter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,11 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 @Slf4j
 @Configuration
 public class FilterConfig {
+    /**
+     * Referer pass domain.
+     */
+    @Value("${header.referers:}")
+    private String allowDomains;
 
     /**
      * 编码过滤器
@@ -36,33 +43,49 @@ public class FilterConfig {
 
 
     /**
-     * 跨域过滤器
+     * 响应头拦截器
      *
      * @return
      */
     @Bean
     public FilterRegistrationBean headerFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        ContentTypeFilter contentTypeFilter = new ContentTypeFilter();
-        log.info("headerFilter.....");
-        filterRegistrationBean.setFilter(contentTypeFilter);
+        TokenFilter tokenFilter = new TokenFilter();
+        log.info("tokenFilter.....");
+        filterRegistrationBean.setFilter(tokenFilter);
         filterRegistrationBean.setOrder(2);
         filterRegistrationBean.addUrlPatterns("/*");
         return filterRegistrationBean;
     }
 
     /**
-     * 跨域过滤器
+     * Reffer拦截器
+     *
+     * @return
+     */
+    @Bean
+    public FilterRegistrationBean requestRefferFilter() {
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+        RequestRefferFilter requestRefferFilter = new RequestRefferFilter(allowDomains);
+        log.info("RequestRefferFilter.....");
+        filterRegistrationBean.setFilter(requestRefferFilter);
+        filterRegistrationBean.setOrder(3);
+        filterRegistrationBean.addUrlPatterns("/*");
+        return filterRegistrationBean;
+    }
+
+    /**
+     * 响应头拦截器
      *
      * @return
      */
     @Bean
     public FilterRegistrationBean crossFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        CrossFilter crossFilter = new CrossFilter();
-        log.info("crossFilter.....");
-        filterRegistrationBean.setFilter(crossFilter);
-        filterRegistrationBean.setOrder(3);
+        ResponceHeaderFilter responceHeaderFilter = new ResponceHeaderFilter();
+        log.info("responceHeaderFilter.....");
+        filterRegistrationBean.setFilter(responceHeaderFilter);
+        filterRegistrationBean.setOrder(4);
         filterRegistrationBean.addUrlPatterns("/*");
         return filterRegistrationBean;
     }
