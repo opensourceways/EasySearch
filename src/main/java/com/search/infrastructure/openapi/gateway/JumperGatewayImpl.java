@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.adapter.condition.NpsConditon;
 import com.search.common.thread.ThreadLocalCache;
 import com.search.common.util.ParameterUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +46,12 @@ public class JumperGatewayImpl {
     @Value("${api.npsApi}")
     private String npsApi;
 
+
+    /**
+     * Logger instance for JumperGatewayImpl.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(JumperGatewayImpl.class);
+
     /**
      * jump request.
      *
@@ -57,7 +65,7 @@ public class JumperGatewayImpl {
         try {
             res = httpRequest(urlStr, false);
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.error(e.getMessage());
         }
         return res;
     }
@@ -74,7 +82,7 @@ public class JumperGatewayImpl {
         try {
             res = httpRequest(urlStr, false);
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.error(e.getMessage());
         }
         return res;
     }
@@ -91,7 +99,7 @@ public class JumperGatewayImpl {
         try {
             res = httpRequest(urlStr, false);
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.error(e.getMessage());
         }
         return res;
     }
@@ -119,7 +127,7 @@ public class JumperGatewayImpl {
             }
             return httpRequest(urlStr, true);
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.error(e.getMessage());
         }
         return null;
     }
@@ -139,7 +147,7 @@ public class JumperGatewayImpl {
         try {
             res = httpRequest(urlStr, false);
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.error(e.getMessage());
         }
         return res;
     }
@@ -159,7 +167,7 @@ public class JumperGatewayImpl {
             String bodyStr = objectMapper.writeValueAsString(body);
             return postRequest(urlStr, bodyStr);
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.error(e.getMessage());
         }
         return null;
     }
