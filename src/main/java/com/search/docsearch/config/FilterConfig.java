@@ -32,7 +32,6 @@ public class FilterConfig {
     public FilterRegistrationBean encodingFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
-        log.info("characterEncodingFilter....");
         characterEncodingFilter.setEncoding("UTF-8");
         filterRegistrationBean.setFilter(characterEncodingFilter);
         // 顺序
@@ -51,7 +50,6 @@ public class FilterConfig {
     public FilterRegistrationBean headerFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         TokenFilter tokenFilter = new TokenFilter();
-        log.info("tokenFilter.....");
         filterRegistrationBean.setFilter(tokenFilter);
         filterRegistrationBean.setOrder(2);
         filterRegistrationBean.addUrlPatterns("/*");
@@ -67,7 +65,6 @@ public class FilterConfig {
     public FilterRegistrationBean requestRefferFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         RequestRefferFilter requestRefferFilter = new RequestRefferFilter(allowDomains);
-        log.info("RequestRefferFilter.....");
         filterRegistrationBean.setFilter(requestRefferFilter);
         filterRegistrationBean.setOrder(3);
         filterRegistrationBean.addUrlPatterns("/*");
@@ -83,7 +80,6 @@ public class FilterConfig {
     public FilterRegistrationBean crossFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         ResponceHeaderFilter responceHeaderFilter = new ResponceHeaderFilter();
-        log.info("responceHeaderFilter.....");
         filterRegistrationBean.setFilter(responceHeaderFilter);
         filterRegistrationBean.setOrder(4);
         filterRegistrationBean.addUrlPatterns("/*");
