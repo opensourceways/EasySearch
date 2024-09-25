@@ -12,7 +12,7 @@ import java.io.IOException;
  * 跨域过滤器
  */
 @Slf4j
-public class CrossFilter implements Filter {
+public class ResponceHeaderFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -23,12 +23,16 @@ public class CrossFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-       // request.getSession(false);
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT, PATCH");
-        response.setHeader("Access-Control-Max-Age", "3600");
-      //  response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+        response.setHeader("X-XSS-Protection", "1; mode=block");
+        response.setHeader("X-Frame-Options", "DENY");
+        response.setHeader("X-Content-Type-Options", "nosniff");
+        response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        response.setHeader("Content-Security-Policy", "script-src 'self'; object-src 'none'; frame-src 'none'");
+        response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.addIntHeader("Expires", 0);
+        response.setHeader("Referrer-Policy", "no-referrer");
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);

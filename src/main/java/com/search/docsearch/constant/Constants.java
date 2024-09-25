@@ -17,4 +17,7 @@ public class Constants {
      * Maxmimum description length.
      */
     public static final int MAX_ES_DESC_LENGHTH = 200;
+
+
+    public static final String HTTPS_PREFIX = "https://";
 }
