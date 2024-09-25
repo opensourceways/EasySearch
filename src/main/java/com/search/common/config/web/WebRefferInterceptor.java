@@ -37,6 +37,15 @@ public class WebRefferInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest servletRequest, HttpServletResponse servletResponse, Object handler) {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
+        response.setHeader("X-XSS-Protection", "1; mode=block");
+        response.setHeader("X-Frame-Options", "DENY");
+        response.setHeader("X-Content-Type-Options", "nosniff");
+        response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        response.setHeader("Content-Security-Policy", "script-src 'self'; object-src 'none'; frame-src 'none'");
+        response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.addIntHeader("Expires", 0);
+        response.setHeader("Referrer-Policy", "no-referrer");
         String referer = request.getHeader("Referer");
         if (allowDomains == null || allowDomains.length() == 0) {
             return true;

@@ -8,39 +8,35 @@
  MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
  See the Mulan PSL v2 for more details.
 */
-package com.search.domain.base.vo;
-
+package com.search.domain.mindspore.dto;
+import com.search.adapter.condition.WordConditon;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class TagsVo {
+@Data
+public class WordMindsporeConditon {
     /**
-     * 数据大类.
+     * 输入语言.
      */
-    private String key;
+    private String query;
+
     /**
-     * 文档数量.
+     * 数据索引.
      */
-    private Long count;
+    private String index;
 
 
     /**
-     * 无参构造，初始化TagsVo.
-     */
-    public TagsVo() {
-
-    }
-
-    /**
-     * 有参构造，初始化TagsVo.
+     * 有参构造，初始化TagsMindsporeCondition.
      *
-     * @param key   关键字 .
-     * @param count 总量.
+     * @param index        数据索引 .
+     * @param wordConditon 前台请求封装条件.
      */
-    public TagsVo(String key, Long count) {
-        this.key = key;
-        this.count = count;
+    public WordMindsporeConditon(WordConditon wordConditon, String index) {
+        this.query = wordConditon.getQuery();
+        this.index = index;
     }
 }

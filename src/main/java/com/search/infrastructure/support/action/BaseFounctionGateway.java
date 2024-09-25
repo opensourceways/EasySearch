@@ -13,7 +13,8 @@ package com.search.infrastructure.support.action;
 import com.search.adapter.vo.CountResponceVo;
 import com.search.adapter.vo.SuggResponceVo;
 import com.search.adapter.vo.TagsResponceVo;
-import com.search.common.util.General;
+
+import com.search.domain.base.dto.SearchSuggBaseCondition;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.base.dto.SearchDocsBaseCondition;
 import com.search.domain.base.dto.SearchSortBaseCondition;
@@ -25,20 +26,18 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.composite.CompositeAggregation;
+import org.elasticsearch.search.aggregations.bucket.composite.CompositeAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.composite.TermsValuesSourceBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.suggest.Suggest;
-import org.elasticsearch.search.suggest.SuggestBuilder;
-import org.elasticsearch.search.suggest.SuggestBuilders;
-import org.elasticsearch.search.suggest.SuggestionBuilder;
-import org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -120,58 +119,27 @@ public class BaseFounctionGateway {
     /**
      * 根据SearchDocsBaseCondition组装SearchRequest 并执行search动作.
      *
-     * @param docsBaseCondition The search condition of query es.
+     * @param suggBaseCondition The search condition of query es.
      * @return SearchResponse.
      */
 
-    public SuggResponceVo getDefaultSuggByCondition(SearchDocsBaseCondition docsBaseCondition) {
-        String saveIndex = docsBaseCondition.getIndex();
+    public SuggResponceVo getDefaultSuggByCondition(SearchSuggBaseCondition suggBaseCondition) {
+
         SuggResponceVo suggResponceVo = new SuggResponceVo();
-        HashSet<String> suggestSet = new HashSet<>();
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        SuggestionBuilder<TermSuggestionBuilder> termSuggestionBuilder =
-                SuggestBuilders.termSuggestion("textContent")
-                        .text(docsBaseCondition.getKeyword())
-                        .minWordLength(2)
-                        .prefixLength(0)
-                        .analyzer("ik_smart")
-                        .size(3)
-                        .suggestMode(TermSuggestionBuilder.SuggestMode.ALWAYS);
-
-        SuggestBuilder suggestBuilder = new SuggestBuilder();
-        String suggFiled = "my_sugg";
-        suggestBuilder.addSuggestion(suggFiled, termSuggestionBuilder);
-
-        SearchRequest suggRequest = new SearchRequest(saveIndex);
-        suggRequest.source(searchSourceBuilder.suggest(suggestBuilder));
-
+        SearchRequest suggRequest = requestBuilder.getDefaultSuggSearchRequest(suggBaseCondition);
         SearchResponse suggResponse = executeDefaultEsSearch(suggRequest);
         if (suggResponse == null) {
             return suggResponceVo;
         }
-        for (int i = 0; i <= 3; i++) {
-            StringBuilder sb = new StringBuilder();
-            for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option> mySugg : suggResponse.getSuggest().getSuggestion(suggFiled)) {
-
-                String op = mySugg.getText().string();
-
-                boolean hc = General.haveChinese(op);
-
-                if (!hc) {
-                    if (mySugg.getOptions().size() > i) {
-                        op = mySugg.getOptions().get(i).getText().string();
-                        sb.append("<em>").append(op).append("</em>").append(" ");
-                    } else {
-                        sb.append(op).append(" ");
-                    }
-                } else {
-                    sb.append(op);
-                }
+        List<String> suggestList = responceHandler.handSuggResponceToList(suggResponse, suggBaseCondition.getFieldname());
+        if (suggestList.size() > 0) {
+            for (int i = 0; i < suggestList.size(); i++) {
+                StringBuilder originBuilder = new StringBuilder();
+                originBuilder.append("<em>").append(suggestList.get(i)).append("</em>").append(" ");
+                suggestList.set(i, originBuilder.toString());
             }
-            suggestSet.add(sb.toString().trim());
-
         }
-        suggResponceVo.setSuggestList(suggestSet.stream().toList());
+        suggResponceVo.setSuggestList(suggestList);
         return suggResponceVo;
     }
 
@@ -186,7 +154,7 @@ public class BaseFounctionGateway {
         SearchRequest defaultTagsSearchRequest = requestBuilder.getDefaultTagsSearchRequest(tagsCondition);
         SearchResponse searchResponse = executeDefaultEsSearch(defaultTagsSearchRequest);
         if (searchResponse != null) {
-            List<Map<String, Object>> numberList = responceHandler.handAggregationToCountList(searchResponse, "data");
+            List<Map<String, Object>> numberList = responceHandler.handAggregationToCountList(searchResponse, "data", Boolean.FALSE);
             List<TagsVo> tagsVos = CommonConverter.toTagsVoList(numberList);
             tagsResponceVo.setTotalNum(tagsVos);
         }
@@ -206,7 +174,7 @@ public class BaseFounctionGateway {
         SearchRequest defaultCountSearchRequest = requestBuilder.getDefaultCountSearchRequest(condition, field, terms);
         SearchResponse response = executeDefaultEsSearch(defaultCountSearchRequest);
         if (response != null) {
-            List<Map<String, Object>> numberList = responceHandler.handAggregationToCountList(response, terms);
+            List<Map<String, Object>> numberList = responceHandler.handAggregationToCountList(response, terms, Boolean.TRUE);
             CountResponceVo countResponceVo = new CountResponceVo();
             countResponceVo.setTotal(CommonConverter.toCountVoList(numberList));
             return countResponceVo;
@@ -224,11 +192,60 @@ public class BaseFounctionGateway {
         SearchResponse response = null;
         try {
             response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
         return response;
     }
 
+    /**
+     * 某一字段的值聚合.
+     *
+     * @param field 聚合的字段.
+     * @param index 索引.
+     * @return List<TagsVo>.
+     */
+    public List<TagsVo> aggFieldCount(String field, String index) {
+        List<TagsVo> tagsVoList = new ArrayList<>();
+        Map<String, Object> afterKey = null;
+        boolean hasMorePages = true;
+        while (hasMorePages) {
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            CompositeAggregationBuilder compositeAggregation = AggregationBuilders.composite("unique_fields", List.of(
+                    new TermsValuesSourceBuilder(field)
+                            .field(field + ".keyword")
+            )).size(1000);
 
+            if (afterKey != null) {
+                compositeAggregation.aggregateAfter(afterKey);
+            }
+
+            searchSourceBuilder.aggregation(compositeAggregation);
+            searchSourceBuilder.size(0);
+
+            SearchRequest searchRequest = new SearchRequest(index);
+            searchRequest.source(searchSourceBuilder);
+
+            SearchResponse searchResponse = executeDefaultEsSearch(searchRequest);
+
+            if (searchResponse != null) {
+                CompositeAggregation aggregation = searchResponse.getAggregations().get("unique_fields");
+
+                for (CompositeAggregation.Bucket bucket : aggregation.getBuckets()) {
+                    TagsVo tagsVo = new TagsVo();
+                    tagsVo.setCount(bucket.getDocCount());
+                    tagsVo.setKey(String.valueOf(bucket.getKey().get(field)));
+                    tagsVoList.add(tagsVo);
+                }
+
+                afterKey = aggregation.afterKey();
+                hasMorePages = aggregation.getBuckets().size() > 0;
+            } else {
+                hasMorePages = false;
+            }
+
+
+        }
+        return tagsVoList;
+    }
 }

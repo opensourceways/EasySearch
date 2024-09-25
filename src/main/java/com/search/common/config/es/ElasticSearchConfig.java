@@ -93,7 +93,7 @@ public class ElasticSearchConfig {
      *
      * @return a RestHighLevelClient.
      */
-    @Bean(destroyMethod = "close")
+    @Bean(destroyMethod = "close", name = "restHighLevelClient")
     public RestHighLevelClient elasticsearchClient() {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(elasticsearchUsername, elasticsearchPassword));

@@ -14,18 +14,22 @@ import com.search.adapter.SearchAdapter;
 import com.search.adapter.condition.DocsCondition;
 import com.search.adapter.condition.SortCondition;
 import com.search.adapter.condition.TagsCondition;
+import com.search.adapter.condition.WordConditon;
 import com.search.common.entity.ResponceResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("/search")
 @RequiredArgsConstructor
 public class SearchController {
+
+
     /**
      * search adapter.
      */
@@ -98,4 +102,17 @@ public class SearchController {
     public ResponceResult getSugg(@RequestBody @Validated DocsCondition condition) {
         return searchAdapter.getSuggByCondition(condition);
     }
+
+    /**
+     * 搜索提示.
+     *
+     * @param condition controller conditon.
+     * @return ResponceResult.
+     */
+    @PostMapping("word")
+    public ResponceResult findWord(@RequestBody @Validated WordConditon condition) {
+        return searchAdapter.getWordByCondition(condition);
+    }
+
+
 }
