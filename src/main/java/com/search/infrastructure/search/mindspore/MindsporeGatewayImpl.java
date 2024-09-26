@@ -137,7 +137,8 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
             trie = initTrie(wordConditon.getIndex());
         }
         String prefix = wordConditon.getQuery();
-        for (int i = 0; i < 3 && i < prefix.length(); i++) {
+        int preLength = prefix.length() < 3 ? prefix.length() : 3;
+        for (int i = 0; i < preLength; i++) {
             String substring = prefix.substring(0, prefix.length() - i);
             keyCountResultList = trie.searchTopKWithPrefix(substring, 10);
             if (!CollectionUtils.isEmpty(keyCountResultList)) {
