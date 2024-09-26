@@ -50,7 +50,7 @@ public class WebSourceInterceptor implements HandlerInterceptor {
      * @param servletResponse – current HTTP response
      * @param handler         – chosen handler to execute, for type and/or instance evaluation
      * @return : true if the execution chain should proceed with the next interceptor or the handler itself. Else,
-     *     DispatcherServlet assumes that this interceptor has already dealt with the response itself.
+     * DispatcherServlet assumes that this interceptor has already dealt with the response itself.
      */
     @Override
     public boolean preHandle(HttpServletRequest servletRequest, HttpServletResponse servletResponse, Object handler) {
@@ -58,6 +58,10 @@ public class WebSourceInterceptor implements HandlerInterceptor {
         String source = request.getHeader(SourceConstant.REQUETS_HEADER_SOURCE);
         if (StringUtils.hasText(this.allowSources)) {
             List<String> allowSourcesList = Arrays.asList(allowSources.split(","));
+            //没传source会选择默认配置,用于更新的时候平替
+            if (StringUtils.isEmpty(source)) {
+                source = allowSourcesList.get(0);
+            }
             if (!allowSourcesList.contains(source)) {
                 throw new ParamErrorException("current support dateSource:" + allowSources);
             }

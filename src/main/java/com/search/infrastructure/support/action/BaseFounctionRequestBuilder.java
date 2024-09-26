@@ -92,18 +92,19 @@ public class BaseFounctionRequestBuilder {
         if (queries == null) {
             queries = new ArrayList<>();
         }
+        String replacementCharacter = General.replacementCharacter(keyWord);
         String dataSource = ThreadLocalCache.getDataSource();
         List<EsQueryBuildConfig.BuildQuery> collect = queries.stream().filter(buildQuery ->
                 dataSource.equals(buildQuery.getSource())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(collect)) {
             MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", keyWord).analyzer("ik_max_word").slop(2);
-            ptitleMP.boost(200);
+            ptitleMP.boost(1000);
             MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", keyWord).analyzer("ik_max_word").slop(2);
             ptextContentMP.boost(100);
             boolQueryBuilder.should(ptitleMP).should(ptextContentMP);
-            MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", keyWord).analyzer("ik_smart");
+            MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", replacementCharacter).analyzer("ik_smart");
             titleMP.boost(2);
-            MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", keyWord).analyzer("ik_smart");
+            MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", replacementCharacter).analyzer("ik_smart");
             textContentMP.boost(1);
             boolQueryBuilder.should(titleMP).should(textContentMP);
 
