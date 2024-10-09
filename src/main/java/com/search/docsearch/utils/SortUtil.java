@@ -107,13 +107,13 @@ public final class SortUtil {
         List<SoftwareRpmDto> rpmpkg = softwareSearchResponce.getRpmpkg();
         if ("asc".equals(timeOrder)) {
             Collections.sort(epkgpkg, Comparator.comparing((SoftwareEpkgDto p) -> getTimeStamp(p.getEpkgUpdateAt())));
-            Collections.sort(oepkg, Comparator.comparing((SoftwareOepkgDto p) -> getISOTimeStamp(p.getRpmUpdateAt())));
+            Collections.sort(oepkg, Comparator.comparing((SoftwareOepkgDto p) -> getTimeStamp(p.getRpmUpdateAt())));
             Collections.sort(rpmpkg, Comparator.comparing((SoftwareRpmDto p) -> getTimeStamp(p.getRpmUpdateAt())));
         }
 
         if ("desc".equals(timeOrder)) {
             Collections.sort(epkgpkg, Comparator.comparing((SoftwareEpkgDto p) -> getTimeStamp(p.getEpkgUpdateAt())).reversed());
-            Collections.sort(oepkg, Comparator.comparing((SoftwareOepkgDto p) -> getISOTimeStamp(p.getRpmUpdateAt())).reversed());
+            Collections.sort(oepkg, Comparator.comparing((SoftwareOepkgDto p) -> getTimeStamp(p.getRpmUpdateAt())).reversed());
             Collections.sort(rpmpkg, Comparator.comparing((SoftwareRpmDto p) -> getTimeStamp(p.getRpmUpdateAt())).reversed());
 
         }
