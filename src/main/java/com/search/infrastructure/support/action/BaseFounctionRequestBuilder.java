@@ -25,10 +25,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.common.lucene.search.function.CombineFunction;
 import org.elasticsearch.common.lucene.search.function.FunctionScoreQuery;
 import org.elasticsearch.core.TimeValue;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -46,10 +43,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -100,14 +94,17 @@ public class BaseFounctionRequestBuilder {
             MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", keyWord).analyzer("ik_max_word").slop(2);
             ptitleMP.boost(1000);
             MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", keyWord).analyzer("ik_max_word").slop(2);
-            ptextContentMP.boost(100);
+            ptextContentMP.boost(5);
             boolQueryBuilder.should(ptitleMP).should(ptextContentMP);
-            MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", replacementCharacter).analyzer("ik_smart");
-            titleMP.boost(2);
+            MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title.keyword", replacementCharacter).analyzer("ik_smart");
+            titleMP.boost(10);
             MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", replacementCharacter).analyzer("ik_smart");
             textContentMP.boost(1);
             boolQueryBuilder.should(titleMP).should(textContentMP);
 
+            WildcardQueryBuilder wildcardtTitleQuery = QueryBuilders.wildcardQuery("title", "*" + keyWord + "*");
+            wildcardtTitleQuery.boost(100);
+            boolQueryBuilder.should(wildcardtTitleQuery);
             boolQueryBuilder.minimumShouldMatch(1);
         } else {
             EsQueryBuildConfig.BuildQuery buildQuery = collect.get(0);
