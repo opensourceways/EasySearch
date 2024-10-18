@@ -55,7 +55,18 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
      */
     @Override
     public DocsResponceVo<MindSporeVo> searchByCondition(DocsMindsporeCondition searchBaseCondition) {
+        String keyword = searchBaseCondition.getKeyword();
+        String keywordSpan = "<span>" + keyword + "</span>";
         List<Map<String, Object>> dateMapList = super.getDefaultSearchByCondition(searchBaseCondition);
+        if (dateMapList != null) {
+            for (int i = 0; i < dateMapList.size(); i++) {
+                Map<String, Object> map = dateMapList.get(i);
+                String title = String.valueOf(map.get("title"));
+                title = title.replace("<span>", "").replace("</span>", "");
+                map.put("title", title.replace(keyword, keywordSpan));
+
+            }
+        }
         List<MindsporeDo> mindsporeDos = CommonConverter.toDoList(dateMapList, MindsporeDo.class);
         List<MindSporeVo> mindSporeVos = CommonConverter.toBaseVoList(mindsporeDos, MindSporeVo.class);
         DocsResponceVo<MindSporeVo> docsResponceVo = new DocsResponceVo(mindSporeVos,
