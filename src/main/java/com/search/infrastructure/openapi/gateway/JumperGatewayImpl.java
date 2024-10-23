@@ -23,27 +23,27 @@ public class JumperGatewayImpl {
     /**
      * allApi.
      */
-    @Value("${api.allApi}")
+    @Value("${api.allApi:}")
     private String allApi;
     /**
      * starsApi.
      */
-    @Value("${api.starsApi}")
+    @Value("${api.starsApi:}")
     private String starsApi;
     /**
      * sigNameApi.
      */
-    @Value("${api.sigNameApi}")
+    @Value("${api.sigNameApi:}")
     private String sigNameApi;
     /**
      * repoInfoApi.
      */
-    @Value("${api.repoInfoApi}")
+    @Value("${api.repoInfoApi:}")
     private String repoInfoApi;
     /**
      * npsApi.
      */
-    @Value("${api.npsApi}")
+    @Value("${api.npsApi:}")
     private String npsApi;
 
 

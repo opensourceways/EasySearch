@@ -133,5 +133,8 @@ public class OpenMindDo {
      * 设置.
      */
     private String settings;
-
+    /**
+     * 版本标签.
+     */
+    private String versionTag;
 }

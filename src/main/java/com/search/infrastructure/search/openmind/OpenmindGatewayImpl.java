@@ -25,9 +25,12 @@ import com.search.infrastructure.support.converter.CommonConverter;
 import com.search.infrastructure.search.openmind.dataobject.OpenMindDo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -44,13 +47,28 @@ public class OpenmindGatewayImpl extends BaseFounctionGateway implements Openmin
      */
     @Override
     public DocsResponceVo<OpenMindVo> searchByCondition(DocsOpenmindCondition searchBaseCondition) {
-        List<Map<String, Object>> dateMapList = super.getDefaultSearchByCondition(searchBaseCondition);
+        List<DocsOpenmindCondition.OpenmindFilter> filterList = searchBaseCondition.getFilter();
+        if (CollectionUtils.isEmpty(filterList)) {
+            DocsOpenmindCondition.OpenmindFilter filter = new DocsOpenmindCondition.OpenmindFilter();
+            filter.setVersionTag("maximumVersion");
+            filterList.add(filter);
+        }
+        SearchRequest defaultSearchRequest = requestBuilder.getDefaultDocsSearchRequest(searchBaseCondition);
+        SearchResponse searchResponse = executeDefaultEsSearch(defaultSearchRequest);
+        List<Map<String, Object>> dateMapList = responceHandler.getDefaultsHightResponceToMapList(
+                searchResponse, Arrays.asList("title"), "textContent");
         List<OpenMindDo> openMindDos = CommonConverter.toDoList(dateMapList, OpenMindDo.class);
         List<OpenMindVo> openMindVos = CommonConverter.toBaseVoList(openMindDos, OpenMindVo.class);
+        for (OpenMindVo openMindVo : openMindVos) {
+            if ("v0.0.0".equals(openMindVo.getVersion())) {
+                openMindVo.setVersion("");
+            }
+        }
         DocsResponceVo docsResponceVo = new DocsResponceVo(openMindVos,
                 searchBaseCondition.getPageSize(),
                 searchBaseCondition.getPage(),
                 searchBaseCondition.getKeyword());
+        docsResponceVo.setCount(searchResponse.getHits().getTotalHits().value);
         return docsResponceVo;
     }
 
@@ -62,6 +80,12 @@ public class OpenmindGatewayImpl extends BaseFounctionGateway implements Openmin
      */
     @Override
     public CountResponceVo getSearchCountByCondition(DocsOpenmindCondition condition) {
+        List<DocsOpenmindCondition.OpenmindFilter> filterList = condition.getFilter();
+        if (CollectionUtils.isEmpty(filterList)) {
+            DocsOpenmindCondition.OpenmindFilter filter = new DocsOpenmindCondition.OpenmindFilter();
+            filter.setVersionTag("maximumVersion");
+            filterList.add(filter);
+        }
         return super.getDefaultSearchCountByCondition(condition);
     }
 

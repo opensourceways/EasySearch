@@ -33,7 +33,7 @@ public final class SourceConstant {
     /**
      * Constant of SOURCE_OPENMIND.
      */
-    public static final String SOURCE_OPENMIND = "openmind";
+    public static final String SOURCE_OPENMIND = "merlin";
     /**
      * Constant of SOURCE_MINDSPORE.
      */

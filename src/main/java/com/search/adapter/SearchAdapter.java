@@ -15,6 +15,7 @@ import com.search.adapter.condition.DocsCondition;
 import com.search.adapter.condition.TagsCondition;
 import com.search.adapter.condition.SortCondition;
 import com.search.adapter.condition.WordConditon;
+import com.search.adapter.vo.WordResponceVo;
 import com.search.common.constant.SearchConstant;
 import com.search.common.constant.SourceConstant;
 import com.search.common.entity.ResponceResult;
@@ -301,6 +302,9 @@ public class SearchAdapter {
             case SourceConstant.SOURCE_MINDSPORE:
                 WordMindsporeConditon wordMindsporeConditon = new WordMindsporeConditon(condition, index);
                 return ResponceResult.ok(mindSporeGateway.getWordByConditon(wordMindsporeConditon));
+
+            case SourceConstant.SOURCE_OPENMIND:
+                return ResponceResult.ok(new WordResponceVo());
             default:
                 return ResponceResult.fail("not supported currently source", null);
         }

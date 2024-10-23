@@ -17,4 +17,18 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OpenMindVo extends CommunityBaseVo {
+    private String docsType;
+
+    private String strong;
+
+
+    private String articleName;
+
+    private String h1;
+    private String h2;
+    private String h3;
+    private String h4;
+    private String h5;
+    private String type;
+    private String version;
 }

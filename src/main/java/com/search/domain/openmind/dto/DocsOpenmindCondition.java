@@ -26,6 +26,7 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
      * Openmind Limit list.
      */
     private List<OpenmindFilter> filter;
+    private List<OpenmindLimit> limit;
 
     /**
      * 有参构造，初始化DocsOpenmindCondition.
@@ -41,7 +42,27 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
         super.keyword = condition.getKeyword();
         super.type = condition.getType();
         setOpenmindFilter(condition);
+        setOpenmindLimit(condition);
     }
+
+    /**
+     * 根据DocsCondition封装社区limit obj.
+     *
+     * @param condition 前台请求封装条件.
+     */
+    public void setOpenmindLimit(DocsCondition condition) {
+        ArrayList<DocsOpenmindCondition.OpenmindLimit> openmindLimits = new ArrayList<>();
+        if (Objects.nonNull(condition.getLimit())) {
+            condition.getLimit().stream().forEach(a -> {
+                OpenmindLimit openmindLimit = new OpenmindLimit();
+                openmindLimit.setType(a.getType());
+                openmindLimit.setVersion(a.getVersion());
+                openmindLimits.add(openmindLimit);
+            });
+        }
+        this.limit = openmindLimits;
+    }
+
 
     /**
      * 根据DocsCondition封装社区limit obj.
@@ -51,9 +72,10 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
     public void setOpenmindFilter(DocsCondition condition) {
         ArrayList<OpenmindFilter> openmindFilters = new ArrayList<>();
         if (Objects.nonNull(condition.getFilter())) {
-            condition.getLimit().stream().forEach(a -> {
+            condition.getFilter().stream().forEach(a -> {
                 OpenmindFilter filter = new OpenmindFilter();
-                filter.setDocsType(a.getDocsType());
+                filter.setType(a.getType());
+                filter.setVersion(a.getVersion());
                 openmindFilters.add(filter);
             });
         }
@@ -65,10 +87,34 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
      */
     @Getter
     @Setter
-    private  static class OpenmindFilter {
+    public static class OpenmindFilter {
         /**
          * 文档类型.
          */
-        private String docsType;
+        private String type;
+        /**
+         * 文档版本.
+         */
+        private String version;
+        /**
+         * 版本标签.
+         */
+        private String versionTag;
+    }
+
+    /**
+     * MindsporeLimit obj.
+     */
+    @Getter
+    @Setter
+    public static class OpenmindLimit {
+        /**
+         * 文档类型.
+         */
+        private String type;
+        /**
+         * 文档版本.
+         */
+        private String version;
     }
 }
