@@ -23,9 +23,12 @@ import java.util.Objects;
 @Setter
 public class DocsOpenmindCondition extends SearchDocsBaseCondition {
     /**
-     * Openmind Limit list.
+     * Openmind filter list.
      */
     private List<OpenmindFilter> filter;
+    /**
+     * Openmind Limit list.
+     */
     private List<OpenmindLimit> limit;
 
     /**
@@ -103,7 +106,7 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
     }
 
     /**
-     * MindsporeLimit obj.
+     * OpenmindLimit obj.
      */
     @Getter
     @Setter

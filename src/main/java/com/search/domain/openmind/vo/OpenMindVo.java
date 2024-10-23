@@ -17,18 +17,45 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OpenMindVo extends CommunityBaseVo {
+    /**
+     * 文档类型.
+     */
     private String docsType;
-
+    /**
+     * strong标签.
+     */
     private String strong;
 
-
+    /**
+     * 文章名称.
+     */
     private String articleName;
-
+    /**
+     * h1标签.
+     */
     private String h1;
+    /**
+     * h2标签.
+     */
     private String h2;
+    /**
+     * h3标签.
+     */
     private String h3;
+    /**
+     * h4标签.
+     */
     private String h4;
+    /**
+     * h5标签.
+     */
     private String h5;
+    /**
+     * 类型.
+     */
     private String type;
+    /**
+     * 版本.
+     */
     private String version;
 }

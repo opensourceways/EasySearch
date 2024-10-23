@@ -59,6 +59,7 @@ public class OpenmindGatewayImpl extends BaseFounctionGateway implements Openmin
                 searchResponse, Arrays.asList("title"), "textContent");
         List<OpenMindDo> openMindDos = CommonConverter.toDoList(dateMapList, OpenMindDo.class);
         List<OpenMindVo> openMindVos = CommonConverter.toBaseVoList(openMindDos, OpenMindVo.class);
+        // 默认v0.0.0版本显示为“”
         for (OpenMindVo openMindVo : openMindVos) {
             if ("v0.0.0".equals(openMindVo.getVersion())) {
                 openMindVo.setVersion("");
