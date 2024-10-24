@@ -25,6 +25,7 @@ import com.search.domain.mindspore.dto.WordMindsporeConditon;
 import com.search.domain.mindspore.gateway.MindSporeGateway;
 import com.search.domain.mindspore.vo.MindSporeVo;
 import com.search.infrastructure.support.action.BaseFounctionGateway;
+import com.search.infrastructure.support.config.EsPopwordConfig;
 import com.search.infrastructure.support.converter.CommonConverter;
 import com.search.infrastructure.search.mindspore.dataobject.MindsporeDo;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -46,6 +45,10 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
      * current community trie.
      */
     private final Map<String, Trie> trieMap = new HashMap<>();
+    /**
+     * search popular word.
+     */
+    private final EsPopwordConfig esPopwordConfig;
 
     /**
      * Search for different types of data.
@@ -182,6 +185,30 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         }
 
         return wordResponceVo;
+    }
+
+    /**
+     * Implement search Hotwords.
+     *
+     * @param lang language.
+     * @return List<String>.
+     */
+    @Override
+    public List<String> getHotwords(String lang) {
+        List<String> wordList = new ArrayList<>();
+        List<EsPopwordConfig.Pop> popwordConfigPop = esPopwordConfig.getPop();
+        if (popwordConfigPop != null) {
+            List<EsPopwordConfig.Pop> mindsporePopWord = popwordConfigPop.stream().filter(a ->
+                    a.getLang().equals(lang) && a.getSource().equals("mindspore")).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(mindsporePopWord)) {
+                EsPopwordConfig.Pop pop = mindsporePopWord.get(0);
+                Integer num = pop.getNum();
+                List<String> origin = Arrays.asList(pop.getWord().split(","));
+                Collections.shuffle(origin);
+                wordList = origin.subList(0, num);
+            }
+        }
+        return wordList;
     }
 
     /**

@@ -114,5 +114,14 @@ public class SearchController {
         return searchAdapter.getWordByCondition(condition);
     }
 
-
+    /**
+     * 搜索r热门词汇.
+     *
+     * @param lang controller conditon.
+     * @return ResponceResult.
+     */
+    @PostMapping("pop")
+    public ResponceResult getPop(String lang) {
+        return searchAdapter.getHotwords(lang);
+    }
 }

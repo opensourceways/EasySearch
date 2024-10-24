@@ -309,4 +309,22 @@ public class SearchAdapter {
                 return ResponceResult.fail("not supported currently source", null);
         }
     }
+
+
+    /**
+     * 根据数据源适配gateway以实现搜索符合条件的各种类型数据的数量.
+     *
+     * @param lang language.
+     * @return ResponceResult.
+     */
+    public ResponceResult getHotwords(String lang) {
+        String dataSource = ThreadLocalCache.getDataSource();
+        switch (dataSource) {
+            case SourceConstant.SOURCE_MINDSPORE:
+                return ResponceResult.ok(mindSporeGateway.getHotwords(lang));
+            default:
+                return ResponceResult.fail("not supported currently source", null);
+        }
+
+    }
 }
