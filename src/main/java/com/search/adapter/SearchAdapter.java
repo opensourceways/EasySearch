@@ -87,7 +87,7 @@ public class SearchAdapter {
                 return ResponceResult.ok(opengaussGateway.searchByCondition(docsOpengaussCondition));
             case SourceConstant.SOURCE_OPENMIND:
                 DocsOpenmindCondition docsOpenmindCondition = new DocsOpenmindCondition(index, condition);
-                return ResponceResult.ok(openmindGateway.searchByCondition(docsOpenmindCondition));
+                return ResponceResult.openmind(openmindGateway.searchByCondition(docsOpenmindCondition));
 
             case SourceConstant.SOURCE_SOFTCENTER:
                 DocsSoftcenterCondition docsSoftcenterCondition = new DocsSoftcenterCondition();
@@ -125,7 +125,7 @@ public class SearchAdapter {
 
             case SourceConstant.SOURCE_OPENMIND:
                 DocsOpenmindCondition docsOpenmindCondition = new DocsOpenmindCondition(index, condition);
-                return ResponceResult.ok(openmindGateway.getSearchCountByCondition(docsOpenmindCondition));
+                return ResponceResult.openmind(openmindGateway.getSearchCountByCondition(docsOpenmindCondition));
 
             case SourceConstant.SOURCE_SOFTCENTER:
                 DocsSoftcenterCondition docsSoftcenterCondition = new DocsSoftcenterCondition();
