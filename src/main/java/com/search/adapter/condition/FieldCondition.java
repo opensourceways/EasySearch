@@ -110,4 +110,10 @@ public class FieldCondition {
     @Size(max = 30)
     @Pattern(regexp = SearchConstant.VALID_STR_REGEXP, message = SearchConstant.VALID_MESSAGE)
     private String tags;
+    /**
+     * condition field of versionTag.
+     */
+    @Size(max = 30)
+    @Pattern(regexp = SearchConstant.VALID_STR_REGEXP, message = SearchConstant.VALID_MESSAGE)
+    private String versionTag;
 }

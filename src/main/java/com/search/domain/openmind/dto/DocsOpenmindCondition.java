@@ -54,12 +54,14 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
      * @param condition 前台请求封装条件.
      */
     public void setOpenmindLimit(DocsCondition condition) {
-        ArrayList<DocsOpenmindCondition.OpenmindLimit> openmindLimits = new ArrayList<>();
+        ArrayList<OpenmindLimit> openmindLimits = new ArrayList<>();
         if (Objects.nonNull(condition.getLimit())) {
             condition.getLimit().stream().forEach(a -> {
                 OpenmindLimit openmindLimit = new OpenmindLimit();
                 openmindLimit.setType(a.getType());
                 openmindLimit.setVersion(a.getVersion());
+                openmindLimit.setDocsType(a.getDocsType());
+                openmindLimit.setVersionTag(a.getVersionTag());
                 openmindLimits.add(openmindLimit);
             });
         }
@@ -79,6 +81,8 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
                 OpenmindFilter filter = new OpenmindFilter();
                 filter.setType(a.getType());
                 filter.setVersion(a.getVersion());
+                filter.setDocsType(a.getDocsType());
+                filter.setVersionTag(a.getVersionTag());
                 openmindFilters.add(filter);
             });
         }

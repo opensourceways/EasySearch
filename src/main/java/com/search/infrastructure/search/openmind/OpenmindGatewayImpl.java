@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,12 +46,6 @@ public class OpenmindGatewayImpl extends BaseFounctionGateway implements Openmin
      */
     @Override
     public DocsResponceVo<OpenMindVo> searchByCondition(DocsOpenmindCondition searchBaseCondition) {
-        List<DocsOpenmindCondition.OpenmindFilter> filterList = searchBaseCondition.getFilter();
-        if (CollectionUtils.isEmpty(filterList)) {
-            DocsOpenmindCondition.OpenmindFilter filter = new DocsOpenmindCondition.OpenmindFilter();
-            filter.setVersionTag("maximumVersion");
-            filterList.add(filter);
-        }
         SearchRequest defaultSearchRequest = requestBuilder.getDefaultDocsSearchRequest(searchBaseCondition);
         SearchResponse searchResponse = executeDefaultEsSearch(defaultSearchRequest);
         List<Map<String, Object>> dateMapList = responceHandler.getDefaultsHightResponceToMapList(
@@ -81,12 +74,6 @@ public class OpenmindGatewayImpl extends BaseFounctionGateway implements Openmin
      */
     @Override
     public CountResponceVo getSearchCountByCondition(DocsOpenmindCondition condition) {
-        List<DocsOpenmindCondition.OpenmindFilter> filterList = condition.getFilter();
-        if (CollectionUtils.isEmpty(filterList)) {
-            DocsOpenmindCondition.OpenmindFilter filter = new DocsOpenmindCondition.OpenmindFilter();
-            filter.setVersionTag("maximumVersion");
-            filterList.add(filter);
-        }
         return super.getDefaultSearchCountByCondition(condition);
     }
 

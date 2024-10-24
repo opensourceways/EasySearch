@@ -58,4 +58,9 @@ public class OpenMindVo extends CommunityBaseVo {
      * 版本.
      */
     private String version;
+
+    /**
+     * 版本标签.
+     */
+    private String versionTag;
 }
