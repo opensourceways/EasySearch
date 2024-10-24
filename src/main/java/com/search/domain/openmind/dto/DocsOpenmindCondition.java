@@ -92,7 +92,7 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
     @Setter
     public static class OpenmindFilter {
         /**
-         * 文档类型.
+         * 数据类型.
          */
         private String type;
         /**
@@ -103,6 +103,11 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
          * 版本标签.
          */
         private String versionTag;
+
+        /**
+         * 文档类型.
+         */
+        private String docsType;
     }
 
     /**
@@ -119,5 +124,15 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
          * 文档版本.
          */
         private String version;
+
+        /**
+         * 版本标签.
+         */
+        private String versionTag;
+
+        /**
+         * 文档类型.
+         */
+        private String docsType;
     }
 }
