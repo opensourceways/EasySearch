@@ -169,7 +169,7 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
             keyCountResultList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 10));
         }
         wordResponceVo.getWord().addAll(keyCountResultList);
-        if (keyCountResultList.size() == 0) {
+        /*if (keyCountResultList.size() == 0) {
             SuggMindsporeCondition suggMindsporeCondition = new SuggMindsporeCondition();
             suggMindsporeCondition.setIndex(wordConditon.getIndex());
             suggMindsporeCondition.setKeyword(wordConditon.getQuery());
@@ -182,7 +182,7 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
                     wordResponceVo.getWord().add(tagsVo);
                 });
             }
-        }
+        }*/
 
         return wordResponceVo;
     }
