@@ -26,6 +26,10 @@ public class ResponceResult {
      * 响应数据.
      */
     private Object obj;
+    /**
+     * 响应数据.
+     */
+    private Object data;
 
     /**
      * 有参构造，初始ResponceResult.
@@ -33,11 +37,13 @@ public class ResponceResult {
      * @param status 状态码 .
      * @param msg    响应消息.
      * @param obj    响应数据.
+     * @param data   响应数据.
      */
-    public ResponceResult(Integer status, String msg, Object obj) {
+    public ResponceResult(Integer status, String msg, Object obj, Object data) {
         this.status = status;
         this.msg = msg;
         this.obj = obj;
+        this.data = data;
     }
 
     /**
@@ -48,7 +54,7 @@ public class ResponceResult {
      * @return ResponceResult.
      */
     public static ResponceResult ok(String msg, Object obj) {
-        return new ResponceResult(200, msg, obj);
+        return new ResponceResult(200, msg, obj, null);
     }
 
 
@@ -58,7 +64,7 @@ public class ResponceResult {
      * @return ResponceResult.
      */
     public static ResponceResult ok() {
-        return new ResponceResult(200, null, null);
+        return new ResponceResult(200, null, null, null);
     }
 
     /**
@@ -68,9 +74,18 @@ public class ResponceResult {
      * @return ResponceResult.
      */
     public static ResponceResult ok(Object data) {
-        return new ResponceResult(200, "查询成功", data);
+        return new ResponceResult(200, "查询成功", data, null);
     }
 
+    /**
+     * 定义成功的静态方法,默认状态码200，msg为‘查询成功’.
+     *
+     * @param data 响应数据.
+     * @return ResponceResult.
+     */
+    public static ResponceResult openmind(Object data) {
+        return new ResponceResult(200, "查询成功", null, data);
+    }
 
     /**
      * 定义一个失败的静态方法,默认状态码201，msg为‘查询成功’.
@@ -80,7 +95,7 @@ public class ResponceResult {
      * @return ResponceResult.
      */
     public static ResponceResult fail(String msg, Object data) {
-        return new ResponceResult(201, msg, data);
+        return new ResponceResult(201, msg, data, null);
     }
 
     /**
@@ -89,6 +104,6 @@ public class ResponceResult {
      * @return ResponceResult.
      */
     public static ResponceResult fail() {
-        return new ResponceResult(201, null, null);
+        return new ResponceResult(201, null, null, null);
     }
 }

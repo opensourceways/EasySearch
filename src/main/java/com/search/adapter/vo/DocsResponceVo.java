@@ -40,7 +40,7 @@ public class DocsResponceVo<T extends CommunityBaseVo> {
     /**
      * result count.
      */
-    private long total;
+    private long count;
 
 
     /**

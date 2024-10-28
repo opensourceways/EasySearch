@@ -21,6 +21,8 @@ import com.search.domain.mindspore.dto.TagsMindsporeCondition;
 import com.search.domain.mindspore.dto.WordMindsporeConditon;
 import com.search.domain.mindspore.vo.MindSporeVo;
 
+import java.util.List;
+
 public interface MindSporeGateway {
     /**
      * Search for different types of data.
@@ -62,4 +64,12 @@ public interface MindSporeGateway {
      * @return WordResponceVo.
      */
     WordResponceVo getWordByConditon(WordMindsporeConditon wordConditon);
+
+    /**
+     * Implement search Hotwords.
+     *
+     * @param lang language.
+     * @return List<String>.
+     */
+    List<String> getHotwords(String lang);
 }

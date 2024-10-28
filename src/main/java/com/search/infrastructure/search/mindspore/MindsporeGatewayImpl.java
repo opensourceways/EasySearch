@@ -25,6 +25,7 @@ import com.search.domain.mindspore.dto.WordMindsporeConditon;
 import com.search.domain.mindspore.gateway.MindSporeGateway;
 import com.search.domain.mindspore.vo.MindSporeVo;
 import com.search.infrastructure.support.action.BaseFounctionGateway;
+import com.search.infrastructure.support.config.EsPopwordConfig;
 import com.search.infrastructure.support.converter.CommonConverter;
 import com.search.infrastructure.search.mindspore.dataobject.MindsporeDo;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -46,6 +45,10 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
      * current community trie.
      */
     private final Map<String, Trie> trieMap = new HashMap<>();
+    /**
+     * search popular word.
+     */
+    private final EsPopwordConfig esPopwordConfig;
 
     /**
      * Search for different types of data.
@@ -55,7 +58,18 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
      */
     @Override
     public DocsResponceVo<MindSporeVo> searchByCondition(DocsMindsporeCondition searchBaseCondition) {
+        String keyword = searchBaseCondition.getKeyword();
+        String keywordSpan = "<span>" + keyword + "</span>";
         List<Map<String, Object>> dateMapList = super.getDefaultSearchByCondition(searchBaseCondition);
+        if (dateMapList != null) {
+            for (int i = 0; i < dateMapList.size(); i++) {
+                Map<String, Object> map = dateMapList.get(i);
+                String title = String.valueOf(map.get("title"));
+                title = title.replace("<span>", "").replace("</span>", "");
+                map.put("title", title.replace(keyword, keywordSpan));
+
+            }
+        }
         List<MindsporeDo> mindsporeDos = CommonConverter.toDoList(dateMapList, MindsporeDo.class);
         List<MindSporeVo> mindSporeVos = CommonConverter.toBaseVoList(mindsporeDos, MindSporeVo.class);
         DocsResponceVo<MindSporeVo> docsResponceVo = new DocsResponceVo(mindSporeVos,
@@ -155,7 +169,7 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
             keyCountResultList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 10));
         }
         wordResponceVo.getWord().addAll(keyCountResultList);
-        if (keyCountResultList.size() == 0) {
+        /*if (keyCountResultList.size() == 0) {
             SuggMindsporeCondition suggMindsporeCondition = new SuggMindsporeCondition();
             suggMindsporeCondition.setIndex(wordConditon.getIndex());
             suggMindsporeCondition.setKeyword(wordConditon.getQuery());
@@ -168,9 +182,33 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
                     wordResponceVo.getWord().add(tagsVo);
                 });
             }
-        }
+        }*/
 
         return wordResponceVo;
+    }
+
+    /**
+     * Implement search Hotwords.
+     *
+     * @param lang language.
+     * @return List<String>.
+     */
+    @Override
+    public List<String> getHotwords(String lang) {
+        List<String> wordList = new ArrayList<>();
+        List<EsPopwordConfig.Pop> popwordConfigPop = esPopwordConfig.getPop();
+        if (popwordConfigPop != null) {
+            List<EsPopwordConfig.Pop> mindsporePopWord = popwordConfigPop.stream().filter(a ->
+                    a.getLang().equals(lang) && a.getSource().equals("mindspore")).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(mindsporePopWord)) {
+                EsPopwordConfig.Pop pop = mindsporePopWord.get(0);
+                Integer num = pop.getNum();
+                List<String> origin = Arrays.asList(pop.getWord().split(","));
+                Collections.shuffle(origin);
+                wordList = origin.subList(0, num);
+            }
+        }
+        return wordList;
     }
 
     /**

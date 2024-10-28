@@ -23,9 +23,13 @@ import java.util.Objects;
 @Setter
 public class DocsOpenmindCondition extends SearchDocsBaseCondition {
     /**
-     * Openmind Limit list.
+     * Openmind filter list.
      */
     private List<OpenmindFilter> filter;
+    /**
+     * Openmind Limit list.
+     */
+    private List<OpenmindLimit> limit;
 
     /**
      * 有参构造，初始化DocsOpenmindCondition.
@@ -41,7 +45,29 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
         super.keyword = condition.getKeyword();
         super.type = condition.getType();
         setOpenmindFilter(condition);
+        setOpenmindLimit(condition);
     }
+
+    /**
+     * 根据DocsCondition封装社区limit obj.
+     *
+     * @param condition 前台请求封装条件.
+     */
+    public void setOpenmindLimit(DocsCondition condition) {
+        ArrayList<OpenmindLimit> openmindLimits = new ArrayList<>();
+        if (Objects.nonNull(condition.getLimit())) {
+            condition.getLimit().stream().forEach(a -> {
+                OpenmindLimit openmindLimit = new OpenmindLimit();
+                openmindLimit.setType(a.getType());
+                openmindLimit.setVersion(a.getVersion());
+                openmindLimit.setDocsType(a.getDocsType());
+                openmindLimit.setVersionTag(a.getVersionTag());
+                openmindLimits.add(openmindLimit);
+            });
+        }
+        this.limit = openmindLimits;
+    }
+
 
     /**
      * 根据DocsCondition封装社区limit obj.
@@ -51,9 +77,12 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
     public void setOpenmindFilter(DocsCondition condition) {
         ArrayList<OpenmindFilter> openmindFilters = new ArrayList<>();
         if (Objects.nonNull(condition.getFilter())) {
-            condition.getLimit().stream().forEach(a -> {
+            condition.getFilter().stream().forEach(a -> {
                 OpenmindFilter filter = new OpenmindFilter();
+                filter.setType(a.getType());
+                filter.setVersion(a.getVersion());
                 filter.setDocsType(a.getDocsType());
+                filter.setVersionTag(a.getVersionTag());
                 openmindFilters.add(filter);
             });
         }
@@ -65,7 +94,46 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
      */
     @Getter
     @Setter
-    private  static class OpenmindFilter {
+    public static class OpenmindFilter {
+        /**
+         * 数据类型.
+         */
+        private String type;
+        /**
+         * 文档版本.
+         */
+        private String version;
+        /**
+         * 版本标签.
+         */
+        private String versionTag;
+
+        /**
+         * 文档类型.
+         */
+        private String docsType;
+    }
+
+    /**
+     * OpenmindLimit obj.
+     */
+    @Getter
+    @Setter
+    public static class OpenmindLimit {
+        /**
+         * 文档类型.
+         */
+        private String type;
+        /**
+         * 文档版本.
+         */
+        private String version;
+
+        /**
+         * 版本标签.
+         */
+        private String versionTag;
+
         /**
          * 文档类型.
          */

@@ -15,6 +15,7 @@ import com.search.adapter.condition.DocsCondition;
 import com.search.adapter.condition.TagsCondition;
 import com.search.adapter.condition.SortCondition;
 import com.search.adapter.condition.WordConditon;
+import com.search.adapter.vo.WordResponceVo;
 import com.search.common.constant.SearchConstant;
 import com.search.common.constant.SourceConstant;
 import com.search.common.entity.ResponceResult;
@@ -86,7 +87,7 @@ public class SearchAdapter {
                 return ResponceResult.ok(opengaussGateway.searchByCondition(docsOpengaussCondition));
             case SourceConstant.SOURCE_OPENMIND:
                 DocsOpenmindCondition docsOpenmindCondition = new DocsOpenmindCondition(index, condition);
-                return ResponceResult.ok(openmindGateway.searchByCondition(docsOpenmindCondition));
+                return ResponceResult.openmind(openmindGateway.searchByCondition(docsOpenmindCondition));
 
             case SourceConstant.SOURCE_SOFTCENTER:
                 DocsSoftcenterCondition docsSoftcenterCondition = new DocsSoftcenterCondition();
@@ -124,7 +125,7 @@ public class SearchAdapter {
 
             case SourceConstant.SOURCE_OPENMIND:
                 DocsOpenmindCondition docsOpenmindCondition = new DocsOpenmindCondition(index, condition);
-                return ResponceResult.ok(openmindGateway.getSearchCountByCondition(docsOpenmindCondition));
+                return ResponceResult.openmind(openmindGateway.getSearchCountByCondition(docsOpenmindCondition));
 
             case SourceConstant.SOURCE_SOFTCENTER:
                 DocsSoftcenterCondition docsSoftcenterCondition = new DocsSoftcenterCondition();
@@ -301,8 +302,29 @@ public class SearchAdapter {
             case SourceConstant.SOURCE_MINDSPORE:
                 WordMindsporeConditon wordMindsporeConditon = new WordMindsporeConditon(condition, index);
                 return ResponceResult.ok(mindSporeGateway.getWordByConditon(wordMindsporeConditon));
+
+            case SourceConstant.SOURCE_OPENMIND:
+                return ResponceResult.ok(new WordResponceVo());
             default:
                 return ResponceResult.fail("not supported currently source", null);
         }
+    }
+
+
+    /**
+     * 根据数据源适配gateway以实现搜索符合条件的各种类型数据的数量.
+     *
+     * @param lang language.
+     * @return ResponceResult.
+     */
+    public ResponceResult getHotwords(String lang) {
+        String dataSource = ThreadLocalCache.getDataSource();
+        switch (dataSource) {
+            case SourceConstant.SOURCE_MINDSPORE:
+                return ResponceResult.ok(mindSporeGateway.getHotwords(lang));
+            default:
+                return ResponceResult.fail("not supported currently source", null);
+        }
+
     }
 }
