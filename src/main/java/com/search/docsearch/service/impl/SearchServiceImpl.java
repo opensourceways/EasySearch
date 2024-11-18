@@ -121,7 +121,8 @@ public class SearchServiceImpl implements SearchService {
             String suggestCorrection = trie.suggestCorrection(keyword);
             suggestList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 5).stream().map(k-> "<em>"+k.getKey()+"</em>").collect(Collectors.toList()));
         }
-
+        String emKeyWord = "<em>" + keyword + "</em>";
+        suggestList = suggestList.stream().filter(a -> !emKeyWord.equals(a)).collect(Collectors.toList());
         if (suggestList.size()>0)
             return result;
 
