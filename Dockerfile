@@ -9,7 +9,7 @@ RUN cd / \
 
 COPY . /EaseSearch-search
 
-ENV JAVA_HOME=/jdk-17.0.12+7
+ENV JAVA_HOME=/jdk-17.0.13+11
 ENV PATH=${JAVA_HOME}/bin:$PATH
 
 ENV MAVEN_HOME=/apache-maven-3.8.1
