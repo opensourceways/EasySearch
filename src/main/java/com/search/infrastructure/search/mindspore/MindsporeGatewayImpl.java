@@ -244,6 +244,10 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         Trie trie = new Trie();
         for (TagsVo a : tagsVoList) {
             trie.insert(a.getKey(), a.getCount().intValue());
+            String lowerCaseKey = a.getKey().toLowerCase(Locale.ROOT);
+            if (!lowerCaseKey.equals(a.getKey())) {
+                trie.insert(lowerCaseKey, a.getCount().intValue());
+            }
         }
         this.trieMap.put(index, trie);
         trie.sortSearchWorld();

@@ -200,7 +200,7 @@ public class BaseFounctionRequestBuilder {
             highlightBuilder.
                     field("textContent")
                     .field("title")
-                    .fragmentSize(100)
+                    .fragmentSize(0)
                     .preTags("<span>")
                     .postTags("</span>");
         }
