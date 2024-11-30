@@ -65,6 +65,12 @@ public class DocsCondition {
     private String type;
 
     /**
+     * card type combination.
+     */
+    @Size(max = 15)
+    private String card;
+
+    /**
      * request limit.
      */
     @Size(max = 30)

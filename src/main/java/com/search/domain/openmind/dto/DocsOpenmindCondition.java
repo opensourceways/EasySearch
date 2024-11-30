@@ -78,12 +78,12 @@ public class DocsOpenmindCondition extends SearchDocsBaseCondition {
         ArrayList<OpenmindFilter> openmindFilters = new ArrayList<>();
         if (Objects.nonNull(condition.getFilter())) {
             condition.getFilter().stream().forEach(a -> {
-                OpenmindFilter filter = new OpenmindFilter();
-                filter.setType(a.getType());
-                filter.setVersion(a.getVersion());
-                filter.setDocsType(a.getDocsType());
-                filter.setVersionTag(a.getVersionTag());
-                openmindFilters.add(filter);
+                OpenmindFilter openmindFilter = new OpenmindFilter();
+                openmindFilter.setType(a.getType());
+                openmindFilter.setVersion(a.getVersion());
+                openmindFilter.setDocsType(a.getDocsType());
+                openmindFilter.setVersionTag(a.getVersionTag());
+                openmindFilters.add(openmindFilter);
             });
         }
         this.filter = openmindFilters;

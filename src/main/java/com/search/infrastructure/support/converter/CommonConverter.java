@@ -14,6 +14,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.search.common.util.ObjectMapperUtil;
 import com.search.domain.base.vo.CountVo;
 import com.search.domain.base.vo.TagsVo;
+import com.search.domain.mindspore.vo.MindSporeCourseVo;
+import com.search.domain.mindspore.vo.MindSporeVo;
+import com.search.infrastructure.search.mindspore.dataobject.MindsporeCourseDo;
+
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
@@ -80,6 +84,18 @@ public final class CommonConverter {
         }
         return doList;
     }
+    /**
+     * Convert a map object to a Do.
+     *
+     * @param dataMap The list of map  to convert
+     * @param clazz       to Convert type
+     * @param <T>    to Convert type.
+     * @return a <T> clazz
+     */
+    public static <T> T toDo(final Map<String, Object> dataMap, Class<T> clazz) {
+        T t = ObjectMapperUtil.toObject(clazz, JSONObject.toJSONString(dataMap));
+        return t;
+    }
 
     /**
      * Convert an list of map object to an vo list.
@@ -96,6 +112,34 @@ public final class CommonConverter {
             voList.add(t);
         }
         return voList;
+    }
+
+    /**
+     * Convert a Do object to an Base vo .
+     *
+     * @param dataObject The Object.
+     * @param clazz  to Convert type.
+     * @param <T>    to Convert type.
+     * @return An list of clazz
+     */
+    public static <T> T toBaseVo(final Object dataObject, Class<T> clazz) {
+        T t = ObjectMapperUtil.toObject(clazz, JSONObject.toJSONString(dataObject));
+        return t;
+    }
+
+    /**
+     * Convert a do to a vo entity.
+     *
+     * @param mindsporeCourseDo The MindsporeCourseDo entity.
+     * @return An MindSporeVo entity
+     */
+    public static MindSporeVo toBaseCourseVo(MindsporeCourseDo mindsporeCourseDo) {
+        MindSporeVo mindSporeVo = new MindSporeVo();
+        MindSporeCourseVo mindSporeCourseVo = new MindSporeCourseVo();
+        BeanUtils.copyProperties(mindsporeCourseDo, mindSporeCourseVo);
+        BeanUtils.copyProperties(mindSporeCourseVo, mindSporeVo);
+        mindSporeVo.setMindsporeCourseVo(mindSporeCourseVo);
+        return mindSporeVo;
     }
 
 }
