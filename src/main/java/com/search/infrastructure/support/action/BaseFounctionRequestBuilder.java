@@ -20,6 +20,7 @@ import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.base.dto.SearchDocsBaseCondition;
 import com.search.domain.base.dto.SearchSortBaseCondition;
 import com.search.domain.base.dto.SearchTagsBaseCondition;
+import com.search.domain.mindspore.dto.DocsMindsporeCondition;
 import com.search.infrastructure.support.config.EsQueryBuildConfig;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.common.lucene.search.function.CombineFunction;
@@ -199,7 +200,7 @@ public class BaseFounctionRequestBuilder {
             highlightBuilder.
                     field("textContent")
                     .field("title")
-                    .fragmentSize(100)
+                    .fragmentSize(0)
                     .preTags("<span>")
                     .postTags("</span>");
         }
@@ -248,6 +249,12 @@ public class BaseFounctionRequestBuilder {
         BoolQueryBuilder boolQueryBuilder = buildBoolQuery();
         if (StringUtils.hasText(condition.getType())) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("type.keyword", condition.getType()));
+        }
+        if (condition instanceof DocsMindsporeCondition) {
+            String cardNot = ((DocsMindsporeCondition) condition).getCard();
+            if (cardNot != null && !cardNot.isEmpty()) {
+                boolQueryBuilder.mustNot(QueryBuilders.termQuery("type.keyword", cardNot));
+            }
         }
         this.buildShouldQuery(boolQueryBuilder, condition.getKeyword());
         this.buildMustNotQuery(boolQueryBuilder, condition.getLimit(), condition.getFilter());

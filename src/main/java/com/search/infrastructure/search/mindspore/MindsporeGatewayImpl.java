@@ -17,6 +17,7 @@ import com.search.adapter.vo.TagsResponceVo;
 import com.search.adapter.vo.WordResponceVo;
 import com.search.common.util.General;
 import com.search.common.util.Trie;
+import com.search.domain.base.vo.CountVo;
 import com.search.domain.base.vo.TagsVo;
 import com.search.domain.mindspore.dto.DocsMindsporeCondition;
 import com.search.domain.mindspore.dto.SuggMindsporeCondition;
@@ -27,7 +28,9 @@ import com.search.domain.mindspore.vo.MindSporeVo;
 import com.search.infrastructure.support.action.BaseFounctionGateway;
 import com.search.infrastructure.support.config.EsPopwordConfig;
 import com.search.infrastructure.support.converter.CommonConverter;
+import com.search.infrastructure.search.mindspore.dataobject.MindsporeCourseDo;
 import com.search.infrastructure.search.mindspore.dataobject.MindsporeDo;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -67,11 +70,24 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
                 String title = String.valueOf(map.get("title"));
                 title = title.replace("<span>", "").replace("</span>", "");
                 map.put("title", title.replace(keyword, keywordSpan));
-
             }
         }
-        List<MindsporeDo> mindsporeDos = CommonConverter.toDoList(dateMapList, MindsporeDo.class);
-        List<MindSporeVo> mindSporeVos = CommonConverter.toBaseVoList(mindsporeDos, MindSporeVo.class);
+        List<MindSporeVo> mindSporeVos = new ArrayList<>();
+        for (Map<String, Object> dataMap : dateMapList) {
+            String type = (String) dataMap.get("type");
+            MindSporeVo mindSporeVo = new MindSporeVo();
+            switch (type) {
+                case "course":
+                    MindsporeCourseDo mindsporeCourseDo = CommonConverter.toDo(dataMap, MindsporeCourseDo.class);
+                    mindSporeVo = CommonConverter.toBaseCourseVo(mindsporeCourseDo);
+                    break;
+                default:
+                    MindsporeDo mindsporeDo = CommonConverter.toDo(dataMap, MindsporeDo.class);
+                    mindSporeVo = CommonConverter.toBaseVo(mindsporeDo, MindSporeVo.class);
+                    break;
+            }
+            mindSporeVos.add(mindSporeVo);
+        }
         DocsResponceVo<MindSporeVo> docsResponceVo = new DocsResponceVo(mindSporeVos,
                 searchBaseCondition.getPageSize(),
                 searchBaseCondition.getPage(),
@@ -87,7 +103,27 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
      */
     @Override
     public CountResponceVo getSearchCountByCondition(DocsMindsporeCondition condition) {
-        return super.getDefaultSearchCountByCondition(condition);
+        CountResponceVo countResponceVo = super.getDefaultSearchCountByCondition(condition);
+        CountResponceVo resCountResponceVo = new CountResponceVo();
+        resCountResponceVo.setTotal(new ArrayList<CountVo>());
+        String[] ordeStrings = new String[]{"all", "api", "docs", "tutorials", "course",
+        "information", "install", "paper", "case"};
+        for (String s : ordeStrings) {
+            Boolean flag = false;
+            for (CountVo countVo : countResponceVo.getTotal()) {
+                if (countVo.getKey().equals(s)) {
+                    resCountResponceVo.getTotal().add(countVo);
+                    flag = true;
+                }
+            }
+            if (!flag) {
+                CountVo countVo = new CountVo();
+                countVo.setKey(s);
+                countVo.setDoc_count(0L);
+                resCountResponceVo.getTotal().add(countVo);
+            }
+        }
+        return resCountResponceVo;
     }
 
 
@@ -169,20 +205,6 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
             keyCountResultList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 10));
         }
         wordResponceVo.getWord().addAll(keyCountResultList);
-        /*if (keyCountResultList.size() == 0) {
-            SuggMindsporeCondition suggMindsporeCondition = new SuggMindsporeCondition();
-            suggMindsporeCondition.setIndex(wordConditon.getIndex());
-            suggMindsporeCondition.setKeyword(wordConditon.getQuery());
-            SuggResponceVo suggByCondition = getSuggByCondition(suggMindsporeCondition);
-            if (suggByCondition.getSuggestList() != null) {
-                suggByCondition.getSuggestList().forEach(a -> {
-                    TagsVo tagsVo = new TagsVo();
-                    tagsVo.setKey(a);
-                    tagsVo.setCount(1L);
-                    wordResponceVo.getWord().add(tagsVo);
-                });
-            }
-        }*/
 
         return wordResponceVo;
     }
@@ -222,6 +244,10 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         Trie trie = new Trie();
         for (TagsVo a : tagsVoList) {
             trie.insert(a.getKey(), a.getCount().intValue());
+            String lowerCaseKey = a.getKey().toLowerCase(Locale.ROOT);
+            if (!lowerCaseKey.equals(a.getKey())) {
+                trie.insert(lowerCaseKey, a.getCount().intValue());
+            }
         }
         this.trieMap.put(index, trie);
         trie.sortSearchWorld();

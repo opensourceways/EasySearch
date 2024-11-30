@@ -20,7 +20,7 @@ import com.search.domain.base.dto.SearchDocsBaseCondition;
 import com.search.domain.base.dto.SearchSortBaseCondition;
 import com.search.domain.base.dto.SearchTagsBaseCondition;
 import com.search.domain.base.vo.TagsVo;
-import com.search.infrastructure.support.converter.CommonConverter;;
+import com.search.infrastructure.support.converter.CommonConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;

@@ -33,6 +33,11 @@ public class DocsMindsporeCondition extends SearchDocsBaseCondition {
     private List<MindsporeFilter> filter;
 
     /**
+     * Mindspore card flag.
+     */
+    private String card;
+
+    /**
      * 有参构造，初始化DocsMindsporeCondition.
      *
      * @param index     数据索引 .
@@ -45,6 +50,7 @@ public class DocsMindsporeCondition extends SearchDocsBaseCondition {
         this.pageSize = condition.getPageSize();
         this.keyword = condition.getKeyword();
         this.type = condition.getType();
+        this.card = condition.getCard();
         setMindsporeLimit(condition);
         setMindsporeFilter(condition);
     }
