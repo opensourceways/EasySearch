@@ -78,21 +78,43 @@ public class UbmcGatewayImpl extends BaseFounctionGateway implements UbmcGateway
         return super.getDefaultSearchCountByCondition(searchDocsCondition);
     }
 
+    /**
+     * Search for sort  of  Ubmc data.
+     *
+     * @param sortCondition The search condition for  Ubmc.
+     * @return SortResponceVo<UbmcVo>.
+     */
     @Override
     public SortResponceVo<UbmcVo> getSearchSortByCondition(SortOpenmindCondition sortCondition) {
         return null;
     }
 
+    /**
+     * Search the tags of    Ubmc data.
+     *
+     * @param tagsCondition The search condition for querying tags.
+     * @return TagsResponceVo.
+     */
     @Override
     public TagsResponceVo getSearchTagsByCondition(TagsOpenmindCondition tagsCondition) {
         return null;
     }
-
+    /**
+     * get Dvide Search Sort  of    Ubmc data.
+     *
+     * @param sortCondition The search condition for querying .
+     * @return SortResponceVo<UbmcVo>.
+     */
     @Override
     public SortResponceVo<UbmcVo> getDvideSearchSortByCondition(SortOpenmindCondition sortCondition) {
         return null;
     }
-
+    /**
+     * Search for Ubmc data.
+     *
+     * @param DivideDocsBaseCondition The search condition .
+     * @return SortResponceVo<UbmcVo>.
+     */
     @Override
     public SortResponceVo<UbmcVo> searchDocByType(DivideDocsBaseCondition DivideDocsBaseCondition) {
         return null;
