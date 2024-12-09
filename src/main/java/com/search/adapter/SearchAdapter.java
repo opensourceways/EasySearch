@@ -39,6 +39,8 @@ import com.search.domain.openmind.dto.DocsOpenmindCondition;
 import com.search.domain.openmind.gateway.OpenmindGateway;
 import com.search.domain.softcenter.dto.DocsSoftcenterCondition;
 import com.search.domain.softcenter.gateway.SoftcenterGateway;
+import com.search.domain.ubmc.dto.DocsUbmcCondition;
+import com.search.domain.ubmc.gateway.UbmcGateway;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +67,10 @@ public class SearchAdapter {
      * Provide softcenter search capability.
      */
     private final SoftcenterGateway softcenterGateway;
+    /**
+     * Provid ubmc search capability.
+     */
+    private final UbmcGateway ubmcGateway;
 
     /**
      * 根据数据源适配gateway以实现搜索符合条件的各种类型数据.
@@ -92,6 +98,9 @@ public class SearchAdapter {
             case SourceConstant.SOURCE_SOFTCENTER:
                 DocsSoftcenterCondition docsSoftcenterCondition = new DocsSoftcenterCondition();
                 return ResponceResult.ok(softcenterGateway.searchByCondition(docsSoftcenterCondition));
+            case SourceConstant.SOURCE_UBMC:
+                DocsUbmcCondition docsUbmcCondition = new DocsUbmcCondition(index, condition);
+                return ResponceResult.ok(ubmcGateway.searchByCondition(docsUbmcCondition));
 
             default:
                 return ResponceResult.fail("not supported currently source", null);
@@ -130,7 +139,9 @@ public class SearchAdapter {
             case SourceConstant.SOURCE_SOFTCENTER:
                 DocsSoftcenterCondition docsSoftcenterCondition = new DocsSoftcenterCondition();
                 return ResponceResult.ok(softcenterGateway.getSearchCountByCondition(docsSoftcenterCondition));
-
+            case SourceConstant.SOURCE_UBMC:
+                DocsUbmcCondition docsUbmcCondition = new DocsUbmcCondition(index, condition);
+                return ResponceResult.ok(ubmcGateway.getSearchCountByCondition(docsUbmcCondition));
             default:
                 return ResponceResult.fail("not supported currently source", null);
         }

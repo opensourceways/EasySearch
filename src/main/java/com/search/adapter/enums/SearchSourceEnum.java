@@ -37,9 +37,12 @@ public enum SearchSourceEnum {
     /**
      * Enum datesource of softcenter .
      */
-    SOFTCENTER(SourceConstant.SOURCE_SOFTCENTER, "软件中心");
+    SOFTCENTER(SourceConstant.SOURCE_SOFTCENTER, "软件中心"),
 
-
+    /**
+     * Enum datesource of UBMC .
+     */
+    UBMC(SourceConstant.SOURCE_UBMC, "UBMC");
     /**
      * 数据源字段 .
      */

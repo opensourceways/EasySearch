@@ -42,4 +42,9 @@ public final class SourceConstant {
      * Constant of SOURCE_SOFTCENTER.
      */
     public static final String SOURCE_SOFTCENTER = "softcenter";
+
+    /**
+     * Constant of SOURCE_UBMC.
+     */
+    public static final String SOURCE_UBMC = "ubmc";
 }
