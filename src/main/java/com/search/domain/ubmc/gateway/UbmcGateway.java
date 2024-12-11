@@ -10,14 +10,11 @@
 */
 package com.search.domain.ubmc.gateway;
 
-import com.search.adapter.vo.CountResponceVo;
-import com.search.adapter.vo.DocsResponceVo;
-import com.search.adapter.vo.SortResponceVo;
-import com.search.adapter.vo.TagsResponceVo;
+import com.search.adapter.vo.*;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
+import com.search.domain.mindspore.dto.*;
 import com.search.domain.ubmc.dto.DocsUbmcCondition;
 import com.search.domain.ubmc.dto.SortOpenmindCondition;
-import com.search.domain.ubmc.dto.TagsOpenmindCondition;
 import com.search.domain.ubmc.vo.UbmcVo;
 
 public interface UbmcGateway {
@@ -51,7 +48,7 @@ public interface UbmcGateway {
      * @param tagsCondition The search condition for querying tags.
      * @return TagsResponceVo.
      */
-    TagsResponceVo getSearchTagsByCondition(TagsOpenmindCondition tagsCondition);
+    TagsResponceVo getSearchTagsByCondition(TagsUbmcCondition tagsCondition);
 
     /**
      * get Dvide Search Sort  of    Ubmc data.
@@ -68,4 +65,21 @@ public interface UbmcGateway {
      * @return SortResponceVo<UbmcVo>.
      */
     SortResponceVo<UbmcVo> searchDocByType(DivideDocsBaseCondition DivideDocsBaseCondition);
+
+
+    /**
+     * Implement search suggestions.
+     *
+     * @param suggUbmcCondition SuggBaseCondition.
+     * @return SuggResponceVo.
+     */
+    SuggResponceVo getSuggByCondition(SuggUbmcCondition suggUbmcCondition);
+
+    /**
+     * Implement search hint.
+     *
+     * @param wordConditon wordConditon.
+     * @return WordResponceVo.
+     */
+    WordResponceVo getWordByConditon(WordUbmcConditon wordConditon);
 }

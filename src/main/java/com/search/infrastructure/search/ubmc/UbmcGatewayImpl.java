@@ -10,14 +10,16 @@
 */
 package com.search.infrastructure.search.ubmc;
 
-import com.search.adapter.vo.CountResponceVo;
-import com.search.adapter.vo.DocsResponceVo;
-import com.search.adapter.vo.SortResponceVo;
-import com.search.adapter.vo.TagsResponceVo;
+import com.search.adapter.vo.*;
+import com.search.common.util.General;
+import com.search.common.util.Trie;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
+import com.search.domain.base.vo.TagsVo;
+import com.search.domain.mindspore.dto.SuggUbmcCondition;
+import com.search.domain.mindspore.dto.TagsUbmcCondition;
+import com.search.domain.mindspore.dto.WordUbmcConditon;
 import com.search.domain.ubmc.dto.DocsUbmcCondition;
 import com.search.domain.ubmc.dto.SortOpenmindCondition;
-import com.search.domain.ubmc.dto.TagsOpenmindCondition;
 import com.search.domain.ubmc.gateway.UbmcGateway;
 import com.search.domain.ubmc.vo.UbmcVo;
 import com.search.infrastructure.search.ubmc.dataobject.UbmcDo;
@@ -28,16 +30,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class UbmcGatewayImpl extends BaseFounctionGateway implements UbmcGateway {
+    /**
+     * current community trie.
+     */
+    private final Map<String, Trie> trieMap = new HashMap<>();
 
     /**
      * Search for different types of data.
@@ -96,9 +101,10 @@ public class UbmcGatewayImpl extends BaseFounctionGateway implements UbmcGateway
      * @return TagsResponceVo.
      */
     @Override
-    public TagsResponceVo getSearchTagsByCondition(TagsOpenmindCondition tagsCondition) {
-        return null;
+    public TagsResponceVo getSearchTagsByCondition(TagsUbmcCondition tagsCondition) {
+        return super.getDefaultSearchTagsByCondition(tagsCondition);
     }
+
     /**
      * get Dvide Search Sort  of    Ubmc data.
      *
@@ -109,6 +115,7 @@ public class UbmcGatewayImpl extends BaseFounctionGateway implements UbmcGateway
     public SortResponceVo<UbmcVo> getDvideSearchSortByCondition(SortOpenmindCondition sortCondition) {
         return null;
     }
+
     /**
      * Search for Ubmc data.
      *
@@ -119,4 +126,78 @@ public class UbmcGatewayImpl extends BaseFounctionGateway implements UbmcGateway
     public SortResponceVo<UbmcVo> searchDocByType(DivideDocsBaseCondition DivideDocsBaseCondition) {
         return null;
     }
+
+    /**
+     * Implement search suggestions.
+     *
+     * @param suggUbmcCondition SuggBaseCondition.
+     * @return SuggResponceVo.
+     */
+    @Override
+    public SuggResponceVo getSuggByCondition(SuggUbmcCondition suggUbmcCondition) {
+        String keywordTrim = suggUbmcCondition.getKeyword().trim();
+        SuggResponceVo suggResponceVo = new SuggResponceVo();
+        List<String> suggestList = new ArrayList<>();
+        suggResponceVo.setSuggestList(suggestList);
+        System.out.println(keywordTrim);
+        List<TagsVo> tagsVoList = getTrie(keywordTrim, suggUbmcCondition.getIndex(), this.trieMap);
+        System.out.println(tagsVoList);
+        if (!CollectionUtils.isEmpty(tagsVoList)) {
+            for (int i = 0; i < tagsVoList.size(); i++) {
+                if (tagsVoList.get(i).getKey().equals(keywordTrim)) {
+                    return suggResponceVo;
+                }
+                StringBuilder originBuilder = new StringBuilder();
+                originBuilder.append("<em>").append(tagsVoList.get(i).getKey()).append("</em>").append(" ");
+                suggestList.add(originBuilder.toString());
+            }
+        }
+        if (suggestList.size() > 0) {
+            return suggResponceVo;
+        }
+        suggUbmcCondition.setAnalyzer("ik_smart");
+        suggUbmcCondition.setFieldname("textContent");
+        suggUbmcCondition.setMinWordLength(1);
+        suggUbmcCondition.setPrefixLength(0);
+        suggUbmcCondition.setSize(3);
+        return super.getDefaultSuggByCondition(suggUbmcCondition);
+    }
+
+    /**
+     * Implement search hint.
+     *
+     * @param wordConditon wordConditon.
+     * @return WordResponceVo.
+     */
+    @Override
+    public WordResponceVo getWordByConditon(WordUbmcConditon wordConditon) {
+        WordResponceVo wordResponceVo = new WordResponceVo();
+        List<TagsVo> keyCountResultList = new ArrayList<>();
+        Trie trie = this.trieMap.get(wordConditon.getIndex());
+        if (trie == null || trie.getSearchCountMap().size() == 0) {
+            trie = initTrie(wordConditon.getIndex(), this.trieMap);
+        }
+        String prefix = wordConditon.getQuery();
+        int preLength = prefix.length() < 3 ? prefix.length() : 3;
+        for (int i = 0; i < preLength; i++) {
+            String substring = prefix.substring(0, prefix.length() - i);
+            keyCountResultList = trie.searchTopKWithPrefix(substring, 10);
+            if (!CollectionUtils.isEmpty(keyCountResultList)) {
+                break;
+            }
+        }
+        if (CollectionUtils.isEmpty(keyCountResultList)) {
+            String newPrefix = General.replacementCharacter(prefix);
+            keyCountResultList = trie.searchTopKWithPrefix(newPrefix, 10);
+        }
+        //没查到根据相似度匹配
+        if (CollectionUtils.isEmpty(keyCountResultList)) {
+            String suggestCorrection = trie.suggestCorrection(prefix);
+            keyCountResultList.addAll(trie.searchTopKWithPrefix(suggestCorrection, 10));
+        }
+        wordResponceVo.getWord().addAll(keyCountResultList);
+
+        return wordResponceVo;
+    }
+
 }

@@ -107,7 +107,7 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         CountResponceVo resCountResponceVo = new CountResponceVo();
         resCountResponceVo.setTotal(new ArrayList<CountVo>());
         String[] ordeStrings = new String[]{"all", "api", "docs", "tutorials", "course",
-        "information", "install", "paper", "case"};
+                "information", "install", "paper", "case"};
         for (String s : ordeStrings) {
             Boolean flag = false;
             for (CountVo countVo : countResponceVo.getTotal()) {
@@ -150,7 +150,7 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         SuggResponceVo suggResponceVo = new SuggResponceVo();
         List<String> suggestList = new ArrayList<>();
         suggResponceVo.setSuggestList(suggestList);
-        List<TagsVo> tagsVoList = getTrie(keywordTrim, suggMindsporeCondition.getIndex());
+        List<TagsVo> tagsVoList = getTrie(keywordTrim, suggMindsporeCondition.getIndex(), this.trieMap);
         if (!CollectionUtils.isEmpty(tagsVoList)) {
             for (int i = 0; i < tagsVoList.size(); i++) {
                 if (tagsVoList.get(i).getKey().equals(keywordTrim)) {
@@ -184,7 +184,7 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
         List<TagsVo> keyCountResultList = new ArrayList<>();
         Trie trie = this.trieMap.get(wordConditon.getIndex());
         if (trie == null || trie.getSearchCountMap().size() == 0) {
-            trie = initTrie(wordConditon.getIndex());
+            trie = initTrie(wordConditon.getIndex(), this.trieMap);
         }
         String prefix = wordConditon.getQuery();
         int preLength = prefix.length() < 3 ? prefix.length() : 3;
@@ -231,47 +231,5 @@ public class MindsporeGatewayImpl extends BaseFounctionGateway implements MindSp
             }
         }
         return wordList;
-    }
-
-    /**
-     * init Trie.
-     *
-     * @param index index.
-     * @return Trie.
-     */
-    private Trie initTrie(String index) {
-        List<TagsVo> tagsVoList = aggFieldCount("title", index);
-        Trie trie = new Trie();
-        for (TagsVo a : tagsVoList) {
-            trie.insert(a.getKey(), a.getCount().intValue());
-            String lowerCaseKey = a.getKey().toLowerCase(Locale.ROOT);
-            if (!lowerCaseKey.equals(a.getKey())) {
-                trie.insert(lowerCaseKey, a.getCount().intValue());
-            }
-        }
-        this.trieMap.put(index, trie);
-        trie.sortSearchWorld();
-        return trie;
-    }
-
-    private List<TagsVo> getTrie(String input, String index) {
-        List<TagsVo> keyCountResultList = new ArrayList<>();
-        Trie trie = this.trieMap.get(index);
-        if (trie == null || trie.getSearchCountMap().size() == 0) {
-            trie = initTrie(index);
-        }
-        String prefix = input;
-        for (int i = 0; i < 3 && i < prefix.length(); i++) {
-            String substring = prefix.substring(0, prefix.length() - i);
-            keyCountResultList = trie.searchTopKWithPrefix(substring, 10);
-            if (!CollectionUtils.isEmpty(keyCountResultList)) {
-                break;
-            }
-        }
-        if (CollectionUtils.isEmpty(keyCountResultList)) {
-            String newPrefix = General.replacementCharacter(prefix);
-            keyCountResultList = trie.searchTopKWithPrefix(newPrefix, 10);
-        }
-        return keyCountResultList;
     }
 }

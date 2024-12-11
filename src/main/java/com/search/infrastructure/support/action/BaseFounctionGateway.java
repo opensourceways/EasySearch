@@ -14,6 +14,8 @@ import com.search.adapter.vo.CountResponceVo;
 import com.search.adapter.vo.SuggResponceVo;
 import com.search.adapter.vo.TagsResponceVo;
 
+import com.search.common.util.General;
+import com.search.common.util.Trie;
 import com.search.domain.base.dto.SearchSuggBaseCondition;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
 import com.search.domain.base.dto.SearchDocsBaseCondition;
@@ -35,11 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -247,5 +247,56 @@ public class BaseFounctionGateway {
 
         }
         return tagsVoList;
+    }
+
+
+    /**
+     * init Trie.
+     *
+     * @param index index.
+     * @param trieMap trieMap.
+     * @return Trie.
+     */
+    protected Trie initTrie(String index, Map<String, Trie> trieMap) {
+        List<TagsVo> tagsVoList = aggFieldCount("title", index);
+        System.out.println(tagsVoList);
+        Trie trie = new Trie();
+        for (TagsVo a : tagsVoList) {
+            trie.insert(a.getKey(), a.getCount().intValue());
+            String lowerCaseKey = a.getKey().toLowerCase(Locale.ROOT);
+            if (!lowerCaseKey.equals(a.getKey())) {
+                trie.insert(lowerCaseKey, a.getCount().intValue());
+            }
+        }
+        trieMap.put(index, trie);
+        trie.sortSearchWorld();
+        return trie;
+    }
+    /**
+     * getTrie.
+     * @param  input input.
+     * @param index index.
+     * @param trieMap trieMap.
+     * @return Trie.
+     */
+    protected List<TagsVo> getTrie(String input, String index, Map<String, Trie> trieMap) {
+        List<TagsVo> keyCountResultList = new ArrayList<>();
+        Trie trie = trieMap.get(index);
+        if (trie == null || trie.getSearchCountMap().size() == 0) {
+            trie = initTrie(index, trieMap);
+        }
+        String prefix = input;
+        for (int i = 0; i < 3 && i < prefix.length(); i++) {
+            String substring = prefix.substring(0, prefix.length() - i);
+            keyCountResultList = trie.searchTopKWithPrefix(substring, 10);
+            if (!CollectionUtils.isEmpty(keyCountResultList)) {
+                break;
+            }
+        }
+        if (CollectionUtils.isEmpty(keyCountResultList)) {
+            String newPrefix = General.replacementCharacter(prefix);
+            keyCountResultList = trie.searchTopKWithPrefix(newPrefix, 10);
+        }
+        return keyCountResultList;
     }
 }

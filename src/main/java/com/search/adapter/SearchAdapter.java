@@ -21,10 +21,7 @@ import com.search.common.constant.SourceConstant;
 import com.search.common.entity.ResponceResult;
 import com.search.common.thread.ThreadLocalCache;
 import com.search.domain.base.dto.DivideDocsBaseCondition;
-import com.search.domain.mindspore.dto.DocsMindsporeCondition;
-import com.search.domain.mindspore.dto.SuggMindsporeCondition;
-import com.search.domain.mindspore.dto.TagsMindsporeCondition;
-import com.search.domain.mindspore.dto.WordMindsporeConditon;
+import com.search.domain.mindspore.dto.*;
 import com.search.domain.mindspore.gateway.MindSporeGateway;
 import com.search.domain.openeuler.dto.DocsOpeneulerCondition;
 import com.search.domain.openeuler.dto.SortOpeneulerCondition;
@@ -196,7 +193,9 @@ public class SearchAdapter {
                 TagsOpengaussCondition tagsOpengaussCondition = new TagsOpengaussCondition(condition, index);
                 return ResponceResult.ok(opengaussGateway.getSearchTagsByCondition(tagsOpengaussCondition));
 
-
+            case SourceConstant.SOURCE_UBMC:
+                TagsUbmcCondition tagsUbmcCondition = new TagsUbmcCondition(condition, index);
+                return ResponceResult.ok(ubmcGateway.getSearchTagsByCondition(tagsUbmcCondition));
             default:
                 return ResponceResult.fail("not supported currently source", null);
         }
@@ -292,6 +291,11 @@ public class SearchAdapter {
             case SourceConstant.SOURCE_MINDSPORE:
                 SuggMindsporeCondition docsMindsporeCondition = new SuggMindsporeCondition(condition, index);
                 return ResponceResult.ok(mindSporeGateway.getSuggByCondition(docsMindsporeCondition));
+
+            case SourceConstant.SOURCE_UBMC:
+                SuggUbmcCondition docsUbmcCondition = new SuggUbmcCondition(condition, index);
+                return ResponceResult.ok(ubmcGateway.getSuggByCondition(docsUbmcCondition));
+
             default:
                 return ResponceResult.fail("not supported currently source", null);
         }
@@ -313,6 +317,11 @@ public class SearchAdapter {
             case SourceConstant.SOURCE_MINDSPORE:
                 WordMindsporeConditon wordMindsporeConditon = new WordMindsporeConditon(condition, index);
                 return ResponceResult.ok(mindSporeGateway.getWordByConditon(wordMindsporeConditon));
+
+
+            case SourceConstant.SOURCE_UBMC:
+                WordUbmcConditon wordUbmcConditon = new WordUbmcConditon(condition, index);
+                return ResponceResult.ok(ubmcGateway.getWordByConditon(wordUbmcConditon));
 
             case SourceConstant.SOURCE_OPENMIND:
                 return ResponceResult.ok(new WordResponceVo());

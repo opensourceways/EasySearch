@@ -10,6 +10,7 @@
 */
 package com.search.domain.mindspore.dto;
 import com.search.adapter.condition.WordConditon;
+import com.search.domain.base.dto.SearchWordBaseCondition;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,16 +18,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Data
-public class WordMindsporeConditon {
-    /**
-     * 输入语言.
-     */
-    private String query;
-
-    /**
-     * 数据索引.
-     */
-    private String index;
+public class WordMindsporeConditon extends SearchWordBaseCondition {
 
 
     /**
