@@ -61,11 +61,11 @@ public class UbmcGatewayImpl extends BaseFounctionGateway implements UbmcGateway
         List<UbmcDo> ubmcDos = CommonConverter.toDoList(dateMapList, UbmcDo.class);
         List<UbmcVo> ubmcVos = CommonConverter.toBaseVoList(ubmcDos, UbmcVo.class);
         // 默认v0.0.0版本显示为“”
-        for (UbmcVo ubmcVo : ubmcVos) {
+       /* for (UbmcVo ubmcVo : ubmcVos) {
             if ("v0.0.0".equals(ubmcVo.getVersion())) {
                 ubmcVo.setVersion("");
             }
-        }
+        }*/
         if (("docs").equals(searchDocsCondition.getType()) && ("desc").equals(searchDocsCondition.getOrderTime())) {
             Collections.sort(ubmcVos, new Comparator<UbmcVo>() {
                 private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/d");
