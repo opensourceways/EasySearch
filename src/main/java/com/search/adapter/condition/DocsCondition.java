@@ -71,6 +71,11 @@ public class DocsCondition {
     private String card;
 
     /**
+     * order bt time.
+     */
+    private String orderTime;
+
+    /**
      * request limit.
      */
     @Size(max = 30)

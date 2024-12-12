@@ -32,8 +32,10 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
-
 
 @Component
 @RequiredArgsConstructor
@@ -63,6 +65,22 @@ public class UbmcGatewayImpl extends BaseFounctionGateway implements UbmcGateway
             if ("v0.0.0".equals(ubmcVo.getVersion())) {
                 ubmcVo.setVersion("");
             }
+        }
+        if (("docs").equals(searchDocsCondition.getType()) && ("desc").equals(searchDocsCondition.getOrderTime())) {
+            Collections.sort(ubmcVos, new Comparator<UbmcVo>() {
+                private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/d");
+
+                @Override
+                public int compare(UbmcVo o1, UbmcVo o2) {
+                    try {
+                        LocalDate date1 = LocalDate.parse(o1.getDate(), formatter);
+                        LocalDate date2 = LocalDate.parse(o2.getDate(), formatter);
+                        return date1.compareTo(date2);
+                    } catch (DateTimeParseException e) {
+                        throw new IllegalArgumentException("Invalid date format in UbmcVo objects", e);
+                    }
+                }
+            });
         }
         DocsResponceVo docsResponceVo = new DocsResponceVo(ubmcVos,
                 searchDocsCondition.getPageSize(),

@@ -30,6 +30,10 @@ public class DocsUbmcCondition extends SearchDocsBaseCondition {
      *  Limit list.
      */
     private List<UbmcLimit> limit;
+    /**
+     * order bt time.
+     */
+    private String orderTime;
 
     /**
      * 有参构造，初始化DocsUbmcCondition.
@@ -44,6 +48,7 @@ public class DocsUbmcCondition extends SearchDocsBaseCondition {
         super.pageSize = condition.getPageSize();
         super.keyword = condition.getKeyword();
         super.type = condition.getType();
+        this.orderTime = condition.getOrderTime();
         setOpenmindFilter(condition);
         setOpenmindLimit(condition);
     }
