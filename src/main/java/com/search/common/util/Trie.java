@@ -87,7 +87,13 @@ public class Trie {
             }
         }
 
-        return suggestion;
+        for (Character c : input.toCharArray()) {
+            if (suggestion.indexOf(c.toString()) != -1) {
+                return suggestion;
+            }
+        }
+
+        return "";
     }
 
     /**
