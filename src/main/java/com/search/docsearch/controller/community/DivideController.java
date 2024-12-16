@@ -1,6 +1,7 @@
 package com.search.docsearch.controller.community;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.search.docsearch.aop.LimitRequest;
 import com.search.docsearch.aop.LogAction;
 import com.search.docsearch.config.EsfunctionScoreConfig;
@@ -33,6 +34,7 @@ public class DivideController {
 
         try {
             ParameterUtil.vailAndLimitRequestMap(m,esfunctionScoreConfig.getEsExistingKey());
+            log.info("请求参数："+ JSONObject.toJSONString(m));
             Map<String, Object> result = divideService.advancedSearch(m, type);
             if (result == null) {
                 return SysResult.fail("内容不存在", null);

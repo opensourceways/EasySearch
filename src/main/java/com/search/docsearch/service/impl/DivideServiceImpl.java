@@ -110,7 +110,9 @@ public class DivideServiceImpl implements DivideService {
 
         SearchResponse response = null;
         try {
+            log.info("请求request："+ request);
             response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+            log.info("请求response："+ response);
         } catch (IOException e) {
             throw new ServiceImplException("can not search");
         }
