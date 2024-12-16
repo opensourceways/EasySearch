@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void controllerException(HttpServletRequest request, HttpServletResponse response, ControllerException e) {
-        log.error("Controller异常:", e.getMessage());
+       // log.error("Controller异常:", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
@@ -44,14 +44,14 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void serviceException(HttpServletRequest request, HttpServletResponse response, ServiceException e) {
-        log.error("Service异常:{}", e.getMessage());
+    //    log.error("Service异常:{}", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
     @ExceptionHandler(value = TrustManagerException.class)
     @ResponseStatus(HttpStatus.OK)
     public void trustManagerException(HttpServletRequest request, HttpServletResponse response, TrustManagerException e) {
-        log.error("TrustManager异常:{}", e.getMessage());
+   //     log.error("TrustManager异常:{}", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void methodArgumentNotValidException(HttpServletRequest request, HttpServletResponse response, MethodArgumentNotValidException e) {
-        log.error("参数校验异常:", e.getMessage());
+     //   log.error("参数校验异常:", e.getMessage());
         BindingResult bindingResult = e.getBindingResult();
         StringBuilder sb = new StringBuilder();
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
@@ -88,7 +88,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void sqlException(HttpServletRequest request, HttpServletResponse response, SQLException e) {
-        log.error("sql异常:{}", e.getMessage());
+       // log.error("sql异常:{}", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void exception(HttpServletRequest request, HttpServletResponse response, Exception e) {
-        log.error("异常:", e.getMessage());
+     //   log.error("异常:", e.getMessage());
         responseJson(request, response, SysResult.fail("查询失败", null));
     }
 
@@ -114,7 +114,7 @@ public class GlobalExceptionHandler {
         try (PrintWriter out = response.getWriter()) {
             out.append(JacksonUtils.writeValueAsString(sysResult));
         } catch (IOException e) {
-            log.error(e.getMessage());
+         //   log.error(e.getMessage());
         }
     }
 }
