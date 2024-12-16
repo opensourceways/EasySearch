@@ -19,10 +19,10 @@ public class ParameterUtil {
             if (!key.matches("^[\\x20\\u4E00-\\u9FA5A-Za-z0-9.\\-_ ]+$") || key.length() > 15) {
                 throw new IllegalArgumentException("Invalid key");
             }
-            if (!condition.get(key).matches("^[\\x20\\u4E00-\\u9FA5A-Za-z0-9.\\-_ ]+$")
+            /*if (!condition.get(key).matches("^[\\x20\\u4E00-\\u9FA5A-Za-z0-9.\\-_ ]+$")
                     || condition.get(key).length() > 20) {
                 throw new IllegalArgumentException("Invalid value");
-            }
+            }*/
             if (!StringUtils.isEmpty(esExistingKey)&&!esExistingKey.contains(key)) {
                 it.remove();
             }
