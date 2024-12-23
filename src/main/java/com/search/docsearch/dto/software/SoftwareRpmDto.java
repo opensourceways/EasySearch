@@ -12,4 +12,5 @@ public class SoftwareRpmDto extends SoftwareBaseDto {
 
     String provides;
     String originPkg;
+    String subPath;
 }
