@@ -72,13 +72,30 @@ public class UbmcGatewayImpl extends BaseFounctionGateway implements UbmcGateway
 
                 @Override
                 public int compare(UbmcVo o1, UbmcVo o2) {
+                    String dateStr1 = o1.getDate();
+                    String dateStr2 = o2.getDate();
+
+                    boolean isEmpty1 = dateStr1 == null || dateStr1.isEmpty();
+                    boolean isEmpty2 = dateStr2 == null || dateStr2.isEmpty();
+                    if (isEmpty1 && !isEmpty2) {
+                        return 1;
+                    }
+                    if (!isEmpty1 && isEmpty2) {
+                        return -1;
+                    }
+                    LocalDate date1 = null;
+                    LocalDate date2 = null;
                     try {
-                        LocalDate date1 = LocalDate.parse(o1.getDate(), formatter);
-                        LocalDate date2 = LocalDate.parse(o2.getDate(), formatter);
-                        return date1.compareTo(date2);
+                        if (dateStr1 != null && !dateStr1.isEmpty()) {
+                            date1 = LocalDate.parse(dateStr1, formatter);
+                        }
+                        if (dateStr2 != null && !dateStr2.isEmpty()) {
+                            date2 = LocalDate.parse(dateStr2, formatter);
+                        }
                     } catch (DateTimeParseException e) {
                         throw new IllegalArgumentException("Invalid date format in UbmcVo objects", e);
                     }
+                    return date2.compareTo(date1); // 降序排序
                 }
             });
         }
