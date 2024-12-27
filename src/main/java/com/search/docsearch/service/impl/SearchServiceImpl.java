@@ -256,7 +256,7 @@ public class SearchServiceImpl implements SearchService {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         if (StringUtils.hasText(condition.getType())) {
-            boolQueryBuilder.filter(QueryBuilders.termQuery("type.keyword", condition.getType()));
+            boolQueryBuilder.filter(QueryBuilders.termsQuery("type.keyword", condition.getType().split(",")));
         }
         //因为会出现一些特殊的字符导致分词出错（比如英文连接词），在这里处理一下
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
