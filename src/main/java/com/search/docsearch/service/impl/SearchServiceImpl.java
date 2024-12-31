@@ -228,7 +228,13 @@ public class SearchServiceImpl implements SearchService {
             }
             if (condition.getPage() == 1) {
                 Float score = hit.getScore();
-                map.put("score", score*trie.getWordSimilarityWithTopSearch(String.valueOf(map.get("title")), 10));
+                Double scoreTopSearch = score * trie.getWordSimilarityWithTopSearch(String.valueOf(map.get("title")), 10);
+                if (!(Math.abs(scoreTopSearch - 0.0) < 1e-6f)) {
+                    map.put("score", scoreTopSearch);
+                }
+                else {
+                    map.put("score", score*1.0);
+                }
             }
             if (highlightFields.containsKey("title")) {
                 map.put("title", highlightFields.get("title").getFragments()[0].toString());
@@ -256,7 +262,7 @@ public class SearchServiceImpl implements SearchService {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         if (StringUtils.hasText(condition.getType())) {
-            boolQueryBuilder.filter(QueryBuilders.termsQuery("type.keyword", condition.getType().split(",")));
+            boolQueryBuilder.filter(QueryBuilders.termsQuery("type.keyword",  condition.getType().split(",")));
         }
         //因为会出现一些特殊的字符导致分词出错（比如英文连接词），在这里处理一下
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
@@ -358,20 +364,36 @@ public class SearchServiceImpl implements SearchService {
         SearchRequest request = new SearchRequest(saveIndex);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
         //因为会出现一些特殊的字符导致分词出错（比如英文连接词），在这里处理一下
         condition.setKeyword(General.replacementCharacter(condition.getKeyword()));
 
         MatchPhraseQueryBuilder ptitleMP = QueryBuilders.matchPhraseQuery("title", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+        ptitleMP.boost(esfunctionScoreConfig.titleBoost == null ? 1000 : esfunctionScoreConfig.titleBoost);
+        MatchPhraseQueryBuilder ph1MP = QueryBuilders.matchPhraseQuery("h1", condition.getKeyword()).analyzer("ik_max_word");
+        ph1MP.boost(esfunctionScoreConfig.h1Boost == null ? 900 : esfunctionScoreConfig.h1Boost);
+        MatchPhraseQueryBuilder ph2MP = QueryBuilders.matchPhraseQuery("h2", condition.getKeyword()).analyzer("ik_max_word");
+        ph2MP.boost(esfunctionScoreConfig.h2Boost == null ? 800 : esfunctionScoreConfig.h2Boost);
+        MatchPhraseQueryBuilder ph3MP = QueryBuilders.matchPhraseQuery("h3", condition.getKeyword()).analyzer("ik_max_word");
+        ph3MP.boost(esfunctionScoreConfig.h3Boost == null ? 700 : esfunctionScoreConfig.h3Boost);
+        MatchPhraseQueryBuilder ph4MP = QueryBuilders.matchPhraseQuery("h4", condition.getKeyword()).analyzer("ik_max_word");
+        ph4MP.boost(esfunctionScoreConfig.h4Boost == null ? 600 : esfunctionScoreConfig.h4Boost);
+        MatchPhraseQueryBuilder ph5MP = QueryBuilders.matchPhraseQuery("h5", condition.getKeyword()).analyzer("ik_max_word");
+        ph5MP.boost(esfunctionScoreConfig.h5Boost == null ? 500 : esfunctionScoreConfig.h5Boost);
+        MatchPhraseQueryBuilder pstrongMP = QueryBuilders.matchPhraseQuery("strong", condition.getKeyword()).analyzer("ik_max_word");
+        pstrongMP.boost(esfunctionScoreConfig.strongBoost == null ? 150 : esfunctionScoreConfig.strongBoost);
+
         MatchPhraseQueryBuilder ptextContentMP = QueryBuilders.matchPhraseQuery("textContent", condition.getKeyword()).analyzer("ik_max_word").slop(2);
+        ptextContentMP.boost(esfunctionScoreConfig.textContentBoost == null ? 100 : esfunctionScoreConfig.textContentBoost);
 
-        boolQueryBuilder.should(ptitleMP).should(ptextContentMP);
-
+        boolQueryBuilder.should(ptitleMP).should(ph1MP).should(ph2MP).should(ph3MP).should(ph4MP).should(ph5MP).should(pstrongMP).should(ptextContentMP);
         MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", condition.getKeyword()).analyzer("ik_smart");
+        titleMP.boost(2);
         MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", condition.getKeyword()).analyzer("ik_smart");
+        textContentMP.boost(1);
         boolQueryBuilder.should(titleMP).should(textContentMP);
 
         boolQueryBuilder.minimumShouldMatch(1);
+
         if (esfunctionScoreConfig.limitType == null || StringUtils.isEmpty(condition.getType()) || esfunctionScoreConfig.limitType.contains(condition.getType()))
             if (condition.getLimit() != null) {
                 for (Map<String, String> map : condition.getLimit()) {
@@ -409,9 +431,22 @@ public class SearchServiceImpl implements SearchService {
             boolQueryBuilder.filter(zBuilder);
         }
 
-        sourceBuilder.query(boolQueryBuilder);
+        if ((condition.getType() == null || "".equals(condition.getType().trim())) && esfunctionScoreConfig.functionscore != null && esfunctionScoreConfig.functionscore.size() > 0) {
+            FunctionScoreQueryBuilder.FilterFunctionBuilder[] functionBuilder = new FunctionScoreQueryBuilder.FilterFunctionBuilder[esfunctionScoreConfig.functionscore.size()];
+            for (int i = 0; i < esfunctionScoreConfig.functionscore.size(); i++) {
+                Map<String, Object> eachFilter = esfunctionScoreConfig.functionscore.get(i);
+                functionBuilder[i] = new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.termQuery(eachFilter.get("termkey").toString(), eachFilter.get("value")), ScoreFunctionBuilders.weightFactorFunction(Float.parseFloat(String.valueOf(eachFilter.get("weight")))));
+            }
+            FunctionScoreQueryBuilder functionScoreQuery = QueryBuilders.functionScoreQuery(boolQueryBuilder, functionBuilder)
+                    .scoreMode(FunctionScoreQuery.ScoreMode.SUM)
+                    .boostMode(CombineFunction.MULTIPLY);
+            sourceBuilder.query(functionScoreQuery);
 
-        sourceBuilder.aggregation(AggregationBuilders.terms("data").field("type.keyword"));
+        } else {
+            sourceBuilder.query(boolQueryBuilder);
+        }
+
+        sourceBuilder.aggregation(AggregationBuilders.terms("data").field("type.keyword").size(100));
         request.source(sourceBuilder);
         SearchResponse response = null;
         try {
