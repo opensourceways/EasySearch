@@ -499,11 +499,6 @@ public class SoftwareEsServiceImpl implements ISoftwareEsSearchService {
             boolQueryBuilder.should(lowerNameMP);
             boolQueryBuilder.should(upNameMP);
             boolQueryBuilder.should(titleMP);
-
-            // 软件中心根据版本号进行搜索
-            WildcardQueryBuilder versionMP = QueryBuilders.wildcardQuery("version.keyword", "*" + condition.getKeyword() + "*");
-            versionMP.boost(10);
-            boolQueryBuilder.should(versionMP);
         }
 
         if (isSearchAll || "ubuntu".equals(condition.getKeywordType())) {
