@@ -87,4 +87,31 @@ public class DataComposite implements Component {
     public int getSize(){
         return children.size();
     }
+
+    /**
+     * merge the other recall results into one way, based one the index 0 of children
+     * 
+     */
+    public Map<String, Object> mergeResult(){
+        if (children.size() <= 1) return this.getChild(0).getResList();
+
+        Component a = children.get(0);
+        Component b = children.get(1);
+
+        Map<String, Object> ares = a.getResList();
+        Map<String, Object> bres = b.getResList();
+
+        List<Map<String, Object>> aresList = (List<Map<String, Object>>) ares.get("records");
+        List<Map<String, Object>> bresList = (List<Map<String, Object>>) bres.get("records");
+        int[] positions = {1, 3, 5, 7, 8};
+        
+        for (int pos : positions) {
+            if (pos >= 0 && pos <= aresList.size() && pos < bresList.size()) {
+                aresList.add(pos, bresList.get(pos));
+            }
+        }
+
+        ares.put("records", aresList);
+        return ares;
+    }
 }
