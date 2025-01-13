@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.docsearch.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,6 +23,8 @@ import com.search.docsearch.except.ServiceImplException;
 import com.search.docsearch.multirecall.composite.DataComposite;
 import com.search.docsearch.multirecall.recall.MultiSearchContext;
 import com.search.docsearch.multirecall.recall.cstrategy.EsSearchStrategy;
+import com.search.docsearch.multirecall.recall.cstrategy.GSearchStrategy;
+import com.search.docsearch.properties.GoogleSearchProperties;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.General;
 import com.search.docsearch.utils.ParameterUtil;
@@ -99,6 +111,10 @@ public class SearchServiceImpl implements SearchService {
 
     @Value("${api.npsApi}")
     private String npsApi;
+
+    @Autowired
+    private GoogleSearchProperties gProperties;
+    
     @Autowired
     private EsfunctionScoreConfig esfunctionScoreConfig;
 
@@ -197,14 +213,16 @@ public class SearchServiceImpl implements SearchService {
     public Map<String, Object> searchByCondition(SearchCondition condition) throws ServiceImplException {
         //create es search strategy
         EsSearchStrategy esRecall = new EsSearchStrategy(restHighLevelClient,mySystem.index,trie,esfunctionScoreConfig);
+        GSearchStrategy gRecall = new GSearchStrategy(gProperties);
         MultiSearchContext multirecall = new MultiSearchContext();
         //set es search into search contex
         multirecall.setSearchStrategy(esRecall);
+        multirecall.setSearchStrategy(gRecall);
         //do recall and fetch the result
         DataComposite multiRecallRes = multirecall.executeMultiSearch(condition);
         // multiRecallRes.filter("policy")  filtering data here
-        // 
-        return multiRecallRes.getChild(0).getResList();
+        return multiRecallRes.mergeResult();
+        //return multiRecallRes.getChild(1).getResList();
     }
 
     public SearchRequest BuildSearchRequest(SearchCondition condition, String index) {
