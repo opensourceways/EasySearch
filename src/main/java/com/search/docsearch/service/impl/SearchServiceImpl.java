@@ -1,3 +1,13 @@
+/* Copyright (c) 2024 openEuler Community
+ EasySoftware is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+     http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ See the Mulan PSL v2 for more details.
+*/
 package com.search.docsearch.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,6 +20,11 @@ import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.except.ServiceException;
 import com.search.docsearch.except.ServiceImplException;
+import com.search.docsearch.multirecall.composite.DataComposite;
+import com.search.docsearch.multirecall.recall.MultiSearchContext;
+import com.search.docsearch.multirecall.recall.cstrategy.EsSearchStrategy;
+import com.search.docsearch.multirecall.recall.cstrategy.GSearchStrategy;
+import com.search.docsearch.properties.GoogleSearchProperties;
 import com.search.docsearch.service.SearchService;
 import com.search.docsearch.utils.General;
 import com.search.docsearch.utils.ParameterUtil;
@@ -22,7 +37,6 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.lucene.search.function.CombineFunction;
 import org.elasticsearch.common.lucene.search.function.FunctionScoreQuery;
-import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
@@ -38,7 +52,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
 import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.SuggestBuilder;
@@ -53,8 +66,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.util.HtmlUtils;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -85,7 +96,7 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     @Qualifier("setConfig")
     private MySystem mySystem;
-
+  
     @Value("${api.allApi}")
     private String allApi;
 
@@ -100,6 +111,10 @@ public class SearchServiceImpl implements SearchService {
 
     @Value("${api.npsApi}")
     private String npsApi;
+
+    @Autowired
+    private GoogleSearchProperties gProperties;
+    
     @Autowired
     private EsfunctionScoreConfig esfunctionScoreConfig;
 
@@ -188,71 +203,26 @@ public class SearchServiceImpl implements SearchService {
 
     }
 
-
+    /**
+     * main page doc search
+     *
+     * @param condition the user query
+     * @return the search results
+     */
     @Override
     public Map<String, Object> searchByCondition(SearchCondition condition) throws ServiceImplException {
-        String saveIndex = mySystem.index + "_" + condition.getLang();
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("keyword", HtmlUtils.htmlEscape(condition.getKeyword()));
-
-        SearchRequest request = BuildSearchRequest(condition, saveIndex);
-        SearchResponse response = null;
-        try {
-            response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            throw new ServiceImplException("can not search");
-        }
-        List<Map<String, Object>> data = new ArrayList<>();
-
-        for (SearchHit hit : response.getHits().getHits()) {
-            Map<String, Object> map = hit.getSourceAsMap();
-            String text = (String) map.getOrDefault("textContent", "");
-            if (null != text && text.length() > 200) {
-                text = text.substring(0, 200) + "......";
-            }
-            map.put("textContent", text);
-            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
-            if (highlightFields.containsKey("textContent")) {
-                StringBuilder highLight = new StringBuilder();
-                for (Text textContent : highlightFields.get("textContent").getFragments()) {
-                    highLight.append(textContent.toString()).append("<br>");
-                }
-                map.put("textContent", highLight.toString());
-            }
-            if ("whitepaper".equals(map.getOrDefault("type", "")) && !map.containsKey("title")) {
-                map.put("title", map.get("secondaryTitle"));
-            }
-            if ("service".equals(map.getOrDefault("type", ""))) {
-                map.put("secondaryTitle", map.get("textContent"));
-            }
-            if (condition.getPage() == 1) {
-                Float score = hit.getScore();
-                Double scoreTopSearch = score * trie.getWordSimilarityWithTopSearch(String.valueOf(map.get("title")), 10);
-                if (!(Math.abs(scoreTopSearch - 0.0) < 1e-6f)) {
-                    map.put("score", scoreTopSearch);
-                }
-                else {
-                    map.put("score", score*1.0);
-                }
-            }
-            if (highlightFields.containsKey("title")) {
-                map.put("title", highlightFields.get("title").getFragments()[0].toString());
-            }
-
-            data.add(map);
-        }
-        if (data.isEmpty()) {
-            return null;
-        }
-
-        if (condition.getPage() == 1) {
-            data = data.stream().sorted((a, b) -> Double.compare((Double) b.get("score"), (Double) a.get("score"))).collect(Collectors.toList());
-        }
-        result.put("page", condition.getPage());
-        result.put("pageSize", condition.getPageSize());
-        result.put("records", data);
-        return result;
+        //create es search strategy
+        EsSearchStrategy esRecall = new EsSearchStrategy(restHighLevelClient,mySystem.index,trie,esfunctionScoreConfig);
+        GSearchStrategy gRecall = new GSearchStrategy(gProperties);
+        MultiSearchContext multirecall = new MultiSearchContext();
+        //set es search into search contex
+        multirecall.setSearchStrategy(esRecall);
+        multirecall.setSearchStrategy(gRecall);
+        //do recall and fetch the result
+        DataComposite multiRecallRes = multirecall.executeMultiSearch(condition);
+        // multiRecallRes.filter("policy")  filtering data here
+        return multiRecallRes.mergeResult();
+        //return multiRecallRes.getChild(1).getResList();
     }
 
     public SearchRequest BuildSearchRequest(SearchCondition condition, String index) {

@@ -51,7 +51,6 @@ public class GRecallData implements Component{
      */
     @Override
     public Map<String, Object> getResList(){
-        //writing filter logic here
-        return null;
+        return this.recallList;
     }
 }
