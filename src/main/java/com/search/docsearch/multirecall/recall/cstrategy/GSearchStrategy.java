@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.docsearch.entity.vo.GoogleSearchParams;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.except.ServiceImplException;
+import com.search.docsearch.factorys.HttpConnectFactory;
 import com.search.docsearch.multirecall.composite.Component;
 import com.search.docsearch.multirecall.composite.cdata.GRecallData;
 import com.search.docsearch.multirecall.recall.SearchStrategy;
@@ -47,8 +48,14 @@ public class GSearchStrategy implements SearchStrategy {
      */
     private GoogleSearchProperties gProperties;
 
-    public GSearchStrategy(GoogleSearchProperties gProperties) {
+    /**
+     * insert httpConnectionFactory to creat a URL
+     */
+    private HttpConnectFactory httpConnectFactory;
+
+    public GSearchStrategy(GoogleSearchProperties gProperties, HttpConnectFactory httpConnectFactory) {
         this.gProperties = gProperties;
+        this.httpConnectFactory = httpConnectFactory;
     }
 
     /**
@@ -78,6 +85,9 @@ public class GSearchStrategy implements SearchStrategy {
      * @throws IOException
      */
     private Component searchByCondition(SearchCondition condition) throws ServiceImplException, IOException {
+        // google search 处理无效字符
+        condition.setKeyword(condition.getKeyword().replace(" ", ""));
+        condition.setKeyword(condition.getKeyword().replace(".", ""));
         GoogleSearchParams googleSearchParams = new GoogleSearchParams();
         googleSearchParams.setKeyWord(condition.getKeyword());
         if ("en".equals(condition.getLang())) {
@@ -94,9 +104,8 @@ public class GSearchStrategy implements SearchStrategy {
         int count = 0;
         String keyWord = googleSearchParams.getKeyWord();
         String urlString = googleSearchParams.buildUrl(gProperties.getUrl(), gProperties.getKey(), gProperties.getCx());
-        // 创建URL对象
-        URL url = new URL(urlString);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        // 创建connection对象
+        HttpURLConnection connection = httpConnectFactory.createConnection(urlString);
         try {
             connection.setRequestMethod("GET");
             int timeout = 15000; // 设置超时时间为15秒
@@ -140,9 +149,10 @@ public class GSearchStrategy implements SearchStrategy {
                 }
             } else {
                 LOGGER.error("GET request not worked, response code: {}", responseCode);
+                return null;
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("google search error: {}", e.getMessage());
         } finally {
             connection.disconnect();
         }

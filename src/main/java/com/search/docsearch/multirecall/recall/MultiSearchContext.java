@@ -53,7 +53,7 @@ public class MultiSearchContext {
             //do recall, the validtaion of condition should implement by concrte strategy
             Component recallRes = searchStgy.search(condition);
             //in case one way does't recall anything  
-            if (recallRes != null){
+            if (recallRes != null && recallRes.getResList().size() > 0){
                 res.add(recallRes);
             }
         }
