@@ -20,4 +20,15 @@ public class Constants {
 
 
     public static final String HTTPS_PREFIX = "https://";
+
+
+    /**
+     * Maxsocre that used to normlize the result
+     */
+    public static final int MAX_SCORE = 10000000;
+
+    /**
+     * Min socre that used to normlize the result
+     */
+    public static final int MIN_SCORE = -1;
 }

@@ -20,6 +20,7 @@ import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.entity.vo.SearchTags;
 import com.search.docsearch.except.ServiceException;
 import com.search.docsearch.except.ServiceImplException;
+import com.search.docsearch.factorys.HttpConnectFactory;
 import com.search.docsearch.multirecall.composite.DataComposite;
 import com.search.docsearch.multirecall.recall.MultiSearchContext;
 import com.search.docsearch.multirecall.recall.cstrategy.EsSearchStrategy;
@@ -112,8 +113,17 @@ public class SearchServiceImpl implements SearchService {
     @Value("${api.npsApi}")
     private String npsApi;
 
+    /**
+     * insert google serach properties
+     */
     @Autowired
     private GoogleSearchProperties gProperties;
+
+    /**
+     * insert httpConnectionFactory to creat a URL
+     */
+    @Autowired
+    private HttpConnectFactory httpConnectFactory;
     
     @Autowired
     private EsfunctionScoreConfig esfunctionScoreConfig;
@@ -213,7 +223,7 @@ public class SearchServiceImpl implements SearchService {
     public Map<String, Object> searchByCondition(SearchCondition condition) throws ServiceImplException {
         //create es search strategy
         EsSearchStrategy esRecall = new EsSearchStrategy(restHighLevelClient,mySystem.index,trie,esfunctionScoreConfig);
-        GSearchStrategy gRecall = new GSearchStrategy(gProperties);
+        GSearchStrategy gRecall = new GSearchStrategy(gProperties, httpConnectFactory);
         MultiSearchContext multirecall = new MultiSearchContext();
         //set es search into search contex
         multirecall.setSearchStrategy(esRecall);

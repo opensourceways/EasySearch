@@ -12,6 +12,7 @@ package com.search.docsearch;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.BeforeEach;
 import com.search.docsearch.entity.vo.SearchCondition;
+import com.search.docsearch.factorys.HttpConnectFactory;
 import com.search.docsearch.multirecall.composite.Component;
 import com.search.docsearch.multirecall.composite.cdata.GRecallData;
 import com.search.docsearch.multirecall.recall.cstrategy.GSearchStrategy;
@@ -40,6 +42,12 @@ public class GSearchStrategyTests {
      */
     @Mock
     private GoogleSearchProperties gProperties;
+
+    /**
+     * insert httpConnectionFactory to creat a URL
+     */
+    @Mock
+    HttpConnectFactory httpConnectFactory;
 
     /**
      * the search service
@@ -64,8 +72,7 @@ public class GSearchStrategyTests {
         searchCondition.setLang("en");
         searchCondition.setPage(1);
         searchCondition.setPageSize(10);
-
-        gSearchStrategy = new GSearchStrategy(gProperties);
+        //gSearchStrategy = new GSearchStrategy(gProperties, httpConnectFactory);
     }
     /**
      * 测试：获得google搜索结果
@@ -77,10 +84,10 @@ public class GSearchStrategyTests {
         
         // Mock the http connection 
         HttpURLConnection mockConnection = mock(HttpURLConnection.class);
-        when(mockConnection.getRequestMethod()).thenReturn("GET");
         when(mockConnection.getResponseCode()).thenReturn(HttpURLConnection.HTTP_OK);
         String mockResponse = "{\"items\":[{\"title\":\"openeuler开源社区\",\"link\":\"http://euler.com\",\"snippet\":\"openeuler提供了一系列...\"}]}";
         when(mockConnection.getInputStream()).thenReturn(new ByteArrayInputStream(mockResponse.getBytes(StandardCharsets.UTF_8)));
+        when(httpConnectFactory.createConnection(anyString())).thenReturn(mockConnection);
 
         // Perform the search
         Component result = gSearchStrategy.search(searchCondition);
@@ -109,6 +116,8 @@ public class GSearchStrategyTests {
 
         // Mock the http connection
         HttpURLConnection mockConnection = mock(HttpURLConnection.class);
+        when(mockConnection.getResponseCode()).thenReturn(HttpURLConnection.HTTP_BAD_REQUEST);
+        when(httpConnectFactory.createConnection(anyString())).thenReturn(mockConnection);
 
         // Perform the search
         Component result = gSearchStrategy.search(searchCondition);
