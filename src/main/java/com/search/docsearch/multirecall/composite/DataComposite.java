@@ -12,9 +12,13 @@ package com.search.docsearch.multirecall.composite;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.search.docsearch.constant.Constants;
+import com.search.docsearch.utils.MergeUtil;
  
 public class DataComposite implements Component {
 
@@ -110,8 +114,40 @@ public class DataComposite implements Component {
                 aresList.add(pos, bresList.get(pos));
             }
         }
-
+        
         ares.put("records", aresList);
         return ares;
-    }
+    }   
+
+    /**
+     * merge the other recall results into one way, based one the index 0 of children
+     * 
+     * @return the merged result lists
+     */
+    public List<Map<String, Object>> weightedMerge(int pageSize){
+        List<Map<String, Object>> mergeList = new ArrayList<>();
+        
+        for (Component recall : this.children){
+            double minScore = Constants.MAX_SCORE;
+            double maxScore = Constants.MIN_SCORE;
+            List<Map<String, Object>>  rcords = (List<Map<String, Object>>) recall.getResList().get("records");
+            // find min and max
+            for (Map<String, Object> entity : rcords) {
+                double score = (double) entity.get("score");
+                minScore = Math.min(score,minScore);
+                maxScore = Math.max(score, maxScore);
+            }
+            // do norm
+            for (Map<String, Object> entity : rcords) {
+                double score = (double) entity.get("score");
+                double normedScore = MergeUtil.normalize(score, minScore, maxScore);
+                entity.put("score", normedScore);
+                mergeList.add(entity);
+            }
+        }
+
+        mergeList = mergeList.stream().sorted((a, b) -> Double.compare((Double) b.get("score"), (Double) a.get("score"))).collect(Collectors.toList());
+       
+        return mergeList.subList(0, Math.min(pageSize, mergeList.size()));
+    } 
 }

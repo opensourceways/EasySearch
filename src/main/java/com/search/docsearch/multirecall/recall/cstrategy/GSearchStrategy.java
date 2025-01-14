@@ -138,7 +138,7 @@ public class GSearchStrategy implements SearchStrategy {
                             } else {
                                 map.put("lang", "zh");
                             }
-                            map.put("score", 5000 - (count + start) * 50);
+                            map.put("score", (double) (5000 - (count + start) * 50));
                             count++;
                             data.add(map);
                         }
