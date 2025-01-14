@@ -160,6 +160,9 @@ public class EsSearchStrategy implements SearchStrategy {
                 else {
                     map.put("score", score*1.0);
                 }
+            } else {
+                Double score = (double) hit.getScore();
+                map.put("score", score);
             }
             if (highlightFields.containsKey("title")) {
                 map.put("title", highlightFields.get("title").getFragments()[0].toString());
