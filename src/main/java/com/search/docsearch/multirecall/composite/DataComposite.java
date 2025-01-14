@@ -97,6 +97,19 @@ public class DataComposite implements Component {
      * 
      */
     public Map<String, Object> mergeResult(){
+        Map<String, Object> baseRes = this.getChild(0).getResList();
+        int pageSize = (int) baseRes.get("pageSize");
+        List<Map<String, Object>> mergedList = weightedMerge(pageSize);
+        baseRes.put("records", mergedList);
+        return baseRes;
+    }   
+
+    /**
+     * merge the other recall results into one way, based one the index 0 of children
+     * 
+     * @return the merged result lists
+     */
+    private Map<String, Object> postionMerge(){
         if (children.size() <= 1) return this.getChild(0).getResList();
 
         Component a = children.get(0);
@@ -114,10 +127,9 @@ public class DataComposite implements Component {
                 aresList.add(pos, bresList.get(pos));
             }
         }
-        
         ares.put("records", aresList);
         return ares;
-    }   
+    }
 
     /**
      * merge the other recall results into one way, based one the index 0 of children
