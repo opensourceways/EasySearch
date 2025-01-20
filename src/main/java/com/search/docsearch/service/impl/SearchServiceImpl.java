@@ -354,6 +354,9 @@ public class SearchServiceImpl implements SearchService {
         sourceBuilder.highlighter(highlightBuilder);
         sourceBuilder.from(startIndex).size(condition.getPageSize());
         sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
+        if ("desc".equals(condition.getSort())) {
+            sourceBuilder.sort("date", SortOrder.DESC);
+        }
         request.source(sourceBuilder);
         return request;
     }
