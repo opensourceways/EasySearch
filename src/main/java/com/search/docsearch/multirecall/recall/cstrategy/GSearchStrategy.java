@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -139,9 +140,13 @@ public class GSearchStrategy implements SearchStrategy {
                         for (JsonNode termNode : termsNode) {
                             Map<String, Object> map = new HashMap<>();
                             String highlightTittle = highLightContent(condition.getKeyword(),termNode.get("title").asText());
-                            String highlightText = highLightContent(condition.getKeyword(),termNode.get("title").asText());
+                            String highlightText = highLightContent(condition.getKeyword(),termNode.get("snippet").asText());
                             map.put("title", highlightTittle);
-                            map.put("path", termNode.get("link").asText());
+                            String path = termNode.get("link").asText();
+                            path = path.replace("http:", "https:");
+                            map.put("path", path);
+                            String type = parseTypeByPath(path);
+                            map.put("type", type);
                             map.put("textContent", highlightText);
                             if ("lang_en".equals(googleSearchParams.getLr())) {
                                 map.put("lang", "en");
@@ -192,4 +197,30 @@ public class GSearchStrategy implements SearchStrategy {
         return lightContent;
     }
 
+    /**
+     * parse google  path to a type params
+     * 
+     * @param path the google search link
+     * @return type content string
+     */
+    public String parseTypeByPath(String path){
+        String type = "other";
+        HashSet<String> hashSet = new HashSet<>(gProperties.getTypeList());
+        String flag = "zh/";
+        if (path.indexOf(flag) == -1) {
+            flag = "en/";
+        }
+        String[] spliteArray = path.split(flag);
+        if (spliteArray.length < 2) {
+            return type;
+        } else {
+            int index = spliteArray[1].indexOf("/");
+            if (index != -1 && hashSet.contains(spliteArray[1].substring(0, index))) {
+                type = spliteArray[1].substring(0, index);
+            } else {
+                return type;
+            }
+        }
+        return type;
+    }
 }
