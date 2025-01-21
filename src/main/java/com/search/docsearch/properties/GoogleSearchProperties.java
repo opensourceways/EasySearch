@@ -10,6 +10,8 @@
 */
 package com.search.docsearch.properties;
 
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -33,4 +35,8 @@ public class GoogleSearchProperties {
      * The URL template for the Google Search API.
      */
     private String url;
+    /**
+     * The list of parsing google search link to type.
+     */
+    private List<String> typeList;
 }

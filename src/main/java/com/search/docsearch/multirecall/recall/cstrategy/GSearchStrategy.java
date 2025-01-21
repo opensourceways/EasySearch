@@ -14,20 +14,23 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.HtmlUtils;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.huaban.analysis.jieba.JiebaSegmenter;
 import com.search.docsearch.entity.vo.GoogleSearchParams;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.except.ServiceImplException;
@@ -53,9 +56,15 @@ public class GSearchStrategy implements SearchStrategy {
      */
     private HttpConnectFactory httpConnectFactory;
 
+   /**
+     * jieba segmenter 
+     */
+    private JiebaSegmenter segmenter;
+
     public GSearchStrategy(GoogleSearchProperties gProperties, HttpConnectFactory httpConnectFactory) {
         this.gProperties = gProperties;
         this.httpConnectFactory = httpConnectFactory;
+        this.segmenter = new JiebaSegmenter();
     }
 
     /**
@@ -130,9 +139,15 @@ public class GSearchStrategy implements SearchStrategy {
                     if (termsNode.isArray()) {
                         for (JsonNode termNode : termsNode) {
                             Map<String, Object> map = new HashMap<>();
-                            map.put("title", termNode.get("title").asText());
-                            map.put("path", termNode.get("link").asText());
-                            map.put("textContent", termNode.get("snippet").asText());
+                            String highlightTittle = highLightContent(condition.getKeyword(),termNode.get("title").asText());
+                            String highlightText = highLightContent(condition.getKeyword(),termNode.get("snippet").asText());
+                            map.put("title", highlightTittle);
+                            String path = termNode.get("link").asText();
+                            path = path.replace("http:", "https:");
+                            map.put("path", path);
+                            String type = parseTypeByPath(path);
+                            map.put("type", type);
+                            map.put("textContent", highlightText);
                             if ("lang_en".equals(googleSearchParams.getLr())) {
                                 map.put("lang", "en");
                             } else {
@@ -157,5 +172,55 @@ public class GSearchStrategy implements SearchStrategy {
             connection.disconnect();
         }
         return null;
+    }
+
+    /**
+     * doing the recall according user query 
+     * 
+     * @param searchkey the user query
+     * @param content the text contnt
+     * @return text content with highlight
+     */
+    public String highLightContent(String searchkey, String content){
+        List<String> segments = this.segmenter.sentenceProcess(searchkey);
+        String lightContent = content;
+        for (String keyword : segments){
+            Pattern pattern = Pattern.compile(Pattern.quote(keyword));
+            Matcher matcher = pattern.matcher(lightContent);
+            StringBuffer result = new StringBuffer();
+            while (matcher.find()) {
+                matcher.appendReplacement(result, "<span>" + matcher.group() + "</span>");
+            }   
+            matcher.appendTail(result);
+            lightContent = result.toString();
+        }
+        return lightContent;
+    }
+
+    /**
+     * parse google  path to a type params
+     * 
+     * @param path the google search link
+     * @return type content string
+     */
+    public String parseTypeByPath(String path){
+        String type = "other";
+        HashSet<String> hashSet = new HashSet<>(gProperties.getTypeList());
+        String flag = "zh/";
+        if (path.indexOf(flag) == -1) {
+            flag = "en/";
+        }
+        String[] spliteArray = path.split(flag);
+        if (spliteArray.length < 2) {
+            return type;
+        } else {
+            int index = spliteArray[1].indexOf("/");
+            if (index != -1 && hashSet.contains(spliteArray[1].substring(0, index))) {
+                type = spliteArray[1].substring(0, index);
+            } else {
+                return type;
+            }
+        }
+        return type;
     }
 }
