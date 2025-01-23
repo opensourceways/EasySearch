@@ -40,11 +40,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 import com.search.docsearch.utils.Trie;
 import com.search.docsearch.config.EsfunctionScoreConfig;
+import com.search.docsearch.constant.Constants;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.except.ServiceImplException;
 import com.search.docsearch.multirecall.composite.Component;
 import com.search.docsearch.multirecall.composite.cdata.EsRecallData;
 import com.search.docsearch.multirecall.recall.SearchStrategy;
+import com.search.docsearch.properties.FusionSortProperties;
 import com.search.docsearch.utils.General;
 import org.elasticsearch.client.RestHighLevelClient;
 
@@ -80,6 +82,11 @@ public class EsSearchStrategy implements SearchStrategy {
     private EsfunctionScoreConfig esfunctionScoreConfig;
 
     /**
+     * insert fusion sort properties
+     */
+    private FusionSortProperties fuProperties;
+
+    /**
      * roughly filter the recalled results
      * 
      * @param pararestHighLevelClient paraClient mannage by spring aoc
@@ -87,11 +94,12 @@ public class EsSearchStrategy implements SearchStrategy {
      * @param paratire the algorithim toolkit
      * @param config the boost socre config which used to ranking the result list
      */
-    public EsSearchStrategy(RestHighLevelClient pararestHighLevelClient, String paraindex, Trie paratire,EsfunctionScoreConfig config){
+    public EsSearchStrategy(RestHighLevelClient pararestHighLevelClient, String paraindex, Trie paratire,EsfunctionScoreConfig config, FusionSortProperties fuProperties){
         this.restHighLevelClient = pararestHighLevelClient;
         this.index = paraindex;
         this.trie = paratire;
         this.esfunctionScoreConfig = config;
+        this.fuProperties = fuProperties;
     }
 
     /**
@@ -167,7 +175,8 @@ public class EsSearchStrategy implements SearchStrategy {
             if (highlightFields.containsKey("title")) {
                 map.put("title", highlightFields.get("title").getFragments()[0].toString());
             }
-
+            reCaculateScore(map);
+            map.put("recallType", "E");
             data.add(map);
         }
         if (data.isEmpty()) {
@@ -186,13 +195,32 @@ public class EsSearchStrategy implements SearchStrategy {
     }
 
     /**
+     * caculate the es recall data by using the date 
+     * 
+     * @param entity the map entity of search result
+     */
+    public void reCaculateScore(Map<String, Object> entity) {
+        double score = (double) entity.get("score");
+            if (entity.containsKey("date")) {
+                String[] parts = entity.get("date").toString().split("-");
+                int year = Integer.parseInt(parts[0]);
+                int month = Integer.parseInt(parts[1]);
+                int day = Integer.parseInt(parts[2]);
+                List<Double> dateWeight = fuProperties.getDateWeight();
+                score += (year * dateWeight.get(0) + month * dateWeight.get(1) + day * dateWeight.get(2));
+                entity.put("score", score);
+            }
+    }
+
+    /**
      * build the es qeury from search condition 
      * 
      * @param condition the user query
      * @param index the search index
      */
     private SearchRequest BuildSearchRequest(SearchCondition condition, String index) {
-        int startIndex = (condition.getPage() - 1) * condition.getPageSize();
+        int startIndex = Constants.ES_START;
+        int num = (Constants.ES_NUM > (condition.getPage() * condition.getPageSize()) ? Constants.ES_NUM : condition.getPage() * condition.getPageSize());
         SearchRequest request = new SearchRequest(index);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -288,7 +316,7 @@ public class EsSearchStrategy implements SearchStrategy {
                 .preTags("<span>")
                 .postTags("</span>");
         sourceBuilder.highlighter(highlightBuilder);
-        sourceBuilder.from(startIndex).size(condition.getPageSize());
+        sourceBuilder.from(startIndex).size(num);
         sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
         request.source(sourceBuilder);
         return request;

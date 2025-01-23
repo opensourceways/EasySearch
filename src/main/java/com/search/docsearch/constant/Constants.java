@@ -21,7 +21,6 @@ public class Constants {
 
     public static final String HTTPS_PREFIX = "https://";
 
-
     /**
      * Maxsocre that used to normlize the result
      */
@@ -31,4 +30,24 @@ public class Constants {
      * Min socre that used to normlize the result
      */
     public static final int MIN_SCORE = -1;
+
+    /**
+     * Google search start
+     */
+    public static final int GOOGLE_START = 1;
+
+    /**
+     * Google search num
+     */
+    public static final int GOOGLE_NUM = 10;
+
+    /**
+     * ES search start
+     */
+    public static final int ES_START = 1;
+
+    /**
+     * ES search num
+     */
+    public static final int ES_NUM = 100;
 }
