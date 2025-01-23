@@ -95,6 +95,9 @@ public class GSearchStrategy implements SearchStrategy {
      * @throws IOException
      */
     private Component searchByCondition(SearchCondition condition) throws ServiceImplException, IOException {
+        if (!"".equals(condition.getType())) {
+            return null;
+        }
         // google search 处理无效字符
         condition.setKeyword(condition.getKeyword().replace(" ", ""));
         condition.setKeyword(condition.getKeyword().replace(".", ""));
