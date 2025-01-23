@@ -50,4 +50,9 @@ public class Constants {
      * ES search num
      */
     public static final int ES_NUM = 100;
+
+    /**
+     * set score to CONSTANT_SCORE when normalize failed
+     */
+    public static final int CONSTANT_SCORE = 1;
 }

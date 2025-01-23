@@ -163,8 +163,14 @@ public class DataComposite implements Component {
             // do norm
             for (Map<String, Object> entity : rcords) {
                 double score = (double) entity.get("score");
-                double normedScore = MergeUtil.normalize(score, minScore, maxScore);
-                entity.put("score", normedScore);
+                try {
+                    double normedScore = MergeUtil.normalize(score, minScore, maxScore);
+                    entity.put("score", normedScore);
+                } catch (IllegalArgumentException e) {
+                    LOGGER.error("failed normalize score, google recall 1 resuslts");
+                    entity.put("score", Constants.CONSTANT_SCORE);
+                }
+                
                 mergeList.add(entity);
             }
             // do fuse
