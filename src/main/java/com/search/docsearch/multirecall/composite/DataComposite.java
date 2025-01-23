@@ -184,7 +184,7 @@ public class DataComposite implements Component {
                 if ("E".equals(entity.get("recallType"))) {
                     entity.put("score", initScore + score * (double)fuProperties.getEsRecallWeight());
                 } else {
-                    entity.put("score", initScore + score * (double)fuProperties.getGRecallWeight());
+                    entity.put("score", initScore + score * (double)fuProperties.getGRecallWeight() + Constants.MAGIC_SCORE);
                 }
                 hashMap.put((String) entity.get("path"), entity);
             }
@@ -197,6 +197,6 @@ public class DataComposite implements Component {
 
         resList = resList.stream().sorted((a, b) -> Double.compare((Double) b.get("score"), (Double) a.get("score"))).collect(Collectors.toList());
 
-        return resList.subList((page - 1) * pageSize, Math.min(page * pageSize,  resList.size()));
+        return resList.subList(0 , Math.min(pageSize,  resList.size()));
     }
 }

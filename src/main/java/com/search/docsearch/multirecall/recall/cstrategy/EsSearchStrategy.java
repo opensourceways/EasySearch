@@ -219,8 +219,7 @@ public class EsSearchStrategy implements SearchStrategy {
      * @param index the search index
      */
     private SearchRequest BuildSearchRequest(SearchCondition condition, String index) {
-        int startIndex = Constants.ES_START;
-        int num = (Constants.ES_NUM > (condition.getPage() * condition.getPageSize()) ? Constants.ES_NUM : condition.getPage() * condition.getPageSize());
+        int startIndex = (condition.getPage() - 1) * condition.getPageSize();
         SearchRequest request = new SearchRequest(index);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -316,7 +315,7 @@ public class EsSearchStrategy implements SearchStrategy {
                 .preTags("<span>")
                 .postTags("</span>");
         sourceBuilder.highlighter(highlightBuilder);
-        sourceBuilder.from(startIndex).size(num);
+        sourceBuilder.from(startIndex).size(condition.getPageSize());
         sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
         request.source(sourceBuilder);
         return request;

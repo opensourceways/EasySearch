@@ -55,4 +55,9 @@ public class Constants {
      * set score to CONSTANT_SCORE when normalize failed
      */
     public static final double CONSTANT_SCORE = 1.0;
+
+    /**
+     * set MAGIC_SCORE to boost google search
+     */
+    public static final double MAGIC_SCORE = 0.3;
 }
