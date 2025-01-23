@@ -54,5 +54,5 @@ public class Constants {
     /**
      * set score to CONSTANT_SCORE when normalize failed
      */
-    public static final int CONSTANT_SCORE = 1;
+    public static final double CONSTANT_SCORE = 1.0;
 }

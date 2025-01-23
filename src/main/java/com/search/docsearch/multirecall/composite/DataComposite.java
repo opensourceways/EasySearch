@@ -197,6 +197,6 @@ public class DataComposite implements Component {
 
         resList = resList.stream().sorted((a, b) -> Double.compare((Double) b.get("score"), (Double) a.get("score"))).collect(Collectors.toList());
 
-        return resList.subList((page - 1) * pageSize, Math.min(pageSize, resList.size() - (page - 1) * pageSize));
+        return resList.subList((page - 1) * pageSize, Math.min(page * pageSize,  resList.size()));
     }
 }
