@@ -237,6 +237,9 @@ public class SearchServiceImpl implements SearchService {
         multirecall.setSearchStrategy(gRecall);
         //do recall and fetch the result
         DataComposite multiRecallRes = multirecall.executeMultiSearch(condition);
+        if ("desc".equals(condition.getSort())) {
+            return multiRecallRes.getChild(0).getResList();
+        }
         multiRecallRes.setFuProperties(fuProperties);
         // multiRecallRes.filter("policy")  filtering data here
         return multiRecallRes.mergeResult();
@@ -342,6 +345,9 @@ public class SearchServiceImpl implements SearchService {
         sourceBuilder.highlighter(highlightBuilder);
         sourceBuilder.from(startIndex).size(condition.getPageSize());
         sourceBuilder.timeout(TimeValue.timeValueMinutes(1L));
+        if ("desc".equals(condition.getSort())) {
+            sourceBuilder.sort("date", SortOrder.DESC);
+        }
         request.source(sourceBuilder);
         return request;
     }
