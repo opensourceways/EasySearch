@@ -40,7 +40,7 @@ public class SearchCondition {
     private List<Map<String, String>> filter;
 
     /**
-     * 按时间排序
+     * sort by time
      */
     private String sort;
 }

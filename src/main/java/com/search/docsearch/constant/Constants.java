@@ -44,7 +44,7 @@ public class Constants {
     /**
      * ES search start
      */
-    public static final int ES_START = 1;
+    public static final int ES_START = 0;
 
     /**
      * ES search num

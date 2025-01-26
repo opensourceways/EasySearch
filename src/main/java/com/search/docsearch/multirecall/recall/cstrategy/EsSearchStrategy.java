@@ -202,6 +202,7 @@ public class EsSearchStrategy implements SearchStrategy {
      */
     public void reCaculateScore(Map<String, Object> entity) {
         double score = (double) entity.get("score");
+        try {
             if (entity.containsKey("date")) {
                 String[] parts = entity.get("date").toString().split("-");
                 int year = Integer.parseInt(parts[0]);
@@ -211,6 +212,9 @@ public class EsSearchStrategy implements SearchStrategy {
                 score += (year * dateWeight.get(0) + month * dateWeight.get(1) + day * dateWeight.get(2));
                 entity.put("score", score);
             }
+        } catch (Exception e) {
+            LOGGER.error("es recall score caculate error: {}", e.getMessage());
+        }
     }
 
     /**
