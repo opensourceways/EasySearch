@@ -38,4 +38,9 @@ public class SearchCondition {
     private List<Map<String, String>> limit;
     @Size(max = 30)
     private List<Map<String, String>> filter;
+
+    /**
+     * sort by time
+     */
+    private String sort;
 }

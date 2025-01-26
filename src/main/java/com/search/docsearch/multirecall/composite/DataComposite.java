@@ -10,22 +10,31 @@
 */
 package com.search.docsearch.multirecall.composite;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import lombok.Data;
 
 import com.search.docsearch.constant.Constants;
+import com.search.docsearch.properties.FusionSortProperties;
 import com.search.docsearch.utils.MergeUtil;
- 
+
+@Data
 public class DataComposite implements Component {
 
     /**
      * logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(Component.class);
+
+    /**
+     * insert fusion sort properties
+     */
+    private FusionSortProperties fuProperties;
     
     /**
      * Recall results list.
@@ -99,7 +108,8 @@ public class DataComposite implements Component {
     public Map<String, Object> mergeResult(){
         Map<String, Object> baseRes = this.getChild(0).getResList();
         int pageSize = (int) baseRes.get("pageSize");
-        List<Map<String, Object>> mergedList = weightedMerge(pageSize);
+        int page = (int) baseRes.get("page");
+        List<Map<String, Object>> mergedList = weightedMerge(page, pageSize);
         baseRes.put("records", mergedList);
         return baseRes;
     }   
@@ -136,9 +146,10 @@ public class DataComposite implements Component {
      * 
      * @return the merged result lists
      */
-    public List<Map<String, Object>> weightedMerge(int pageSize){
+    public List<Map<String, Object>> weightedMerge(int page, int pageSize){
         List<Map<String, Object>> mergeList = new ArrayList<>();
         
+        Map<String, Object> hashMap = new HashMap();
         for (Component recall : this.children){
             double minScore = Constants.MAX_SCORE;
             double maxScore = Constants.MIN_SCORE;
@@ -152,14 +163,40 @@ public class DataComposite implements Component {
             // do norm
             for (Map<String, Object> entity : rcords) {
                 double score = (double) entity.get("score");
-                double normedScore = MergeUtil.normalize(score, minScore, maxScore);
-                entity.put("score", normedScore);
+                try {
+                    double normedScore = MergeUtil.normalize(score, minScore, maxScore);
+                    entity.put("score", normedScore);
+                } catch (IllegalArgumentException e) {
+                    LOGGER.error("failed normalize score, google recall 1 resuslts");
+                    entity.put("score", Constants.CONSTANT_SCORE);
+                }
+                
                 mergeList.add(entity);
             }
+            // do fuse
+            for(Map<String, Object> entity : mergeList) {
+                double score = (double) entity.get("score");
+                double initScore = 0;
+                if (hashMap.containsKey(entity.get("path"))) {
+                    Map<String, Object> preMap = (Map<String, Object>) hashMap.get(entity.get("path"));
+                    initScore = (double) preMap.get("score");   
+                }
+                if ("E".equals(entity.get("recallType"))) {
+                    entity.put("score", initScore + score * (double)fuProperties.getEsRecallWeight());
+                } else {
+                    entity.put("score", initScore + score * (double)fuProperties.getGRecallWeight() + Constants.MAGIC_SCORE);
+                }
+                hashMap.put((String) entity.get("path"), entity);
+            }
+        }
+        List<Map<String, Object>> resList = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : hashMap.entrySet()) {
+            Map<String, Object> value = (Map<String, Object>) entry.getValue();
+            resList.add(value);
         }
 
-        mergeList = mergeList.stream().sorted((a, b) -> Double.compare((Double) b.get("score"), (Double) a.get("score"))).collect(Collectors.toList());
-       
-        return mergeList.subList(0, Math.min(pageSize, mergeList.size()));
-    } 
+        resList = resList.stream().sorted((a, b) -> Double.compare((Double) b.get("score"), (Double) a.get("score"))).collect(Collectors.toList());
+
+        return resList.subList(0 , Math.min(pageSize,  resList.size()));
+    }
 }

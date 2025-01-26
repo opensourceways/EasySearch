@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huaban.analysis.jieba.JiebaSegmenter;
+import com.search.docsearch.constant.Constants;
 import com.search.docsearch.entity.vo.GoogleSearchParams;
 import com.search.docsearch.entity.vo.SearchCondition;
 import com.search.docsearch.except.ServiceImplException;
@@ -94,6 +95,9 @@ public class GSearchStrategy implements SearchStrategy {
      * @throws IOException
      */
     private Component searchByCondition(SearchCondition condition) throws ServiceImplException, IOException {
+        if (!"".equals(condition.getType())) {
+            return null;
+        }
         // google search 处理无效字符
         condition.setKeyword(condition.getKeyword().replace(" ", ""));
         condition.setKeyword(condition.getKeyword().replace(".", ""));
@@ -103,7 +107,7 @@ public class GSearchStrategy implements SearchStrategy {
             googleSearchParams.setLr("lang_en");
         }
         int start = (condition.getPage() - 1) * condition.getPageSize() + 1;
-        int num = Math.min(10, condition.getPageSize());
+        int num = Constants.GOOGLE_NUM;
         if(start + num > 100) {
             return null;
         } else {
@@ -154,6 +158,7 @@ public class GSearchStrategy implements SearchStrategy {
                                 map.put("lang", "zh");
                             }
                             map.put("score", (double) (5000 - (count + start) * 50));
+                            map.put("recallType","G");
                             count++;
                             data.add(map);
                         }
@@ -185,12 +190,12 @@ public class GSearchStrategy implements SearchStrategy {
         List<String> segments = this.segmenter.sentenceProcess(searchkey);
         String lightContent = content;
         for (String keyword : segments){
-            Pattern pattern = Pattern.compile(Pattern.quote(keyword));
+            Pattern pattern = Pattern.compile(Pattern.quote(keyword), Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(lightContent);
             StringBuffer result = new StringBuffer();
             while (matcher.find()) {
                 matcher.appendReplacement(result, "<span>" + matcher.group() + "</span>");
-            }   
+            }
             matcher.appendTail(result);
             lightContent = result.toString();
         }
