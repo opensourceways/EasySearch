@@ -220,6 +220,7 @@ public class SearchServiceImpl implements SearchService {
 
     }
 
+
     /**
      * main page doc search
      *
@@ -227,7 +228,29 @@ public class SearchServiceImpl implements SearchService {
      * @return the search results
      */
     @Override
-    public Map<String, Object> searchByCondition(SearchCondition condition) throws ServiceImplException {
+    public Map<String, Object> searchByConditionEs(SearchCondition condition) throws ServiceImplException {
+        //create es search strategy
+        EsSearchStrategy esRecall = new EsSearchStrategy(restHighLevelClient,mySystem.index,trie,esfunctionScoreConfig,fuProperties);
+        MultiSearchContext multirecall = new MultiSearchContext();
+        //set es search into search contex
+        multirecall.setSearchStrategy(esRecall);
+        //do recall and fetch the result
+        DataComposite multiRecallRes = multirecall.executeMultiSearch(condition);
+        if ("desc".equals(condition.getSort())) {
+            return multiRecallRes.getChild(0).getResList();
+        }
+        multiRecallRes.setFuProperties(fuProperties);
+        return multiRecallRes.mergeResult();
+    }
+
+    /**
+     * multi doc search
+     *
+     * @param condition the user query
+     * @return the search results
+     */
+    @Override
+    public Map<String, Object> searchByConditionMulti(SearchCondition condition) throws ServiceImplException {
         //create es search strategy
         EsSearchStrategy esRecall = new EsSearchStrategy(restHighLevelClient,mySystem.index,trie,esfunctionScoreConfig,fuProperties);
         GSearchStrategy gRecall = new GSearchStrategy(gProperties, httpConnectFactory);
@@ -243,7 +266,6 @@ public class SearchServiceImpl implements SearchService {
         multiRecallRes.setFuProperties(fuProperties);
         // multiRecallRes.filter("policy")  filtering data here
         return multiRecallRes.mergeResult();
-        //return multiRecallRes.getChild(1).getResList();
     }
 
     public SearchRequest BuildSearchRequest(SearchCondition condition, String index) {

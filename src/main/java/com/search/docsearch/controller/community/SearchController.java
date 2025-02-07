@@ -56,7 +56,31 @@ public class SearchController {
         ParameterUtil.vaildListMap(condition.getLimit());
         ParameterUtil.vaildListMap(condition.getFilter());
         try {
-            Map<String, Object> result = searchService.searchByCondition(condition);
+            Map<String, Object> result = searchService.searchByConditionEs(condition);
+            if (result == null) {
+                return SysResult.fail("内容不存在", null);
+            }
+            return SysResult.ok("查询成功", result);
+        } catch (ControllerException e) {
+            log.error("searchByCondition error is: " + e.getMessage());
+        }
+        return SysResult.fail("查询失败", null);
+    }
+
+    /**
+     * 查询文档，首页大搜索-多路召回接口
+     *
+     * @param condition 封装查询条件
+     * @return 搜索结果
+     */
+    @LogAction(type = "Global multi-search", OperationResource = "Documents")
+    @PostMapping("docsng")
+    @LimitRequest()
+    public SysResult multisearchDocByKeyword(@RequestBody @Validated SearchCondition condition) {
+        ParameterUtil.vaildListMap(condition.getLimit());
+        ParameterUtil.vaildListMap(condition.getFilter());
+        try {
+            Map<String, Object> result = searchService.searchByConditionMulti(condition);
             if (result == null) {
                 return SysResult.fail("内容不存在", null);
             }
