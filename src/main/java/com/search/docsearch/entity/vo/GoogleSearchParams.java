@@ -48,7 +48,7 @@ public class GoogleSearchParams {
     private String lr;
     public String buildUrl(String url, String api, String cx) {
         String urlString = url + "?key=" + api + "&q=" + keyWord + "&cx=" + cx
-                + "&start=" + start + "&num=" + num + "&lr=" + lr;
+                + "&start=" + start + "&num=" + num + "&lr=" + lr + "&hq=openeuler";
         return urlString;
     }
 }
