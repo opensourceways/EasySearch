@@ -104,7 +104,15 @@ public class DivideServiceImpl implements DivideService {
         sourceBuilder.from(startIndex).size(pageSize);
         sourceBuilder.query(boolQueryBuilder);
 
-        sourceBuilder.sort("date", SortOrder.DESC);
+        if ("showcase".equals(category)) {
+            if (search.containsKey("industry")) {
+                sourceBuilder.sort("typeOrder", SortOrder.DESC);
+            } else {
+                sourceBuilder.sort("allOrder", SortOrder.DESC);
+            }
+        } else {
+            sourceBuilder.sort("date", SortOrder.DESC);
+        }
 
         request.source(sourceBuilder);
 
