@@ -241,7 +241,7 @@ public class GSearchStrategy implements SearchStrategy {
      */
     public String reHandlePath(String path, String type){
         path = path.replace("http:", "https:");
-        if ("docs".equals(type) || "news".equals(type) || "blog".equals(type)) {
+        if ("docs".equals(type)) {
             String flag = "zh/";
             if (path.indexOf(flag) == -1) {
                 flag = "en/";
@@ -250,7 +250,7 @@ public class GSearchStrategy implements SearchStrategy {
             path = path.substring(index);
             path = path.replaceAll(".html", "");
         } else if ("forum".equals(type)) {
-            String flag = "t/";
+            String flag = "/t/";
             int index = path.indexOf(flag);
             path = path.substring(index);
         }
