@@ -46,9 +46,9 @@ public class GoogleSearchParams {
      * The language restriction for the search.
      */
     private String lr;
-    public String buildUrl(String url, String api, String cx) {
+    public String buildUrl(String url, String api, String cx, String hq) {
         String urlString = url + "?key=" + api + "&q=" + keyWord + "&cx=" + cx
-                + "&start=" + start + "&num=" + num + "&lr=" + lr + "&hq=openeuler";
+                + "&start=" + start + "&num=" + num + "&lr=" + lr + "&hq=" + hq;
         return urlString;
     }
 }

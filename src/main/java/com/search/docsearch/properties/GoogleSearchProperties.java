@@ -36,6 +36,10 @@ public class GoogleSearchProperties {
      */
     private String url;
     /**
+     * The hq params of API to manage the search range.
+     */
+    private String hq;
+    /**
      * The list of parsing google search link to type.
      */
     private List<String> typeList;
