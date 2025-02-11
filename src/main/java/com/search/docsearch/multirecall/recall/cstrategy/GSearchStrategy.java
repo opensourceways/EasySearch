@@ -116,7 +116,7 @@ public class GSearchStrategy implements SearchStrategy {
         }
         int count = 0;
         String keyWord = googleSearchParams.getKeyWord();
-        String urlString = googleSearchParams.buildUrl(gProperties.getUrl(), gProperties.getKey(), gProperties.getCx());
+        String urlString = googleSearchParams.buildUrl(gProperties.getUrl(), gProperties.getKey(), gProperties.getCx(), gProperties.getHq());
         // 创建connection对象
         HttpURLConnection connection = httpConnectFactory.createConnection(urlString);
         try {
@@ -147,10 +147,10 @@ public class GSearchStrategy implements SearchStrategy {
                             String highlightText = highLightContent(condition.getKeyword(),termNode.get("snippet").asText());
                             map.put("title", highlightTittle);
                             String path = termNode.get("link").asText();
-                            path = path.replace("http:", "https:");
-                            map.put("path", path);
                             String type = parseTypeByPath(path);
                             map.put("type", type);
+                            path = reHandlePath(path, type);
+                            map.put("path", path);
                             map.put("textContent", highlightText);
                             if ("lang_en".equals(googleSearchParams.getLr())) {
                                 map.put("lang", "en");
@@ -217,6 +217,9 @@ public class GSearchStrategy implements SearchStrategy {
         }
         String[] spliteArray = path.split(flag);
         if (spliteArray.length < 2) {
+            if (path.indexOf("/t/") != -1 && path.indexOf("forum") != -1) {
+                type = "forum";
+            }
             return type;
         } else {
             int index = spliteArray[1].indexOf("/");
@@ -227,5 +230,30 @@ public class GSearchStrategy implements SearchStrategy {
             }
         }
         return type;
+    }
+
+     /**
+     * parse google  path to a type params
+     * 
+     * @param path the google search link
+     * @param type the google content type
+     * @return type content string
+     */
+    public String reHandlePath(String path, String type){
+        path = path.replace("http:", "https:");
+        if ("docs".equals(type) || "news".equals(type) || "blog".equals(type)) {
+            String flag = "zh/";
+            if (path.indexOf(flag) == -1) {
+                flag = "en/";
+            }
+            int index = path.indexOf(flag);
+            path = path.substring(index);
+            path = path.replaceAll(".html", "");
+        } else if ("forum".equals(type)) {
+            String flag = "t/";
+            int index = path.indexOf(flag);
+            path = path.substring(index);
+        }
+        return path;
     }
 }
