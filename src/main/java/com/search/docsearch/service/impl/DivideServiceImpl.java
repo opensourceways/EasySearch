@@ -16,10 +16,7 @@ import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -36,6 +33,7 @@ import com.search.docsearch.except.ServiceImplException;
 import com.search.docsearch.service.DivideService;
 
 import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Slf4j
 public class DivideServiceImpl implements DivideService {
@@ -71,27 +69,42 @@ public class DivideServiceImpl implements DivideService {
         int page = 1;
         int pageSize = 10;
         String keyword = "";
-
+        String path = "";
+        String version = "";
         for (Map.Entry<String, String> entry : search.entrySet()) {
-            if (entry.getKey().equals("page")) {
-                page = Integer.parseInt(entry.getValue());
-                continue;
-            }
-            if (entry.getKey().equals("pageSize")) {
-                pageSize = Integer.parseInt(entry.getValue());
-                continue;
-            }
-            if (entry.getKey().equals("keyword")) {
-                keyword = entry.getValue();
-                continue;
+            String key = entry.getKey();
+            String value = entry.getValue();
+            switch (key) {
+                case "page":
+                    page = Integer.parseInt(entry.getValue());
+                    continue;
+                case "pageSize":
+                    pageSize = Integer.parseInt(entry.getValue());
+                    continue;
+                case "keyword":
+                    keyword = entry.getValue();
+                    continue;
+                case "path":
+                    path = entry.getValue();
+                    continue;
+                case "version":
+                    version = entry.getValue();
             }
 
-            boolQueryBuilder.filter(QueryBuilders.termQuery(entry.getKey() + ".keyword", entry.getValue()));
+            boolQueryBuilder.filter(QueryBuilders.termQuery(key + ".keyword", value));
         }
+        if ("docs".equals(category) && StringUtils.hasText(path) && StringUtils.hasText(version)) {
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(lang).append("/docs/").append(version).append("/docs/").append(path).append("*");
 
+            WildcardQueryBuilder pathWildcard = QueryBuilders.wildcardQuery("path.keyword",
+                    pathBuilder.toString());
+            pathWildcard.boost(3);
+            boolQueryBuilder.should(pathWildcard);
+        }
         int startIndex = (page - 1) * pageSize;
 
-        if (!keyword.equals("")) {
+        if (StringUtils.hasText(keyword)) {
             MatchQueryBuilder titleMP = QueryBuilders.matchQuery("title", keyword);
             titleMP.boost(2);
             MatchQueryBuilder textContentMP = QueryBuilders.matchQuery("textContent", keyword);
